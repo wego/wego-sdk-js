@@ -1,6 +1,6 @@
 {
   "name": "wego-sdk",
-  "version": "1.0.0",
+  "version": "1.0.0-beta-1",
   "description": "Wego SDK",
   "main": "build/npm.bundle.js",
   "scripts": {
