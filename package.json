@@ -1,0 +1,32 @@
+{
+  "name": "wego-sdk",
+  "version": "1.0.0",
+  "description": "Wego SDK",
+  "main": "build/npm.bundle.js",
+  "scripts": {
+    "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
+    "build": "./node_modules/.bin/webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wego/wego-sdk-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wego/wego-sdk-js/issues"
+  },
+  "homepage": "https://github.com/wego/wego-sdk-js#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "chai-spies": "^0.7.1",
+    "dirty-chai": "^1.2.2",
+    "mocha": "^3.2.0",
+    "sinon": "^2.1.0",
+    "sinon-chai": "^2.9.0",
+    "uglify-js": "^2.8.22",
+    "uglifyjs-webpack-plugin": "^0.4.1",
+    "webpack": "^2.3.3"
+  }
+}
