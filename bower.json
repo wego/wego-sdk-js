@@ -1,0 +1,14 @@
+{
+  "name": "wego-sdk",
+  "description": "Wego SDK",
+  "main": "build/bower.bundle.js",
+  "license": "ISC",
+  "homepage": "https://github.com/wego/wego-sdk-js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

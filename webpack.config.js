@@ -2,10 +2,13 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    npm: "./src/index.js",
+    bower: "./src/bower.js",
+  },
   output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: 'npm.bundle.js'
+    path: path.join(__dirname, "build"),
+    filename: "[name].bundle.js"
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
