@@ -481,17 +481,13 @@ HotelSearchClient.prototype = {
   searchHotels: function(search) {
     this.search = search;
     this.reset();
-    this.updateProgress();
     this.updateResult();
-    this.updateDisplayedFilter();
     this._prepareFetch();
   },
 
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
-    this.updateProgress();
     this.updateResult();
-    this.updateDisplayedFilter();
     this._prepareFetch();
   },
 
@@ -530,12 +526,12 @@ HotelSearchClient.prototype = {
     this.currency = currency;
     this.__merger.updateCurrency(currency);
     this.updateResult();
-    this.updateDisplayedFilter();
   },
 
   updateRateAmenityIds: function(rateAmenityIds) {
     this.rateAmenityIds = rateAmenityIds;
     this.reset();
+    this.updateResult();
     this._prepareFetch();
   },
 
@@ -560,10 +556,8 @@ HotelSearchClient.prototype = {
     var sortedHotels = sorting.sortHotels(filteredHotels, this.sort);
     this.onHotelsChanged(sortedHotels);
     this.onTotalHotelsChanged(hotels);
-  },
-
-  updateDisplayedFilter: function() {
     this.onDisplayedFilterChanged(this.__merger.getFilter());
+    this.updateProgress();
   },
 
   _fetch: function() {
