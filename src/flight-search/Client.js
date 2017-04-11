@@ -29,17 +29,13 @@ FlightSearchClient.prototype = {
   searchTrips: function(search) {
     this.search = search;
     this.reset();
-    this.updateProgress();
     this.updateResult();
-    this.updateDisplayedFilter();
     this._prepareFetch();
   },
 
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
     this.updateResult();
-    this.updateDisplayedFilter();
-    this.updateProgress();
     if (this.__fetchCount === 1) this.onSearchCreated(response.search);
     this._prepareFetch();
   },
@@ -68,12 +64,14 @@ FlightSearchClient.prototype = {
   updatePaymentMethodIds: function(paymentMethodIds) {
     this.paymentMethodIds = paymentMethodIds;
     this.reset();
+    this.updateResult();
     this._prepareFetch();
   },
 
   updateProviderTypes: function(providerTypes) {
     this.providerTypes = providerTypes;
     this.reset();
+    this.updateResult();
     this._prepareFetch();
   },
 
@@ -91,7 +89,6 @@ FlightSearchClient.prototype = {
     this.currency = currency;
     this.__merger.updateCurrency(currency);
     this.updateResult();
-    this.updateDisplayedFilter();
   },
 
   updateProgress: function() {
@@ -110,6 +107,7 @@ FlightSearchClient.prototype = {
   },
 
   updateResult: function() {
+    this.updateProgress();
     var trips = this.__merger.getTrips();
     var filteredTrips = filtering.filterTrips(trips, this.filter);
     var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
@@ -119,9 +117,6 @@ FlightSearchClient.prototype = {
     this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
     this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
     this.onTotalTripsChanged(trips);
-  },
-
-  updateDisplayedFilter: function() {
     this.onDisplayedFilterChanged(this.__merger.getFilter());
   },
 
