@@ -1,6 +1,7 @@
 var FlightSearchMerger = require('./Merger');
 var sorting = require('./sorting');
 var filtering = require('./filtering');
+var Api = require('../Api');
 
 var FlightSearchClient = function(options) {
   options = options || {};
@@ -144,7 +145,7 @@ FlightSearchClient.prototype = {
       aborted = true;
     };
 
-    WegoApi.searchTrips(this._getSearchRequestBody(), {
+    Api.searchTrips(this._getSearchRequestBody(), {
       currencyCode: this.currency.code,
       locale: this.locale,
     }).then(function(response) {

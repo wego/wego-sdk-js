@@ -1,6 +1,7 @@
 var HotelSearchMerger = require('./Merger');
 var sorting = require('./sorting');
 var filtering = require('./filtering');
+var Api = require('../Api');
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -130,7 +131,7 @@ HotelSearchClient.prototype = {
       aborted = true;
     };
 
-    WegoApi.searchHotels(this._getSearchRequestBody(), {
+    Api.searchHotels(this._getSearchRequestBody(), {
       currencyCode: this.currency.code,
       locale: this.locale,
     }).then(function(response) {

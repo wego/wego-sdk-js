@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   entry: {
     npm: "./src/index.js",
-    bower: "./src/bower.js",
+    bower: "./bower_entry.js",
   },
   output: {
     path: path.join(__dirname, "build"),
