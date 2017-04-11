@@ -107,7 +107,6 @@ FlightSearchClient.prototype = {
   },
 
   updateResult: function() {
-    this.updateProgress();
     var trips = this.__merger.getTrips();
     var filteredTrips = filtering.filterTrips(trips, this.filter);
     var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
@@ -118,6 +117,7 @@ FlightSearchClient.prototype = {
     this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
     this.onTotalTripsChanged(trips);
     this.onDisplayedFilterChanged(this.__merger.getFilter());
+    this.updateProgress();
   },
 
   _fetch: function() {
