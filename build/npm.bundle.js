@@ -97,8 +97,8 @@ var utils = {
     var val1 = propertyGetter(item1);
     var val2 = propertyGetter(item2);
     if (val1 === val2) return 0;
-    if (val1 === null || val2 === undefined) return 1;
-    if (val2 === null || val1 === undefined) return -1;
+    if (val1 === null || val1 === undefined) return 1;
+    if (val2 === null || val2 === undefined) return -1;
     return (val1 > val2) === (order === 'ASC') ? 1 : -1;
   },
 
