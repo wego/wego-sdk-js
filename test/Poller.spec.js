@@ -39,9 +39,9 @@ describe('Poller', () => {
     });
 
     it('sets count to 0', function() {
-      poller.count = 10;
+      poller.resultCount = 10;
       poller.reset();
-      expect(poller.count).to.equal(0);
+      expect(poller.resultCount).to.equal(0);
     });
   });
 
@@ -49,7 +49,7 @@ describe('Poller', () => {
     it('is computed by both fetch count and count', function() {
       poller.pollLimit = 10;
       poller.pollCount = 4;
-      poller.count = 200;
+      poller.resultCount = 200;
       expect(poller.getProgress()).to.equal(30);
     });
 
@@ -60,7 +60,7 @@ describe('Poller', () => {
     });
 
     it('returns 100 when count >= 1000', function() {
-      poller.count = 1000;
+      poller.resultCount = 1000;
       expect(poller.getProgress()).to.equal(100);
     });
   });
@@ -125,7 +125,7 @@ describe('Poller', () => {
       poller.handleSuccessResponse({
         count: count,
       });
-      expect(poller.count).to.equal(count);
+      expect(poller.resultCount).to.equal(count);
     });
 
     it('calls onSuccessResponse', () => {

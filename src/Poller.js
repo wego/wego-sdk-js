@@ -13,15 +13,15 @@ Poller.prototype = {
       this.abortLastPoll();
     }
     this.pollCount = 0;
-    this.count = 0;
+    this.resultCount = 0;
   },
 
   getProgress: function() {
-    if (this.pollCount >= this.pollLimit || this.count >= 1000) {
+    if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
       return 100;
     }
 
-    return this.pollCount / this.pollLimit * 50 + this.count / 1000 * 50;
+    return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
   },
 
   start: function() {
@@ -49,7 +49,7 @@ Poller.prototype = {
 
   handleSuccessResponse: function(response) {
     this.onSuccessResponse(response);
-    this.count = response.count;
+    this.resultCount = response.count;
     this.prepareFetch();
   },
 
