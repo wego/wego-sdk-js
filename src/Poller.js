@@ -9,8 +9,8 @@ var Poller = function (options) {
 Poller.prototype = {
   reset: function() {
     clearTimeout(this.timer);
-    if (this.abortLastPoll) {
-      this.abortLastPoll();
+    if (this.abortLastFetch) {
+      this.abortLastFetch();
     }
     this.pollCount = 0;
     this.resultCount = 0;
@@ -25,22 +25,22 @@ Poller.prototype = {
   },
 
   start: function() {
-    this.prepareFetch();
+    this.preparePoll();
   },
 
-  prepareFetch: function() {
+  preparePoll: function() {
     var self = this;
     if (this.pollCount < this.delays.length) {
       this.timer = setTimeout(function() {
-        self.fetch();
+        self.poll();
       }, this.delays[this.pollCount]);
     }
   },
 
-  fetch: function() {
+  poll: function() {
     this.pollCount++;
     this.retryCount = 0;
-    this.poll();
+    this.fetch();
   },
 
   handleErrorResponse: function() {
@@ -50,20 +50,20 @@ Poller.prototype = {
   handleSuccessResponse: function(response) {
     this.onSuccessResponse(response);
     this.resultCount = response.count;
-    this.prepareFetch();
+    this.preparePoll();
   },
 
   retry: function() {
     if (this.retryCount < 3) {
       this.retryCount++;
-      this.poll();
+      this.fetch();
     }
   },
 
-  poll: function() {
+  fetch: function() {
     var self = this;
     var aborted = false;
-    this.abortLastPoll = function() {
+    this.abortLastFetch = function() {
       aborted = true;
     };
 

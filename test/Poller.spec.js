@@ -16,7 +16,7 @@ describe('Poller', () => {
   });
 
   describe('#start', () => {
-    it('calls prepareFetch', () => {
+    it('calls preparePoll', () => {
       poller.delays = [1, 2, 3];
       poller.pollCount = 1;
       poller.timer = null;
@@ -33,9 +33,9 @@ describe('Poller', () => {
     });
 
     it('aborts last request call', () => {
-      poller.abortLastPoll = sinon.spy();
+      poller.abortLastFetch = sinon.spy();
       poller.reset();
-      expect(poller.abortLastPoll).to.have.been.calledOnce();
+      expect(poller.abortLastFetch).to.have.been.calledOnce();
     });
 
     it('sets count to 0', function() {
@@ -65,26 +65,26 @@ describe('Poller', () => {
     });
   });
 
-  describe('#fetch', () => {
+  describe('#poll', () => {
     it('increases pollCount', () => {
       poller.pollCount = 1;
-      poller.fetch();
+      poller.poll();
       expect(poller.pollCount).to.equal(2);
     });
 
     it('resets retryCount', () => {
       poller.retryCount = 2;
-      poller.fetch();
+      poller.poll();
       expect(poller.retryCount).to.equal(0);
     });
   });
 
-  describe('#prepareFetch', () => {
+  describe('#preparePoll', () => {
     it('creates timer when pollCount is smaller than length of delays', () => {
       poller.delays = [1, 2, 3];
       poller.pollCount = 1;
       poller.timer = null;
-      poller.prepareFetch();
+      poller.preparePoll();
       expect(poller.timer).not.equal(null);
     });
 
@@ -92,7 +92,7 @@ describe('Poller', () => {
       poller.delays = [1, 2, 3];
       poller.pollCount = 3;
       poller.timer = null;
-      poller.prepareFetch();
+      poller.preparePoll();
       expect(poller.timer).to.equal(null);
     });
   });
@@ -112,7 +112,7 @@ describe('Poller', () => {
   });
 
   describe('#handleSuccessResponse', () => {
-    it('calls prepareFetch', () => {
+    it('calls preparePoll', () => {
       poller.delays = [1, 2, 3];
       poller.pollCount = 1;
       poller.timer = null;
