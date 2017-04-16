@@ -7,6 +7,10 @@ var Poller = function (options) {
 };
 
 Poller.prototype = {
+  start: function() {
+    this.preparePoll();
+  },
+
   reset: function() {
     clearTimeout(this.timer);
     if (this.abortLastFetch) {
@@ -24,8 +28,14 @@ Poller.prototype = {
     return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
   },
 
-  start: function() {
+  handleSuccessResponse: function(response) {
+    this.onSuccessResponse(response);
+    this.resultCount = response.count;
     this.preparePoll();
+  },
+
+  handleErrorResponse: function() {
+    this.retry();
   },
 
   preparePoll: function() {
@@ -41,16 +51,6 @@ Poller.prototype = {
     this.pollCount++;
     this.retryCount = 0;
     this.fetch();
-  },
-
-  handleErrorResponse: function() {
-    this.retry();
-  },
-
-  handleSuccessResponse: function(response) {
-    this.onSuccessResponse(response);
-    this.resultCount = response.count;
-    this.preparePoll();
   },
 
   retry: function() {
