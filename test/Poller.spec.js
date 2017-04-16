@@ -45,23 +45,23 @@ describe('Poller', () => {
     });
   });
 
-  describe('#progress', function() {
+  describe('#getProgress', function() {
     it('is computed by both fetch count and count', function() {
       poller.pollLimit = 10;
       poller.pollCount = 4;
       poller.count = 200;
-      expect(poller.progress()).to.equal(30);
+      expect(poller.getProgress()).to.equal(30);
     });
 
     it('returns 100 when pollCount >= pollLimit', () => {
       poller.pollLimit = 3;
       poller.pollCount = 3;
-      expect(poller.progress()).to.equal(100);
+      expect(poller.getProgress()).to.equal(100);
     });
 
     it('returns 100 when count >= 1000', function() {
       poller.count = 1000;
-      expect(poller.progress()).to.equal(100);
+      expect(poller.getProgress()).to.equal(100);
     });
   });
 

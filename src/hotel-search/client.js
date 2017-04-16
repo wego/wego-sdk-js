@@ -92,7 +92,7 @@ HotelSearchClient.prototype = {
     this.onHotelsChanged(sortedHotels);
     this.onTotalHotelsChanged(hotels);
     this.onDisplayedFilterChanged(this.merger.getFilter());
-    this.onProgressChanged(this.poller.progress());
+    this.onProgressChanged(this.poller.getProgress());
   },
 
   getSearchRequestBody: function() {

@@ -107,7 +107,7 @@ FlightSearchClient.prototype = {
     this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
     this.onTotalTripsChanged(trips);
     this.onDisplayedFilterChanged(this.merger.getFilter());
-    this.onProgressChanged(this.poller.progress());
+    this.onProgressChanged(this.poller.getProgress());
   },
 
   getSearchRequestBody: function() {

@@ -16,7 +16,7 @@ Poller.prototype = {
     this.count = 0;
   },
 
-  progress: function() {
+  getProgress: function() {
     if (this.pollCount >= this.pollLimit || this.count >= 1000) {
       return 100;
     }
