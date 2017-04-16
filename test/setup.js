@@ -16,3 +16,4 @@ global.AssertionError = chai.AssertionError;
 global.Assertion = chai.Assertion;
 global.assert = chai.assert;
 global.expect.spy = chai.spy;
+global.fetch = function() { return Promise.resolve() };
