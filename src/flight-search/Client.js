@@ -32,8 +32,8 @@ var FlightSearchClient = function(options) {
         locale: self.locale,
       });
     },
-    onSuccessResponse: function() {
-      return self.handleSearchResponse();
+    onSuccessResponse: function(response) {
+      return self.handleSearchResponse(response);
     },
   });
   this.reset();

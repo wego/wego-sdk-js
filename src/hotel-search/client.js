@@ -20,14 +20,17 @@ var HotelSearchClient = function(options) {
 
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
+    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
+    pollLimit: 7,
     callApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale,
       });
     },
-    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
-    pollLimit: 7,
+    onSuccessResponse: function(response) {
+      return self.handleSearchResponse(response);
+    },
   });
   this.reset();
 };
