@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -249,14 +249,101 @@ module.exports = Api;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+var Poller = function (options) {
+  options = options || {};
+  this.callApi = options.callApi;
+  this.delays = options.delays;
+  this.onSuccessResponse = options.onSuccessResponse;
+  this.pollLimit = options.pollLimit;
+};
+
+Poller.prototype = {
+  start: function() {
+    this.preparePoll();
+  },
+
+  reset: function() {
+    clearTimeout(this.timer);
+    if (this.abortLastFetch) {
+      this.abortLastFetch();
+    }
+    this.pollCount = 0;
+    this.resultCount = 0;
+  },
+
+  getProgress: function() {
+    if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
+      return 100;
+    }
+
+    return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
+  },
+
+  handleSuccessResponse: function(response) {
+    this.onSuccessResponse(response);
+    this.resultCount = response.count;
+    this.preparePoll();
+  },
+
+  handleErrorResponse: function() {
+    this.retry();
+  },
+
+  preparePoll: function() {
+    var self = this;
+    if (this.pollCount < this.delays.length) {
+      this.timer = setTimeout(function() {
+        self.poll();
+      }, this.delays[this.pollCount]);
+    }
+  },
+
+  poll: function() {
+    this.pollCount++;
+    this.retryCount = 0;
+    this.fetch();
+  },
+
+  retry: function() {
+    if (this.retryCount < 3) {
+      this.retryCount++;
+      this.fetch();
+    }
+  },
+
+  fetch: function() {
+    var self = this;
+    var aborted = false;
+    this.abortLastFetch = function() {
+      aborted = true;
+    };
+
+    this.callApi().then(function(response) {
+      if (!aborted) {
+        self.handleSuccessResponse(response);
+      }
+    }).catch(function() {
+      self.handleErrorResponse();
+    });
+  },
+};
+
+module.exports = Poller;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(5);
-var sorting = __webpack_require__(8);
-var filtering = __webpack_require__(7);
+var FlightSearchMerger = __webpack_require__(6);
+var sorting = __webpack_require__(9);
+var filtering = __webpack_require__(8);
 var Api = __webpack_require__(1);
+var Poller = __webpack_require__(2);
 
 var FlightSearchClient = function(options) {
+  var self = this;
   options = options || {};
   this.currency  = options.currency || {};
   this.locale = options.locale;
@@ -272,9 +359,21 @@ var FlightSearchClient = function(options) {
   this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
-  this.__delays = [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000];
-  this.__progressStopAfter = 7;
-  this.__merger = new FlightSearchMerger();
+  this.merger = new FlightSearchMerger();
+
+  this.poller = new Poller({
+    delays: [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000],
+    pollLimit: 7,
+    callApi: function() {
+      return Api.searchTrips(self.getSearchRequestBody(), {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+      });
+    },
+    onSuccessResponse: function(response) {
+      return self.handleSearchResponse(response);
+    },
+  });
   this.reset();
 };
 
@@ -283,49 +382,40 @@ FlightSearchClient.prototype = {
     this.search = search;
     this.reset();
     this.updateResult();
-    this._prepareFetch();
+    this.poller.start();
   },
 
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
     this.updateResult();
-    if (this.__fetchCount === 1) this.onSearchCreated(response.search);
-    this._prepareFetch();
-  },
-
-  handleSearchError: function() {
-    this._retry();
+    if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
-    this.__merger.mergeResponse(response);
-    this.__processedFaresCount = response.count;
-    this.__responseSearch = response.search;
+    this.merger.mergeResponse(response);
+    this.processedFaresCount = response.count;
+    this.responseSearch = response.search;
   },
 
   reset: function() {
-    clearTimeout(this.__timer);
-    if (this.__abortLastRequest) {
-      this.__abortLastRequest();
-    }
-    this.__merger.reset();
-    this.__responseSearch = {};
-    this.__processedFaresCount = 0;
-    this.__fetchCount = 0;
+    this.poller.reset();
+    this.merger.reset();
+    this.responseSearch = {};
+    this.processedFaresCount = 0;
   },
 
   updatePaymentMethodIds: function(paymentMethodIds) {
     this.paymentMethodIds = paymentMethodIds;
     this.reset();
     this.updateResult();
-    this._prepareFetch();
+    this.poller.start();
   },
 
   updateProviderTypes: function(providerTypes) {
     this.providerTypes = providerTypes;
     this.reset();
     this.updateResult();
-    this._prepareFetch();
+    this.poller.start();
   },
 
   updateSort: function(sort) {
@@ -340,27 +430,12 @@ FlightSearchClient.prototype = {
 
   updateCurrency: function(currency) {
     this.currency = currency;
-    this.__merger.updateCurrency(currency);
+    this.merger.updateCurrency(currency);
     this.updateResult();
   },
 
-  updateProgress: function() {
-    var fetchCount = this.__fetchCount;
-    var progressStopAfter = this.__progressStopAfter;
-    var processedFaresCount = this.__processedFaresCount;
-
-    var progress;
-    if (fetchCount >= progressStopAfter || processedFaresCount >= 1000) {
-      progress = 100;
-    } else {
-      progress = fetchCount / progressStopAfter * 50 + processedFaresCount / 1000 * 50;
-    }
-
-    this.onProgressChanged(progress);
-  },
-
   updateResult: function() {
-    var trips = this.__merger.getTrips();
+    var trips = this.merger.getTrips();
     var filteredTrips = filtering.filterTrips(trips, this.filter);
     var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
 
@@ -369,60 +444,16 @@ FlightSearchClient.prototype = {
     this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
     this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
     this.onTotalTripsChanged(trips);
-    this.onDisplayedFilterChanged(this.__merger.getFilter());
-    this.updateProgress();
+    this.onDisplayedFilterChanged(this.merger.getFilter());
+    this.onProgressChanged(this.poller.getProgress());
   },
 
-  _fetch: function() {
-    this.__fetchCount++;
-    this.__retryCount = 0;
-    this._callApi();
-  },
-
-  _retry: function() {
-    if (this.__retryCount < 3) {
-      this.__retryCount++;
-      this._callApi();
-    }
-  },
-
-  _callApi: function() {
-    var self = this;
-    var aborted = false;
-    this.__abortLastRequest = function() {
-      aborted = true;
-    };
-
-    Api.searchTrips(this._getSearchRequestBody(), {
-      currencyCode: this.currency.code,
-      locale: this.locale,
-    }).then(function(response) {
-      if (!aborted) {
-        self.handleSearchResponse(response);
-      }
-    }).catch(function() {
-      self.handleSearchError();
-    });
-  },
-
-  _prepareFetch: function() {
-    var fetchCount = this.__fetchCount;
-    var delays = this.__delays;
-    var self = this;
-    if (fetchCount < delays.length) {
-      this.__timer = setTimeout(function() {
-        self._fetch();
-      }, delays[fetchCount]);
-    }
-  },
-
-  _getSearchRequestBody: function() {
+  getSearchRequestBody: function() {
     var search = this.search || {};
     var legs = search.legs || [];
-    var responseSearch = this.__responseSearch || {};
     return {
       search: {
-        id: responseSearch.id,
+        id: this.responseSearch.id,
         cabin: search.cabin,
         adultsCount: search.adultsCount,
         childrenCount: search.childrenCount,
@@ -440,7 +471,7 @@ FlightSearchClient.prototype = {
           };
         }),
       },
-      offset: this.__processedFaresCount,
+      offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
       providerTypes: this.providerTypes,
     }
@@ -450,15 +481,17 @@ FlightSearchClient.prototype = {
 module.exports = FlightSearchClient;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(9);
-var sorting = __webpack_require__(12);
-var filtering = __webpack_require__(11);
+var HotelSearchMerger = __webpack_require__(10);
+var sorting = __webpack_require__(13);
+var filtering = __webpack_require__(12);
 var Api = __webpack_require__(1);
+var Poller = __webpack_require__(2);
 
 var HotelSearchClient = function(options) {
+  var self = this;
   options = options || {};
   this.currency  = options.currency || {};
   this.locale = options.locale;
@@ -471,9 +504,20 @@ var HotelSearchClient = function(options) {
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
   this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
 
-  this.__delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
-  this.__progressStopAfter = 7;
-  this.__merger = new HotelSearchMerger();
+  this.merger = new HotelSearchMerger();
+  this.poller = new Poller({
+    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
+    pollLimit: 7,
+    callApi: function() {
+      return Api.searchHotels(self.getSearchRequestBody(), {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+      });
+    },
+    onSuccessResponse: function(response) {
+      return self.handleSearchResponse(response);
+    },
+  });
   this.reset();
 };
 
@@ -482,34 +526,25 @@ HotelSearchClient.prototype = {
     this.search = search;
     this.reset();
     this.updateResult();
-    this._prepareFetch();
+    this.poller.start();
   },
 
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
     this.updateResult();
-    this._prepareFetch();
-  },
-
-  handleSearchError: function() {
-    this._retry();
   },
 
   mergeResponse: function(response) {
-    this.__merger.mergeResponse(response);
-    this.__lastRatesCount = response.count;
-    this.__responseSearch = response.search;
+    this.merger.mergeResponse(response);
+    this.lastRatesCount = response.count;
+    this.responseSearch = response.search;
   },
 
   reset: function() {
-    clearTimeout(this.__timer);
-    if (this.__abortLastRequest) {
-      this.__abortLastRequest();
-    }
-    this.__merger.reset();
-    this.__responseSearch = {};
-    this.__lastRatesCount = 0;
-    this.__fetchCount = 0;
+    this.poller.reset();
+    this.merger.reset();
+    this.responseSearch = {};
+    this.lastRatesCount = 0;
   },
 
   updateSort: function(sort) {
@@ -524,86 +559,29 @@ HotelSearchClient.prototype = {
 
   updateCurrency: function(currency) {
     this.currency = currency;
-    this.__merger.updateCurrency(currency);
+    this.merger.updateCurrency(currency);
     this.updateResult();
   },
 
   updateRateAmenityIds: function(rateAmenityIds) {
     this.rateAmenityIds = rateAmenityIds;
     this.reset();
+    this.poller.reset();
     this.updateResult();
-    this._prepareFetch();
-  },
-
-  updateProgress: function() {
-    var fetchCount = this.__fetchCount;
-    var progressStopAfter = this.__progressStopAfter;
-    var lastRatesCount = this.__lastRatesCount;
-
-    var progress;
-    if (fetchCount >= progressStopAfter || lastRatesCount >= 1000) {
-      progress = 100;
-    } else {
-      progress = fetchCount / progressStopAfter * 50 + lastRatesCount / 1000 * 50;
-    }
-
-    this.onProgressChanged(progress);
+    this.poller.start();
   },
 
   updateResult: function() {
-    var hotels = this.__merger.getHotels();
+    var hotels = this.merger.getHotels();
     var filteredHotels = filtering.filterHotels(hotels, this.filter);
     var sortedHotels = sorting.sortHotels(filteredHotels, this.sort);
     this.onHotelsChanged(sortedHotels);
     this.onTotalHotelsChanged(hotels);
-    this.onDisplayedFilterChanged(this.__merger.getFilter());
-    this.updateProgress();
+    this.onDisplayedFilterChanged(this.merger.getFilter());
+    this.onProgressChanged(this.poller.getProgress());
   },
 
-  _fetch: function() {
-    this.__fetchCount++;
-    this.__retryCount = 0;
-    this._callApi();
-  },
-
-  _retry: function() {
-    if (this.__retryCount < 3) {
-      this.__retryCount++;
-      this._callApi();
-    }
-  },
-
-  _callApi: function() {
-    var self = this;
-    var aborted = false;
-    this.__abortLastRequest = function() {
-      aborted = true;
-    };
-
-    Api.searchHotels(this._getSearchRequestBody(), {
-      currencyCode: this.currency.code,
-      locale: this.locale,
-    }).then(function(response) {
-      if (!aborted) {
-        self.handleSearchResponse(response);
-      }
-    }).catch(function() {
-      self.handleSearchError();
-    });
-  },
-
-  _prepareFetch: function() {
-    var fetchCount = this.__fetchCount;
-    var delays = this.__delays;
-    var self = this;
-    if (fetchCount < delays.length) {
-      this.__timer = setTimeout(function() {
-        self._fetch();
-      }, delays[fetchCount]);
-    }
-  },
-
-  _getSearchRequestBody: function() {
+  getSearchRequestBody: function() {
     var search = this.search || {};
     var currency = this.currency || {};
     var currencyCode = currency.code;
@@ -611,7 +589,7 @@ HotelSearchClient.prototype = {
 
     return {
       search: {
-        id: this.__responseSearch.id,
+        id: this.responseSearch.id,
         siteCode: this.siteCode,
         locale: locale,
         currencyCode: currencyCode,
@@ -625,7 +603,7 @@ HotelSearchClient.prototype = {
         appType: this.appType,
       },
       rateAmenityIds: this.rateAmenityIds,
-      offset: this.__lastRatesCount,
+      offset: this.lastRatesCount,
     };
   },
 };
@@ -633,12 +611,12 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Api = __webpack_require__(1);
-var FlightSearchClient = __webpack_require__(2);
-var HotelSearchClient = __webpack_require__(3);
+var FlightSearchClient = __webpack_require__(3);
+var HotelSearchClient = __webpack_require__(4);
 
 module.exports = {
   Api: Api,
@@ -647,10 +625,10 @@ module.exports = {
 };
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(6);
+var dataUtils = __webpack_require__(7);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -939,7 +917,7 @@ FlightSearchMerger.prototype = {
 module.exports = FlightSearchMerger;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1147,7 +1125,7 @@ module.exports = {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1271,7 +1249,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1366,11 +1344,11 @@ module.exports = {
 };
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
-var dataUtils = __webpack_require__(10);
+var dataUtils = __webpack_require__(11);
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -1637,7 +1615,7 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1742,7 +1720,7 @@ module.exports = {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1825,7 +1803,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1896,10 +1874,10 @@ module.exports = {
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var WegoSdk = __webpack_require__(4);
+var WegoSdk = __webpack_require__(5);
 window.WegoSdk = WegoSdk;
 
 /***/ })
