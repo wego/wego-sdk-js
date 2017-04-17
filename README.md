@@ -1,5 +1,5 @@
 # Wego SDK for javascript
-The official Wego SDK for JavaScript, available for browsers and mobile devices, or Node.js backends
+The official Wego SDK for JavaScript, available for browsers and mobile devices (if you are using javascript), or Node.js backends
 
 ## Installing
 ### Bower
