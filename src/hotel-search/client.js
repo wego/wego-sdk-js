@@ -2,8 +2,10 @@ var HotelSearchMerger = require('./Merger');
 var sorting = require('./sorting');
 var filtering = require('./filtering');
 var Api = require('../Api');
+var Poller = require('../Poller');
 
 var HotelSearchClient = function(options) {
+  var self = this;
   options = options || {};
   this.currency  = options.currency || {};
   this.locale = options.locale;
@@ -16,9 +18,20 @@ var HotelSearchClient = function(options) {
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
   this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
 
-  this.__delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
-  this.__progressStopAfter = 7;
-  this.__merger = new HotelSearchMerger();
+  this.merger = new HotelSearchMerger();
+  this.poller = new Poller({
+    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
+    pollLimit: 7,
+    callApi: function() {
+      return Api.searchHotels(self.getSearchRequestBody(), {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+      });
+    },
+    onSuccessResponse: function(response) {
+      return self.handleSearchResponse(response);
+    },
+  });
   this.reset();
 };
 
@@ -27,34 +40,25 @@ HotelSearchClient.prototype = {
     this.search = search;
     this.reset();
     this.updateResult();
-    this._prepareFetch();
+    this.poller.start();
   },
 
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
     this.updateResult();
-    this._prepareFetch();
-  },
-
-  handleSearchError: function() {
-    this._retry();
   },
 
   mergeResponse: function(response) {
-    this.__merger.mergeResponse(response);
-    this.__lastRatesCount = response.count;
-    this.__responseSearch = response.search;
+    this.merger.mergeResponse(response);
+    this.lastRatesCount = response.count;
+    this.responseSearch = response.search;
   },
 
   reset: function() {
-    clearTimeout(this.__timer);
-    if (this.__abortLastRequest) {
-      this.__abortLastRequest();
-    }
-    this.__merger.reset();
-    this.__responseSearch = {};
-    this.__lastRatesCount = 0;
-    this.__fetchCount = 0;
+    this.poller.reset();
+    this.merger.reset();
+    this.responseSearch = {};
+    this.lastRatesCount = 0;
   },
 
   updateSort: function(sort) {
@@ -69,86 +73,29 @@ HotelSearchClient.prototype = {
 
   updateCurrency: function(currency) {
     this.currency = currency;
-    this.__merger.updateCurrency(currency);
+    this.merger.updateCurrency(currency);
     this.updateResult();
   },
 
   updateRateAmenityIds: function(rateAmenityIds) {
     this.rateAmenityIds = rateAmenityIds;
     this.reset();
+    this.poller.reset();
     this.updateResult();
-    this._prepareFetch();
-  },
-
-  updateProgress: function() {
-    var fetchCount = this.__fetchCount;
-    var progressStopAfter = this.__progressStopAfter;
-    var lastRatesCount = this.__lastRatesCount;
-
-    var progress;
-    if (fetchCount >= progressStopAfter || lastRatesCount >= 1000) {
-      progress = 100;
-    } else {
-      progress = fetchCount / progressStopAfter * 50 + lastRatesCount / 1000 * 50;
-    }
-
-    this.onProgressChanged(progress);
+    this.poller.start();
   },
 
   updateResult: function() {
-    var hotels = this.__merger.getHotels();
+    var hotels = this.merger.getHotels();
     var filteredHotels = filtering.filterHotels(hotels, this.filter);
     var sortedHotels = sorting.sortHotels(filteredHotels, this.sort);
     this.onHotelsChanged(sortedHotels);
     this.onTotalHotelsChanged(hotels);
-    this.onDisplayedFilterChanged(this.__merger.getFilter());
-    this.updateProgress();
+    this.onDisplayedFilterChanged(this.merger.getFilter());
+    this.onProgressChanged(this.poller.getProgress());
   },
 
-  _fetch: function() {
-    this.__fetchCount++;
-    this.__retryCount = 0;
-    this._callApi();
-  },
-
-  _retry: function() {
-    if (this.__retryCount < 3) {
-      this.__retryCount++;
-      this._callApi();
-    }
-  },
-
-  _callApi: function() {
-    var self = this;
-    var aborted = false;
-    this.__abortLastRequest = function() {
-      aborted = true;
-    };
-
-    Api.searchHotels(this._getSearchRequestBody(), {
-      currencyCode: this.currency.code,
-      locale: this.locale,
-    }).then(function(response) {
-      if (!aborted) {
-        self.handleSearchResponse(response);
-      }
-    }).catch(function() {
-      self.handleSearchError();
-    });
-  },
-
-  _prepareFetch: function() {
-    var fetchCount = this.__fetchCount;
-    var delays = this.__delays;
-    var self = this;
-    if (fetchCount < delays.length) {
-      this.__timer = setTimeout(function() {
-        self._fetch();
-      }, delays[fetchCount]);
-    }
-  },
-
-  _getSearchRequestBody: function() {
+  getSearchRequestBody: function() {
     var search = this.search || {};
     var currency = this.currency || {};
     var currencyCode = currency.code;
@@ -156,7 +103,7 @@ HotelSearchClient.prototype = {
 
     return {
       search: {
-        id: this.__responseSearch.id,
+        id: this.responseSearch.id,
         siteCode: this.siteCode,
         locale: locale,
         currencyCode: currencyCode,
@@ -170,7 +117,7 @@ HotelSearchClient.prototype = {
         appType: this.appType,
       },
       rateAmenityIds: this.rateAmenityIds,
-      offset: this.__lastRatesCount,
+      offset: this.lastRatesCount,
     };
   },
 };

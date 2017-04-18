@@ -13,16 +13,10 @@ describe('FlightSearchClient', function() {
   }
 
   describe('#reset', function() {
-    it('reset processedFaresCount', function() {
-      client.__processedFaresCount = 10;
+    it('resets poller', function() {
+      client.poller.pollCount = 4;
       client.reset();
-      expect(client.__processedFaresCount).to.equal(0);
-    });
-
-    it('set fetchCount to 0', function() {
-      client.__fetchCount = 6;
-      client.reset();
-      expect(client.__fetchCount).to.equal(0);
+      expect(client.poller.pollCount).to.equal(0);
     });
 
     it('#reset merger', function() {
@@ -34,7 +28,7 @@ describe('FlightSearchClient', function() {
 
       client.reset();
 
-      expect(client.__merger.__staticData.airports).to.deep.equal({});
+      expect(client.merger.__staticData.airports).to.deep.equal({});
     });
 
     it('abort last request call', function() {
@@ -47,16 +41,15 @@ describe('FlightSearchClient', function() {
 
   describe('paymentMethodIds change', function() {
     it('should reset and do new polling', function() {
-      client.mergeResponse({
-      });
+      client.mergeResponse({});
 
-      client.__timer = null;
-      client.__fetchCount = 2;
+      client.poller.timer = null;
+      client.poller.pollCount = 2;
 
       client.updatePaymentMethodIds([]);
 
-      expect(client.__fetchCount).to.equal(0);
-      expect(client.__timer).to.not.equal(null);
+      expect(client.poller.pollCount).to.equal(0);
+      expect(client.poller.timer).to.not.equal(null);
     });
   });
 
@@ -65,13 +58,13 @@ describe('FlightSearchClient', function() {
       client.mergeResponse({
       });
 
-      client.__timer = null;
-      client.__fetchCount = 2;
+      client.poller.timer = null;
+      client.poller.pollCount = 2;
 
       client.updateProviderTypes([]);
 
-      expect(client.__fetchCount).to.equal(0);
-      expect(client.__timer).to.not.equal(null);
+      expect(client.poller.pollCount).to.equal(0);
+      expect(client.poller.timer).to.not.equal(null);
     });
   });
 
@@ -241,30 +234,14 @@ describe('FlightSearchClient', function() {
   });
 
   describe('#searchTrips', function() {
-    it('reset state', function() {
-      client.__fetchCount = 5;
+    it('start poller', function() {
+      client.poller.timer = null;
       client.searchTrips({});
-      expect(client.__fetchCount).to.equal(0);
-    });
-
-    it('prepare fetch', function() {
-      client.__delays = [1, 2, 3];
-      client.__fetchCount = 1;
-      client.__timer = null;
-      client.searchTrips({});
-      expect(client.__timer).not.equal(null);
+      expect(client.poller.timer).not.equal(null);
     })
   });
 
   describe('handleSearchResponse', function() {
-    it('prepare next fetch', function() {
-      client.__delays = [1, 2, 3];
-      client.__fetchCount = 1;
-      client.__timer = null;
-      client.handleSearchResponse({});
-      expect(client.__timer).not.equal(null);
-    });
-
     it('update processedFaresCount', function() {
       var processedFaresCount = 10;
 
@@ -272,7 +249,7 @@ describe('FlightSearchClient', function() {
         count: processedFaresCount,
       });
 
-      expect(client.__processedFaresCount).to.equal(processedFaresCount);
+      expect(client.processedFaresCount).to.equal(processedFaresCount);
     });
 
     it('update displayed filter', function() {
@@ -326,59 +303,7 @@ describe('FlightSearchClient', function() {
     });
   });
 
-  describe('#handleSearchError', function() {
-    it('increase __retryCount', function() {
-      client.__retryCount = 1;
-      client.handleSearchError();
-      expect(client.__retryCount).to.equal(2);
-    });
-
-    it('do nothing when reach the limit of retry', function() {
-      client.__retryCount = 3;
-      client.handleSearchError();
-      expect(client.__retryCount).to.equal(3);
-    })
-  });
-
-  it('#_fetch', function() {
-    client = new FlightSearchClient({
-      locale: 'en',
-      currency: {
-        code: 'SGD'
-      },
-      host: 'http://host'
-    });
-
-    mockAjaxCall(client);
-
-    client.__fetchCount = 1;
-    client.__retryCount = 2;
-
-    client._fetch();
-
-    expect(client.__fetchCount).to.equal(2);
-    expect(client.__retryCount).to.equal(0);
-  });
-
-  describe('#_prepareFetch', function() {
-    it('create timer if fetchCount is smaller than length of delays', function() {
-      client.__delays = [1, 2, 3];
-      client.__fetchCount = 1;
-      client.__timer = null;
-      client._prepareFetch();
-      expect(client.__timer).not.equal(null);
-    });
-
-    it('not create timer if fetchCount is greater or equal to length of delays', function() {
-      client.__delays = [1, 2, 3];
-      client.__fetchCount = 3;
-      client.__timer = null;
-      client._prepareFetch();
-      expect(client.__timer).to.equal(null);
-    });
-  });
-
-  describe('#_getSearchRequestBody', function() {
+  describe('#getSearchRequestBody', function() {
     it('search', function() {
       var searchId = 1;
       var cabin = 'ECONOMIC';
@@ -412,9 +337,9 @@ describe('FlightSearchClient', function() {
 
       mockAjaxCall(client);
 
-      client.__processedFaresCount = processedFaresCount;
+      client.processedFaresCount = processedFaresCount;
 
-      client.__responseSearch = {
+      client.responseSearch = {
         id: searchId,
       };
 
@@ -434,7 +359,7 @@ describe('FlightSearchClient', function() {
         ]
       };
 
-      var requestBody = client._getSearchRequestBody();
+      var requestBody = client.getSearchRequestBody();
 
       var search = requestBody.search;
       expect(search.id).to.equal(searchId);
@@ -466,7 +391,7 @@ describe('FlightSearchClient', function() {
         search: search,
       });
 
-      expect(client.__responseSearch).to.equal(search);
+      expect(client.responseSearch).to.equal(search);
     });
 
     it('processedFaresCount', function() {
@@ -474,7 +399,7 @@ describe('FlightSearchClient', function() {
       client.handleSearchResponse({
         count: processedFaresCount,
       });
-      expect(client.__processedFaresCount).to.equal(processedFaresCount);
+      expect(client.processedFaresCount).to.equal(processedFaresCount);
     });
 
     it('merge response by merger', function() {
@@ -486,42 +411,7 @@ describe('FlightSearchClient', function() {
         airports: [airport]
       });
 
-      expect(client.__merger.__staticData.airports[1]).to.equal(airport);
-    });
-  });
-
-  describe('update progress', function() {
-    var progress;
-    beforeEach(function() {
-      progress = 0;
-      client = new FlightSearchClient({
-        onProgressChanged: function(_progress) {
-          progress = _progress;
-        }
-      });
-      mockAjaxCall(client);
-    });
-
-    it('when smaller then 100', function() {
-      client.__progressStopAfter = 10;
-      client.__fetchCount = 4;
-      client.handleSearchResponse({
-        count: 200,
-      });
-      expect(progress).to.equal(30);
-    });
-
-    it('should update to 100 when __fetchCount >= __progressStopAfter', function() {
-      client.__progressStopAfter = 3;
-      client.__fetchCount = 3;
-      client.updateProgress();
-      expect(progress).to.equal(100);
-    });
-
-    it('should update to 100 when __processedFaresCount >= 1000', function() {
-      client.__processedFaresCount = 1000;
-      client.updateProgress();
-      expect(progress).to.equal(100);
+      expect(client.merger.__staticData.airports[1]).to.equal(airport);
     });
   });
 
@@ -721,6 +611,16 @@ describe('FlightSearchClient', function() {
       expect(bestExperienceTrip.id).to.equal(2);
     });
 
+    it('calls onProgressChanged', () => {
+      var onProgressChanged = sinon.spy();
+      client = new FlightSearchClient({
+        onProgressChanged: onProgressChanged
+      });
+      client.poller.fetchCount = 10;
+      client.handleSearchResponse({});
+      expect(onProgressChanged).to.have.been.calledOnce();
+    });
+
     it('onCreatedTrip', function() {
       var onSearchCreated = sinon.spy();
       client = new FlightSearchClient({
@@ -729,7 +629,7 @@ describe('FlightSearchClient', function() {
 
       var search = { id: 1 };
 
-      client.__fetchCount = 1;
+      client.poller.pollCount = 1;
       client.handleSearchResponse({
         search: search,
       });
