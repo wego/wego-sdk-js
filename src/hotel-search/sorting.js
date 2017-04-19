@@ -21,7 +21,7 @@ module.exports = {
     }
 
     function getStar(hotel) {
-      return hotel.star;
+      return hotel.star === 0 ? undefined : hotel.star;
     }
 
     function getScore(hotel) {

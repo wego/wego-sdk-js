@@ -97,13 +97,14 @@ describe('wego-hotel-search-sorting', function() {
       var hotel1 = { star: 1 };
       var hotel2 = { star: 3 };
       var hotel3 = { star: 2 };
+      var hotel4 = { star: 0 };
 
-      var hotels = sorting.sortHotels([hotel1, hotel2, hotel3], {
+      var hotels = sorting.sortHotels([hotel1, hotel2, hotel3, hotel4], {
         by: 'STAR',
         order: 'ASC',
       })
 
-      expect(hotels).to.deep.equal([hotel1, hotel3, hotel2]);
+      expect(hotels).to.deep.equal([hotel1, hotel3, hotel2, hotel4]);
     });
 
     it('sorting by distanceToCityCentre', function() {
