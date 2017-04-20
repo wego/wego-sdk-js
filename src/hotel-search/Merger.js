@@ -57,7 +57,7 @@ HotelSearchClient.prototype = {
     function merge(itemMap, items) {
       if (!items) return;
       items.forEach(function(item) {
-        var key = item.code || item.id;
+        var key = item.id || item.code;
         itemMap[key] = item;
       });
     }
