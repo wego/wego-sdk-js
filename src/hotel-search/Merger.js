@@ -54,17 +54,17 @@ HotelSearchClient.prototype = {
   },
 
   _mergeStaticData: function(response) {
-    function merge(itemMap, items) {
+    function merge(itemMap, items, type) {
       if (!items) return;
       items.forEach(function(item) {
-        var key = item.id || item.code;
+        var key = (type === 'providers') ? item.code : item.id;
         itemMap[key] = item;
       });
     }
 
     var staticData = this.__staticData;
     this.__staticDataTypes.forEach(function(type) {
-      merge(staticData[type], response[type]);
+      merge(staticData[type], response[type], type);
     });
   },
 
@@ -247,7 +247,6 @@ HotelSearchClient.prototype = {
     'amenities',
     'rateAmenities',
     'chains',
-    'reviewerGroups',
     'providers',
   ],
 

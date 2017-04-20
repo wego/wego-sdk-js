@@ -109,8 +109,8 @@ describe('Merger', function() {
   describe('merge static data', function() {
     it('merging stars', function() {
       var star = {
-        code: 1,
-        name: 1,
+        id: 1,
+        name: '1',
       };
 
       merger.mergeResponse({
@@ -135,13 +135,14 @@ describe('Merger', function() {
     it('merging providers', function() {
       var provider = {
         id: 1,
+        code: 'booking.com'
       };
 
       merger.mergeResponse({
         providers: [provider]
       });
 
-      expect(merger.__staticData.providers[1]).to.equal(provider);
+      expect(merger.__staticData.providers['booking.com']).to.equal(provider);
     });
 
     it('merging propertyTypes', function() {
@@ -200,18 +201,6 @@ describe('Merger', function() {
       expect(merger.__staticData.rateAmenities[1]).to.equal(amenity1);
       expect(merger.__staticData.rateAmenities[2]).to.equal(amenity2);
 
-    });
-
-    it('merging reviewerGroups', function() {
-      var reviewer = {
-        code: 'code'
-      };
-
-      merger.mergeResponse({
-        reviewerGroups: [reviewer],
-      });
-
-      expect(merger.__staticData.reviewerGroups['code']).to.equal(reviewer);
     });
 
   });
