@@ -22,7 +22,7 @@ module.exports = {
 
     function filterByContainText(text, filterText) {
       if (!filterText) return true;
-      return text.indexOf(filterText) > -1;
+      return text.toLowerCase().indexOf(filterText.toLowerCase()) > -1;
     }
 
     function filterByReviewScore(hotel, filter) {
