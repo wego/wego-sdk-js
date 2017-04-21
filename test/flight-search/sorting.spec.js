@@ -144,7 +144,8 @@ describe('sorting', function() {
     var trip1 = createTrip({
       legs: [
         {
-          arrivalTimeMinutes: 1
+          arrivalTimeMinutes: 1,
+          durationDays: 0
         }
       ]
     });
@@ -152,7 +153,8 @@ describe('sorting', function() {
     var trip2 = createTrip({
       legs: [
         {
-          arrivalTimeMinutes: 3
+          arrivalTimeMinutes: 3,
+          durationDays: 0
         }
       ]
     });
@@ -160,7 +162,8 @@ describe('sorting', function() {
     var trip3 = createTrip({
       legs: [
         {
-          arrivalTimeMinutes: 2
+          arrivalTimeMinutes: 2,
+          durationDays: 0
         }
       ]
     });
@@ -173,12 +176,40 @@ describe('sorting', function() {
     expect(trips).to.deep.equal([trip1, trip3, trip2]);
   });
 
+    it('sorting by outbound arrival time when there is overnight flight', function() {
+    var trip1 = createTrip({
+      legs: [
+        {
+          arrivalTimeMinutes: 1,
+          durationDays: 1,
+        }
+      ]
+    });
+
+    var trip2 = createTrip({
+      legs: [
+        {
+          arrivalTimeMinutes: 3,
+          durationDays: 0,
+        }
+      ]
+    });
+
+    var trips = sorting.sortTrips([trip1, trip2], {
+      by: 'OUTBOUND_ARRIVAL_TIME',
+      order: 'ASC',
+    });
+
+    expect(trips).to.deep.equal([trip2, trip1]);
+  });
+
   it('sorting by inbound arrival time', function() {
     var trip1 = createTrip({
       legs: [
         {},
         {
-          arrivalTimeMinutes: 1
+          arrivalTimeMinutes: 1,
+          durationDays: 0
         }
       ]
     });
@@ -187,7 +218,8 @@ describe('sorting', function() {
       legs: [
         {},
         {
-          arrivalTimeMinutes: 3
+          arrivalTimeMinutes: 3,
+          durationDays: 0
         }
       ]
     });
@@ -196,7 +228,8 @@ describe('sorting', function() {
       legs: [
         {},
         {
-          arrivalTimeMinutes: 2
+          arrivalTimeMinutes: 2,
+          durationDays: 0
         }
       ]
     });
