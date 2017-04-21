@@ -87,8 +87,7 @@ var utils = {
       return dictionary[key] || key;
     }
 
-    var i;
-    for (i=0; i<inChars.length; i++) {
+    for (var i = 0; i < inChars.length; i++) {
       dictionary[inChars[i]] = outChars[i];
     }
 
