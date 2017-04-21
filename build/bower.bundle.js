@@ -1238,7 +1238,8 @@ module.exports = {
 
     function getArrivalTime(legIndex) {
       return function(trip) {
-        return trip.legs[legIndex].arrivalTimeMinutes;
+        var leg = trip.legs[legIndex];
+        return leg.arrivalTimeMinutes + leg.durationDays * 24 * 60;
       }
     }
 
