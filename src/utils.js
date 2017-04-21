@@ -58,9 +58,9 @@ var utils = {
     return true;
   },
 
-  filterByMatchingText: function(text, query) {
+  filterByTextMatching: function(text, query) {
     if (!query) return true;
-    return text.toLowerCase().indexOf(query.toLowerCase()) > -1;
+    return this.stripAccents(text).toLowerCase().indexOf(this.stripAccents(query).toLowerCase()) > -1;
   },
 
   filterByRange: function(value, range) {
@@ -76,6 +76,25 @@ var utils = {
     });
     return map;
   },
+
+  stripAccents: (function () {
+    var inChars = 'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ';
+    var outChars = 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY';
+    var charsRgx = new RegExp('[' + inChars + ']', 'g');
+    var dictionary = {};
+
+    function lookup(key) {
+      return dictionary[key] || key;
+    }
+
+    for (var i = 0; i < inChars.length; i++) {
+      dictionary[inChars[i]] = outChars[i];
+    }
+
+    return function (text) {
+      return text.replace(charsRgx, lookup);
+    }
+  })(),
 };
 
 module.exports = utils;
