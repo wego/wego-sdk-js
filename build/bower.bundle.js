@@ -114,10 +114,10 @@ var utils = {
     return true;
   },
 
-  filterBySomeKeys: function(map, filterArray) {
-    if (!filterArray || filterArray.length === 0) return true;
-    for (var i = 0; i < filterArray.length; i++) {
-      if (map[filterArray[i]]) return true;
+  filterBySomeKeys: function(map, filterKeys) {
+    if (!filterKeys || filterKeys.length === 0) return true;
+    for (var i = 0; i < filterKeys.length; i++) {
+      if (map[filterKeys[i]]) return true;
     }
     return false;
   },
@@ -128,6 +128,11 @@ var utils = {
       if (!keyMap[filterKeys[i]]) return false;
     }
     return true;
+  },
+
+  filterByMatchingText: function(text, query) {
+    if (!query) return true;
+    return text.toLowerCase().indexOf(query.toLowerCase()) > -1;
   },
 
   filterByRange: function(value, range) {
@@ -142,7 +147,7 @@ var utils = {
       map[item] = true;
     });
     return map;
-  }
+  },
 };
 
 module.exports = utils;
@@ -1130,120 +1135,78 @@ module.exports = {
 
 var utils = __webpack_require__(0);
 
-function filterByKey(key, filterMap) {
-  return !filterMap || filterMap[key];
+function filterByPrice(trip, priceRange) {
+  if (!priceRange) return true;
+  return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
-function filterByAllKeys(keys, filterMap) {
-  if (!filterMap) return true;
-  for (var i = 0; i < keys.length; i++) {
-    if (!filterMap[keys[i]]) return false;
+function filterByTripOptions(trip, tripOptions) {
+  if (!tripOptions) return true;
+  for (var i = 0; i < tripOptions.length; i++) {
+    if (tripOptions[i] === 'SAME_AIRLINE' && trip.airlineCodes.length > 1) return false;
   }
   return true;
 }
 
-function filterBySomeKeys(map, filterArray) {
-  if (!filterArray || filterArray.length === 0) return true;
-  for (var i = 0; i < filterArray.length; i++) {
-    if (map[filterArray[i]]) return true;
-  }
-  return false;
-}
-
-function filterByContainAllKeys(keyMap, filterKeys) {
-  if (!filterKeys) return true;
-  for (var i = 0; i < filterKeys.length; i++) {
-    if (!keyMap[filterKeys[i]]) return false;
+function filterByStopoverOptions(trip, stopoverOptions) {
+  if (!stopoverOptions || stopoverOptions.length === 0) return true;
+  for (var i = 0; i < stopoverOptions.length; i++) {
+    if (stopoverOptions[i] === 'NOT_CHANGE_AIRPORT' && trip.changeAirportAtStopover) return false
   }
   return true;
 }
 
-function filterByRange(value, range) {
-  if (!range) return true;
-  return range.min <= value && value <= range.max;
+function filterByItineraryOptions(trip, itineraryOptions) {
+  if (!itineraryOptions) return true;
+  for (var i = 0; i < itineraryOptions.length; i++) {
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
+  }
+  return true;
+}
+
+function filterByRanges(trip, ranges, field) {
+  if (!ranges) return true;
+  for (var i = 0; i < ranges.length; i++) {
+    var range = ranges[i];
+    var leg = trip.legs[range.legIndex];
+    if (!utils.filterByRange(leg[field], range)) return false;
+  }
+  return true;
+}
+
+function filterByAirlines(trip, airlineCodeMap) {
+  if (!airlineCodeMap) return true;
+  if (!trip.marketingAirline) return false;
+  return utils.filterByKey(trip.marketingAirline.code, airlineCodeMap);
 }
 
 module.exports = {
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
 
-    function filterByPrice(trip, priceRange) {
-      if (!priceRange) return true;
-      return trip.fares[0] && filterByRange(trip.fares[0].price.amountUsd, priceRange);
-    }
-
-    function filterByTripOptions(trip, tripOptions) {
-      if (!tripOptions) return true;
-      for (var i = 0; i < tripOptions.length; i++) {
-        if (tripOptions[i] === 'SAME_AIRLINE' && trip.airlineCodes.length > 1) return false;
-      }
-      return true;
-    }
-
-    function filterByStopoverOptions(trip, stopoverOptions) {
-      if (!stopoverOptions || stopoverOptions.length === 0) return true;
-      for (var i = 0; i < stopoverOptions.length; i++) {
-        if (stopoverOptions[i] === 'NOT_CHANGE_AIRPORT' && trip.changeAirportAtStopover) return false
-      }
-      return true;
-    }
-
-    function filterByItineraryOptions(trip, itineraryOptions) {
-      if (!itineraryOptions) return true;
-      for (var i = 0; i < itineraryOptions.length; i++) {
-        if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
-        if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
-      }
-      return true;
-    }
-
-    function filterByRanges(trip, ranges, field) {
-      if (!ranges) return true;
-      for (var i = 0; i < ranges.length; i++) {
-        var range = ranges[i];
-        var leg = trip.legs[range.legIndex];
-        if (!filterByRange(leg[field], range)) return false;
-      }
-      return true;
-    }
-
-    function filterByAirlines(trip, airlineCodeMap) {
-      if (!airlineCodeMap) return true;
-      if (!trip.marketingAirline) return false;
-      return filterByKey(trip.marketingAirline.code, airlineCodeMap);
-    }
-
-    function arrayToMap(items) {
-      if (!items || items.length === 0) return null;
-      var map = {};
-      items.forEach(function(item) {
-        map[item] = true;
-      });
-      return map;
-    }
-
-    var stopCodeMap = arrayToMap(filter.stopCodes);
-    var airlineCodeMap = arrayToMap(filter.airlineCodes);
-    var allianceCodeMap = arrayToMap(filter.allianceCodes);
-    var originAirportCodeMap = arrayToMap(filter.originAirportCodes);
-    var destinationAirportCodeMap = arrayToMap(filter.destinationAirportCodes);
+    var stopCodeMap = utils.arrayToMap(filter.stopCodes);
+    var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
+    var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
+    var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
+    var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
 
     return trips.filter(function(trip) {
       return filterByPrice(trip, filter.priceRange)
-        && filterByKey(trip.stopCode, stopCodeMap)
+        && utils.filterByKey(trip.stopCode, stopCodeMap)
         && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
         && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
         && filterByAirlines(trip, airlineCodeMap)
-        && filterByAllKeys(trip.allianceCodes, allianceCodeMap)
+        && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
         && filterByTripOptions(trip, filter.tripOptions)
-        && filterByKey(trip.departureAirportCode, originAirportCodeMap)
-        && filterByKey(trip.arrivalAirportCode, destinationAirportCodeMap)
-        && filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
+        && utils.filterByKey(trip.departureAirportCode, originAirportCodeMap)
+        && utils.filterByKey(trip.arrivalAirportCode, destinationAirportCodeMap)
+        && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
         && filterByStopoverOptions(trip, filter.stopoverOptions)
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
-        && filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
+        && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
         && filterByItineraryOptions(trip, filter.itineraryOptions)
-        && filterByContainAllKeys(trip.legIdMap, filter.legIds);
+        && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds);
     });
   }
 };
@@ -1720,82 +1683,52 @@ module.exports = {
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+function filterByReviewScore(hotel, filter) {
+  if (!filter.reviewScoreRange) return true;
+  var review  = hotel.reviewMap['ALL'] || {};
+  return utils.filterByRange(review.score, filter.reviewScoreRange)
+}
+
+function filterByReviewerGroups(hotel, reviewerGroups) {
+  if (!reviewerGroups) return true;
+  for (var i = 0; i < reviewerGroups.length; i++) {
+    var review = hotel.reviewMap[reviewerGroups[i]];
+    if (review && review.score >= 80) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function filterByPrice(hotel, priceRange) {
+  if (!priceRange) return true;
+  return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
+}
 
 module.exports = {
   filterHotels: function(hotels, filter) {
     if (!filter) return hotels;
 
-    function filterByKey(key, filterMap) {
-      return !filterMap || filterMap[key];
-    }
-
-    function filterByArrayContainAll(map, filterArray) {
-      if (!filterArray) return true;
-      var containAll = true;
-      filterArray.forEach(function(element) {
-        if (!map[element]) containAll = false;
-      });
-      return containAll;
-    }
-
-    function filterByRange(value, range) {
-      if (!range) return true;
-      return range.min <= value && value <= range.max;
-    }
-
-    function filterByContainText(text, filterText) {
-      if (!filterText) return true;
-      return text.toLowerCase().indexOf(filterText.toLowerCase()) > -1;
-    }
-
-    function filterByReviewScore(hotel, filter) {
-      if (!filter.reviewScoreRange) return true;
-      var review  = hotel.reviewMap['ALL'] || {};
-      return filterByRange(review.score, filter.reviewScoreRange)
-    }
-
-    function filterByReviewerGroups(hotel, reviewerGroups) {
-      if (!reviewerGroups) return true;
-      for (var i = 0; i < reviewerGroups.length; i++) {
-        var review = hotel.reviewMap[reviewerGroups[i]];
-        if (review && review.score >= 80) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function filterByPrice(hotel, priceRange) {
-      if (!priceRange) return true;
-      return hotel.rates[0] && filterByRange(hotel.rates[0].price.amountUsd, priceRange);
-    }
-
-    function arrayToMap(items) {
-      if (!items) return null;
-      var map = {};
-      items.forEach(function(item) {
-        map[item] = true;
-      });
-      return map;
-    }
-
-    var starMap = arrayToMap(filter.stars);
-    var districtIdMap = arrayToMap(filter.districtIds);
-    var propertyTypeIdMap = arrayToMap(filter.propertyTypeIds);
-    var brandIdMap = arrayToMap(filter.brandIds);
-    var chainIdMap = arrayToMap(filter.chainIds);
+    var starMap = utils.arrayToMap(filter.stars);
+    var districtIdMap = utils.arrayToMap(filter.districtIds);
+    var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
+    var brandIdMap = utils.arrayToMap(filter.brandIds);
+    var chainIdMap = utils.arrayToMap(filter.chainIds);
 
     return hotels.filter(function(hotel) {
       return filterByPrice(hotel, filter.priceRange)
-        && filterByKey(hotel.star, starMap)
+        && utils.filterByKey(hotel.star, starMap)
         && filterByReviewScore(hotel, filter)
-        && filterByArrayContainAll(hotel.amenityIdMap, filter.amenityIds)
-        && filterByKey(hotel.districtId, districtIdMap)
-        && filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
-        && filterByKey(hotel.brandId, brandIdMap)
-        && filterByContainText(hotel.name, filter.name)
-        && filterByKey(hotel.chainId, chainIdMap)
+        && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
+        && utils.filterByKey(hotel.districtId, districtIdMap)
+        && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
+        && utils.filterByKey(hotel.brandId, brandIdMap)
+        && utils.filterByMatchingText(hotel.name, filter.name)
+        && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups);
     });
   }

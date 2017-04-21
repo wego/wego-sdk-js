@@ -42,10 +42,10 @@ var utils = {
     return true;
   },
 
-  filterBySomeKeys: function(map, filterArray) {
-    if (!filterArray || filterArray.length === 0) return true;
-    for (var i = 0; i < filterArray.length; i++) {
-      if (map[filterArray[i]]) return true;
+  filterBySomeKeys: function(map, filterKeys) {
+    if (!filterKeys || filterKeys.length === 0) return true;
+    for (var i = 0; i < filterKeys.length; i++) {
+      if (map[filterKeys[i]]) return true;
     }
     return false;
   },
@@ -56,6 +56,11 @@ var utils = {
       if (!keyMap[filterKeys[i]]) return false;
     }
     return true;
+  },
+
+  filterByMatchingText: function(text, query) {
+    if (!query) return true;
+    return text.toLowerCase().indexOf(query.toLowerCase()) > -1;
   },
 
   filterByRange: function(value, range) {
@@ -70,7 +75,7 @@ var utils = {
       map[item] = true;
     });
     return map;
-  }
+  },
 };
 
 module.exports = utils;
