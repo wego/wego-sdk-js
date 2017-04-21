@@ -40,7 +40,7 @@ module.exports = {
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
-        && utils.filterByMatchingText(hotel.name, filter.name)
+        && utils.filterByTextMatching(hotel.name, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups);
     });
