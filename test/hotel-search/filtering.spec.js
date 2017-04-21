@@ -88,7 +88,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
     });
 
     it('filtering by name', function() {
-      var hotel1 = createHotel({ name: 'wego' });
+      var hotel1 = createHotel({ name: 'wEgo' });
       var hotel2 = createHotel({ name: 'weho' });
       var hotel3 = createHotel({ name: 'legh' });
 
