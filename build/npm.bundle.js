@@ -130,9 +130,9 @@ var utils = {
     return true;
   },
 
-  filterByMatchingText: function(text, query) {
+  filterByTextMatching: function(text, query) {
     if (!query) return true;
-    return text.toLowerCase().indexOf(query.toLowerCase()) > -1;
+    return this.stripAccents(text).toLowerCase().indexOf(this.stripAccents(query).toLowerCase()) > -1;
   },
 
   filterByRange: function(value, range) {
@@ -148,6 +148,25 @@ var utils = {
     });
     return map;
   },
+
+  stripAccents: (function () {
+    var inChars = 'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ';
+    var outChars = 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY';
+    var charsRgx = new RegExp('[' + inChars + ']', 'g');
+    var dictionary = {};
+
+    function lookup(key) {
+      return dictionary[key] || key;
+    }
+
+    for (var i = 0; i < inChars.length; i++) {
+      dictionary[inChars[i]] = outChars[i];
+    }
+
+    return function (text) {
+      return text.replace(charsRgx, lookup);
+    }
+  })(),
 };
 
 module.exports = utils;
@@ -1698,7 +1717,7 @@ function filterByReviewerGroups(hotel, reviewerGroups) {
   if (!reviewerGroups) return true;
   for (var i = 0; i < reviewerGroups.length; i++) {
     var review = hotel.reviewMap[reviewerGroups[i]];
-    if (review && review.score >= 80) {
+    if (review && review.score >= 80 && review.count >= 100) {
       return true;
     }
   }
@@ -1728,7 +1747,7 @@ module.exports = {
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
-        && utils.filterByMatchingText(hotel.name, filter.name)
+        && utils.filterByTextMatching(hotel.name, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups);
     });
