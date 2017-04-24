@@ -29,6 +29,14 @@ module.exports = {
       }
     }
 
+    function hasOvernightLeg(legs) {
+      var hasOvernight = false;
+      legs.forEach(function(leg) {
+        if (leg.overnight) hasOvernight = true;
+      });
+      return hasOvernight;
+    }
+
     function hasAirportChangeAtStopover(legs) {
       for (var i = 0; i < legs.length - 1; i++) {
         if (legs[i].arrivalAirportCode !== legs[i + 1].departureAirportCode) return true;
@@ -105,6 +113,8 @@ module.exports = {
     trip.arrivalTimeMinutes = legs[legs.length - 1].arrivalTimeMinutes;
 
     trip.marketingAirline = getMarketingAirline(legs);
+
+    trip.overnight = hasOvernightLeg(legs);
   },
 
   prepareLeg: function(leg, staticData) {
