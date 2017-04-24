@@ -107,11 +107,12 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by recommendedReviewerCodeMap', function() {
+    it('filtering by recommended Reviewer', function() {
       var hotel1 = createHotel({
         reviewMap: {
           FAMILY: {
             score: 90,
+            count: 200
           }
         }
       });
@@ -119,6 +120,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
         reviewMap: {
           BUSINESS: {
             score: 90,
+            count: 90
           }
         }
       });
@@ -126,16 +128,18 @@ describe('wego-hotel-filtering-behavior_test', function() {
         reviewMap: {
           FAMILY: {
             score: 70,
+            count: 200
           },
           BUSINESS: {
             score: 70,
+            count: 200
           },
         },
       });
 
       expect(filtering.filterHotels([hotel1, hotel2, hotel3], {
         reviewerGroups: ['FAMILY', 'BUSINESS'],
-      })).to.deep.equal([hotel1, hotel2]);
+      })).to.deep.equal([hotel1]);
     });
 
     it('priceRange', function() {
