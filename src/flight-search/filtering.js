@@ -24,10 +24,10 @@ function filterByStopoverOptions(trip, stopoverOptions) {
 function filterByItineraryOptions(trip, itineraryOptions) {
   if (!itineraryOptions) return true;
   for (var i = 0; i < itineraryOptions.length; i++) {
-    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
-    if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
   }
-  return true;
+  return false;
 }
 
 function filterByRanges(trip, ranges, field) {

@@ -975,6 +975,22 @@ module.exports = {
       }
     }
 
+    function hasOvernightLeg(legs) {
+      var hasOvernight = false;
+      legs.forEach(function(leg) {
+        if (leg.overnight) hasOvernight = true;
+      });
+      return hasOvernight;
+    }
+
+    function hasLongStopoverLeg(legs) {
+      var longStopover = false;
+      legs.forEach(function(leg) {
+        if (leg.longStopover) longStopover = true;
+      });
+      return longStopover;
+    }
+
     function hasAirportChangeAtStopover(legs) {
       for (var i = 0; i < legs.length - 1; i++) {
         if (legs[i].arrivalAirportCode !== legs[i + 1].departureAirportCode) return true;
@@ -1051,6 +1067,10 @@ module.exports = {
     trip.arrivalTimeMinutes = legs[legs.length - 1].arrivalTimeMinutes;
 
     trip.marketingAirline = getMarketingAirline(legs);
+
+    trip.overnight = hasOvernightLeg(legs);
+
+    trip.longStopover = hasLongStopoverLeg(legs);
   },
 
   prepareLeg: function(leg, staticData) {
@@ -1178,10 +1198,10 @@ function filterByStopoverOptions(trip, stopoverOptions) {
 function filterByItineraryOptions(trip, itineraryOptions) {
   if (!itineraryOptions) return true;
   for (var i = 0; i < itineraryOptions.length; i++) {
-    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
-    if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
   }
-  return true;
+  return false;
 }
 
 function filterByRanges(trip, ranges, field) {
