@@ -25,7 +25,7 @@ function filterByRateAmenities(hotel, rateAmenityIds) {
 
   for (var i = 0; i < rates.length; i++) {
     for (var j = 0; j < rateAmenityIds.length; j++) {
-      if (rates[i].rateAmenityIds.includes(rateAmenityIds[j])) return true;
+      if (rates[i].rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) return true;
     }
   }
   

@@ -45,24 +45,6 @@ describe('HotelSearchClient', function() {
     })
   });
 
-  describe('#updateRateAmenityIds', function() {
-    it('should reset and do new polling', function() {
-      client.mergeResponse({
-      });
-
-      client.poller.timer = null;
-      client.poller.pollCount = 2;
-
-      var rateAmenityIds = [];
-
-      client.updateRateAmenityIds(rateAmenityIds);
-
-      expect(client.rateAmenityIds).to.equal(rateAmenityIds);
-      expect(client.poller.pollCount).to.equal(0);
-      expect(client.poller.timer).to.not.equal(null);
-    });
-  });
-
   it('#updateSort', function() {
     var hotels;
     var client = new HotelSearchClient({
@@ -252,7 +234,6 @@ describe('HotelSearchClient', function() {
     var checkIn = '2017-02-07';
     var checkOut = '2017-02-07';
     var countryCode = 'SG';
-    var rateAmenityIds = [1, 2, 3];
     var deviceType = 'desktop';
     var appType = 'IOS_APP';
     var searchId = 111;
@@ -272,8 +253,6 @@ describe('HotelSearchClient', function() {
       }
     });
 
-    client.rateAmenityIds = rateAmenityIds;
-
     client.search = {
       cityCode: cityCode,
       roomsCount: roomsCount,
@@ -289,7 +268,6 @@ describe('HotelSearchClient', function() {
     var requestBody = client.getSearchRequestBody();
     var requestSearch = requestBody.search;
 
-    expect(requestBody.rateAmenityIds).to.deep.equal(rateAmenityIds);
     expect(requestBody.offset).to.equal(lastRatesCount);
     expect(requestSearch.id).to.equal(searchId);
     expect(requestSearch.cityCode).to.equal(cityCode);
