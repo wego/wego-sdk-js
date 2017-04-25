@@ -1759,7 +1759,7 @@ function filterByReviewerGroups(hotel, reviewerGroups) {
 }
 
 function filterByRateAmenities(hotel, rateAmenityIds) {
-  if (!rateAmenityIds) return true;
+  if (!rateAmenityIds || rateAmenityIds.length === 0) return true;
   var rates = hotel.rates;
 
   if (!rates) return false;
