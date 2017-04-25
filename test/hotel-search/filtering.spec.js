@@ -174,7 +174,36 @@ describe('wego-hotel-filtering-behavior_test', function() {
 
       expect(hotels).to.deep.equal([hotel2, hotel3, hotel4]);
     });
+
+    it('filtering by rate amenities', function() {
+      var filter = {
+        rateAmenityIds: [1, 2]
+      };
+
+      var hotel1 = {
+        rates: [createRateWithRateAmenities([1,2])]
+      };
+
+      var hotel2 = {
+        rates: [createRateWithRateAmenities([3,2])]
+      };
+
+      var hotel3 = {
+        rates: [createRateWithRateAmenities([3,4])]
+      };
+
+      var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
+
+      expect(hotels).to.deep.equal([hotel1, hotel2]);
+    });
+
   });
+
+  function createRateWithRateAmenities(amenities) {
+    return {
+      rateAmenityIds: amenities
+    }
+  }
 
   function createRateWithAmountUsd(amountUsd) {
     return {

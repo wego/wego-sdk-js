@@ -17,6 +17,21 @@ function filterByReviewerGroups(hotel, reviewerGroups) {
   return false;
 }
 
+function filterByRateAmenities(hotel, rateAmenityIds) {
+  if (!rateAmenityIds) return true;
+  var rates = hotel.rates;
+
+  if (!rates) return false;
+
+  for (var i = 0; i < rates.length; i++) {
+    for (var j = 0; j < rateAmenityIds.length; j++) {
+      if (rates[i].rateAmenityIds.includes(rateAmenityIds[j])) return true;
+    }
+  }
+  
+  return false;
+}
+
 function filterByPrice(hotel, priceRange) {
   if (!priceRange) return true;
   return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
@@ -42,7 +57,8 @@ module.exports = {
         && utils.filterByKey(hotel.brandId, brandIdMap)
         && utils.filterByTextMatching(hotel.name, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
-        && filterByReviewerGroups(hotel, filter.reviewerGroups);
+        && filterByReviewerGroups(hotel, filter.reviewerGroups)
+        && filterByRateAmenities(hotel, filter.rateAmenityIds);
     });
   }
 };
