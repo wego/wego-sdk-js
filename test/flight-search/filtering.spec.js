@@ -363,26 +363,6 @@ describe('filtering', function() {
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip2, trip3]);
     });
-
-    it('filter by provider types', function() {
-      var filter = {
-        providerTypes: ['airline']
-      };
-
-      var fare1 = createFareWithProviderType('ota');
-      var fare2 = createFareWithProviderType('ota');
-      var fare3 = createFareWithProviderType('airline');
-
-      var trip1 = {
-        fares: [fare1, fare2]
-      };
-
-      var trip2 = {
-        fares: [fare2, fare3]
-      }
-
-      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip2]);
-    });
   });
 
   describe('filtering by itineraryOptions', function() {
@@ -455,6 +435,47 @@ describe('filtering', function() {
     });
   });
 
+  describe('filtering by providerTypes', function() {
+    it('filter for instant book', function() {
+      var filter = {
+        providerTypes: ['instant']
+      };
+
+      var fare1 = createFareWithProvider('ota', 'wego.com-kiwi');
+      var fare2 = createFareWithProvider('ota');
+      var fare3 = createFareWithProvider('airline');
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2, fare3]
+      }
+
+      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip1]);
+    });
+
+    it('filter for airline', function() {
+      var filter = {
+        providerTypes: ['airline']
+      };
+
+      var fare1 = createFareWithProvider('ota', 'wego.com-kiwi');
+      var fare2 = createFareWithProvider('airline');
+
+      var trip1 = {
+        fares: [fare1]
+      };
+
+      var trip2 = {
+        fares: [fare2]
+      }
+
+      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip2]);
+    });
+  });
+
   function createFareWithAmountUsd(amountUsd) {
     return {
       price: {
@@ -463,10 +484,11 @@ describe('filtering', function() {
     };
   }
 
-  function createFareWithProviderType(providerType) {
+  function createFareWithProvider(providerType, providerCode) {
     return {
       provider: {
-        type: providerType
+        type: providerType,
+        code: providerCode || 'some-provider.com'
       }
     }
   }

@@ -1185,6 +1185,7 @@ function filterByProviderTypes(trip, providerTypes) {
 
   if (!fares) return false;
   for (var i = 0; i < fares.length; i++) {
+    if (fares[i].provider.code.includes('wego.com') && providerTypes.includes('instant')) return true;
     if (providerTypes.includes(fares[i].provider.type)) return true;
   }
 
