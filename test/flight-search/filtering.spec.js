@@ -363,6 +363,26 @@ describe('filtering', function() {
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip2, trip3]);
     });
+
+    it('filter by provider types', function() {
+      var filter = {
+        providerTypes: ['airline']
+      };
+
+      var fare1 = createFareWithProviderType('ota');
+      var fare2 = createFareWithProviderType('ota');
+      var fare3 = createFareWithProviderType('airline');
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2, fare3]
+      }
+
+      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip2]);
+    });
   });
 
   describe('filtering by itineraryOptions', function() {
@@ -441,6 +461,14 @@ describe('filtering', function() {
         amountUsd: amountUsd,
       }
     };
+  }
+
+  function createFareWithProviderType(providerType) {
+    return {
+      provider: {
+        type: providerType
+      }
+    }
   }
 
 });
