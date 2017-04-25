@@ -1179,6 +1179,18 @@ function filterByPrice(trip, priceRange) {
   return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
+function filterByProviderTypes(trip, providerTypes) {
+  if (!providerTypes) return true;
+  var fares = trip.fares;
+
+  if (!fares) return false;
+  for (var i = 0; i < fares.length; i++) {
+    if (providerTypes.includes(fares[i].provider.type)) return true;
+  }
+
+  return false;
+}
+
 function filterByTripOptions(trip, tripOptions) {
   if (!tripOptions) return true;
   for (var i = 0; i < tripOptions.length; i++) {
@@ -1245,7 +1257,8 @@ module.exports = {
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
         && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
         && filterByItineraryOptions(trip, filter.itineraryOptions)
-        && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds);
+        && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
+        && filterByProviderTypes(trip, filter.providerTypes);
     });
   }
 };
