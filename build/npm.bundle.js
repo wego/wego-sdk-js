@@ -527,6 +527,7 @@ var HotelSearchClient = function(options) {
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
   this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
+  this.onSearchCreated = options.onSearchCreated || function() {};
 
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
@@ -556,6 +557,7 @@ HotelSearchClient.prototype = {
   handleSearchResponse: function(response) {
     this.mergeResponse(response);
     this.updateResult();
+    if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
