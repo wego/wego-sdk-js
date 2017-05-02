@@ -548,14 +548,16 @@ describe('data-utils', function() {
       expect(convertedPrice.totalAmountUsd).to.equal(totalAmountUsd);
     });
 
-    it('#converting amountUsd and totalAmountUsd to different currency when having different currency', function() {
+    it('#converting amountUsd, totalAmountUsd, originalAmountUsd to different currency when having different currency', function() {
       var currencyCode = 'CC';
       var amount = 10;
+      var originalAmount = 8;
       var totalAmount = 40;
       var price = {
         currencyCode: 'FC',
         amountUsd: 5,
         totalAmountUsd: 20,
+        originalAmountUsd: 4
       };
 
       var currency = {
@@ -568,6 +570,32 @@ describe('data-utils', function() {
       expect(convertedPrice.currency).to.equal(currency);
       expect(convertedPrice.amount).to.equal(amount);
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.originalAmount).to.equal(originalAmount);
+    });
+
+    it('#converting amountUsd, totalAmountUsd, originalAmountUsd to different currency when having different currency with rounding off', function() {
+      var currencyCode = 'CC';
+      var amount = 5;
+      var originalAmount = 8;
+      var totalAmount = 40;
+      var price = {
+        currencyCode: 'FC',
+        amountUsd: 2.7,
+        totalAmountUsd: 20,
+        originalAmountUsd: 3.75
+      };
+
+      var currency = {
+        code: currencyCode,
+        rate: 2,
+      };
+
+      var convertedPrice = dataUtils.convertPrice(price, currency);
+
+      expect(convertedPrice.currency).to.equal(currency);
+      expect(convertedPrice.amount).to.equal(amount);
+      expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.originalAmount).to.equal(originalAmount);
     });
   });
 

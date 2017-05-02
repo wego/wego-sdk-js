@@ -195,19 +195,23 @@ module.exports = {
     if (!price) return null;
     var amount = price.amount;
     var totalAmount = price.totalAmount;
+    var originalAmount = price.originalAmount;
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = Math.round(price.totalAmountUsd * exchangeRate);
+      originalAmount = Math.round(price.originalAmountUsd * exchangeRate);
     }
 
     return {
       currency: currency,
       amount: amount,
+      originalAmount: originalAmount,
       totalAmount: totalAmount,
       amountUsd: price.amountUsd,
       totalAmountUsd: price.totalAmountUsd,
+      originalAmountUsd: price.originalAmountUsd
     };
   },
 
