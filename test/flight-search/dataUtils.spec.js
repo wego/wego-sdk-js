@@ -362,6 +362,28 @@ describe('data-utils', function() {
 
       expect(fare.price.currency).to.equal(currency);
     });
+
+    it('paymentFees', function() {
+      var fare = {
+        paymentFees: [
+          {
+            amount: 1,
+            amountUsd: '1',
+            currencyCode: 'SGD'
+          }
+        ]
+      }
+
+      var currency = {
+        code: 'VND',
+        rate: 2
+      };
+
+      dataUtils.prepareFare(fare, currency, createStaticData());
+
+      expect(fare.paymentFees[0].currencyCode).to.equal(currency.code);
+      expect(fare.paymentFees[0].amount).to.equal(2);
+    })
   });
 
   it('#prepareSegment', function() {
@@ -597,6 +619,83 @@ describe('data-utils', function() {
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
       expect(convertedPrice.originalAmount).to.equal(originalAmount);
     });
+
+    it('#convertPaymentFee should not convert if currency is the same', function() {
+      var paymentFee = {
+        currencyCode: 'USD',
+        amount: 1.4,
+        amountUsd: 1.0
+      }
+
+      var currency = {
+        code: 'USD'
+      }
+
+      var convertedPaymentFee = dataUtils.convertPaymentFee(paymentFee, currency);
+
+      expect(convertedPaymentFee.amount).to.equal(1.4);
+    });
+
+    it('converPaymentFee should convert to different exchange rate', function() {
+      var paymentFee = {
+        currencyCode: 'SGD',
+        amount: 1.4,
+        amountUsd: 1.0
+      }
+
+      var currency = {
+        code: 'USD',
+        rate: 3
+      }
+
+      var convertedPaymentFee = dataUtils.convertPaymentFee(paymentFee, currency);
+
+      expect(convertedPaymentFee.amount).to.equal(3);
+    });
+
+    it('converPaymentFee should convert to different exchange rate', function() {
+      var paymentFee = {
+        currencyCode: 'SGD',
+        amount: 1.4,
+        amountUsd: 1.0
+      }
+
+      var currency = {
+        code: 'USD',
+        rate: 3
+      }
+
+      var convertedPaymentFee = dataUtils.convertPaymentFee(paymentFee, currency);
+
+      expect(convertedPaymentFee.amount).to.equal(3);
+      expect(convertedPaymentFee.currencyCode).to.equal('USD');
+    });
+
+    it('converPaymentFees should convert to different exchange rate', function() {
+      var paymentFee = [
+        {
+          currencyCode: 'SGD',
+          amount: 1.4,
+          amountUsd: 1.0
+        },
+        {
+          currencyCode: 'SGD',
+          amount: 1.4,
+          amountUsd: 2.0
+        },
+      ]
+
+      var currency = {
+        code: 'USD',
+        rate: 3
+      }
+
+      var convertedPaymentFees = dataUtils.convertPaymentFees(paymentFee, currency);
+
+      expect(convertedPaymentFees[0].amount).to.equal(3);
+      expect(convertedPaymentFees[1].amount).to.equal(6);
+    });
+
   });
 
   function createStaticData(data) {

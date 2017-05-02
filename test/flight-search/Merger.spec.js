@@ -18,7 +18,14 @@ describe('FlightSearchMerger', function() {
         price: {
           currencyCode: 'vnd',
           amountUsd: 10,
-        }
+        },
+        paymentFees: [
+          {
+            currencyCode: 'vnd',
+            amount: 1.3,
+            amountUsd: 1
+          }
+        ]
       };
 
       var currency = {
@@ -42,6 +49,7 @@ describe('FlightSearchMerger', function() {
       expect(newTrip.fares[0].price.amount).to.equal(20);
       expect(newTrips).to.not.equal(oldTrips);
       expect(newTrip).to.not.equal(oldTrip);
+      expect(newTrip.fares[0].paymentFees[0].amount).to.equal(2);
     });
 
     it('update filter', function() {

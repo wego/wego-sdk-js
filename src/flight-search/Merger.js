@@ -45,6 +45,7 @@ FlightSearchMerger.prototype = {
     for (var tripId in tripMap) {
       tripMap[tripId].fares.forEach(function(fare) {
         fare.price = dataUtils.convertPrice(fare.price, currency);
+        fare.paymentFees = dataUtils.convertPaymentFees(fare.paymentFees, currency);
       });
     }
     this._cloneTrips(Object.keys(tripMap));
