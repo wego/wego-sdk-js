@@ -172,6 +172,7 @@ module.exports = {
   prepareFare: function(fare, currency, staticData) {
     fare.provider = staticData.providers[fare.providerCode];
     fare.price = this.convertPrice(fare.price, currency);
+    fare.paymentFees = this.convertPaymentFees(fare.paymentFees, currency);
   },
 
   prepareFilterOption: function(option, type, currency, staticData) {
@@ -195,20 +196,51 @@ module.exports = {
     if (!price) return null;
     var amount = price.amount;
     var totalAmount = price.totalAmount;
+    var originalAmount = price.originalAmount;
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = Math.round(price.totalAmountUsd * exchangeRate);
+      originalAmount = Math.round(price.originalAmountUsd * exchangeRate);
     }
 
     return {
       currency: currency,
       amount: amount,
+      originalAmount: originalAmount,
       totalAmount: totalAmount,
       amountUsd: price.amountUsd,
       totalAmountUsd: price.totalAmountUsd,
+      originalAmountUsd: price.originalAmountUsd
     };
+  },
+
+  convertPaymentFee: function(paymentFee, currency) {
+    if (!currency) return paymentFee;
+    if (!paymentFee) return null;
+
+    var amount = paymentFee.amount;
+    if (paymentFee.currencyCode !== currency.code) {
+      var exchangeRate = currency.rate;
+      amount = paymentFee.amountUsd * exchangeRate;
+    }
+
+    return {
+      paymentMethodId: paymentFee.paymentMethodId,
+      currencyCode: currency.code,
+      amount: amount,
+      amountUsd: paymentFee.amountUsd
+    };
+  },
+
+  convertPaymentFees: function(paymentFees, currency) {
+    if (!paymentFees) return null;
+
+    var self = this;
+    return paymentFees.map(function(paymentFee) {
+      return self.convertPaymentFee(paymentFee, currency)
+    });
   },
 
   __filterOptionTypeToStaticDataType: {
