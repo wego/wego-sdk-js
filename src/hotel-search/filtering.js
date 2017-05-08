@@ -7,7 +7,7 @@ function filterByReviewScore(hotel, filter) {
 }
 
 function filterByReviewerGroups(hotel, reviewerGroups) {
-  if (!reviewerGroups) return true;
+  if (!reviewerGroups || reviewerGroups.length === 0) return true;
   for (var i = 0; i < reviewerGroups.length; i++) {
     var review = hotel.reviewMap[reviewerGroups[i]];
     if (review && review.score >= 80 && review.count >= 100) {
