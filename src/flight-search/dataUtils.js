@@ -88,6 +88,19 @@ module.exports = {
       return ans;
     }
 
+    function getDestinationAirportCodes(legs) {
+      var codes = [legs[0].arrivalAirportCode];
+      if (legs.length > 1) {
+        for (var i = 1; i < legs.length; i ++) {
+          var code = legs[i].departureAirportCode;
+          if (!codes.includes(code)) {
+            codes.push(legs[i].departureAirportCode);
+          }
+        }
+      }
+      return codes;
+    }
+
     trip.stopCode = getStopCode(legs);
 
     trip.airlineCodes = concatListsToList(legs.map(function(leg){
@@ -125,6 +138,8 @@ module.exports = {
     trip.overnight = hasOvernightLeg(legs);
 
     trip.longStopover = hasLongStopoverLeg(legs);
+
+    trip.destinationAirportCodes = getDestinationAirportCodes(legs);
   },
 
   prepareLeg: function(leg, staticData) {

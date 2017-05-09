@@ -72,6 +72,25 @@ describe('data-utils', function() {
       expect(trip.airlineCodes).to.deep.equal(['x', 'y', 'z', 't']);
     });
 
+    it('destinationAirportCodes', function() {
+      var trip = {
+        legs: [
+          createLeg({
+            arrivalAirportCode: 'x'
+          }),
+          createLeg({
+            departureAirportCode: 'y'
+          }),
+          createLeg({
+            departureAirportCode: 'y'
+          })
+        ]
+      };
+
+      dataUtils.prepareTrip(trip, createStaticData());
+
+      expect(trip.destinationAirportCodes).to.deep.equal(['x', 'y']);
+    });
     it('allianceCodes', function() {
       var trip = {
         legs: [

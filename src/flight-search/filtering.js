@@ -78,7 +78,7 @@ module.exports = {
         && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
         && filterByTripOptions(trip, filter.tripOptions)
         && utils.filterByKey(trip.departureAirportCode, originAirportCodeMap)
-        && utils.filterByKey(trip.arrivalAirportCode, destinationAirportCodeMap)
+        && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
         && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
         && filterByStopoverOptions(trip, filter.stopoverOptions)
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
