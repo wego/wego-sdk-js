@@ -41,8 +41,8 @@ module.exports = {
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
     return {

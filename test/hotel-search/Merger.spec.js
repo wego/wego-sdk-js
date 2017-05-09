@@ -21,12 +21,18 @@ describe('Merger', function() {
       var hotel = {
         id: 1,
       };
+      
+      var roomsCount = 1;
+      var nightsCount = 2;
+      var amountUsd = 10.15;
+      var totalAmountUsd = amountUsd * roomsCount * nightsCount;
 
       var rate = {
         hotelId: 1,
         price: {
           currencyCode: 'vnd',
-          amountUsd: 10,
+          amountUsd: 10.15,
+          totalAmountUsd: totalAmountUsd
         }
       };
 
@@ -49,6 +55,7 @@ describe('Merger', function() {
       var newHotel = newHotels[0];
 
       expect(newHotel.rates[0].price.amount).to.equal(20);
+      expect(newHotel.rates[0].price.totalAmount).to.equal(40);
       expect(newHotels).to.not.equal(oldHotels);
       expect(newHotel).to.not.equal(oldHotel);
     });
