@@ -703,6 +703,7 @@ FlightSearchMerger.prototype = {
     for (var tripId in tripMap) {
       tripMap[tripId].fares.forEach(function(fare) {
         fare.price = dataUtils.convertPrice(fare.price, currency);
+        fare.paymentFees = dataUtils.convertPaymentFees(fare.paymentFees, currency);
       });
     }
     this._cloneTrips(Object.keys(tripMap));
@@ -944,6 +945,7 @@ FlightSearchMerger.prototype = {
 
 module.exports = FlightSearchMerger;
 
+
 /***/ }),
 /* 7 */
 /***/ (function(module, exports) {
@@ -1038,6 +1040,34 @@ module.exports = {
       return ans;
     }
 
+    // Destination and origin will not work for multi city
+    // as there is no concept of destination or origin
+    function getDestinationAirportCodes(legs) {
+      var codes = [legs[0].arrivalAirportCode];
+      if (legs.length > 1) {
+        for (var i = 1; i < legs.length; i ++) {
+          var code = legs[i].departureAirportCode;
+          if (!codes.includes(code)) {
+            codes.push(legs[i].departureAirportCode);
+          }
+        }
+      }
+      return codes;
+    }
+
+    function getOriginAirportCodes(legs) {
+      var codes = [legs[0].departureAirportCode];
+      if (legs.length > 1) {
+        for (var i = 1; i < legs.length; i ++) {
+          var code = legs[i].arrivalAirportCode;
+          if (!codes.includes(code)) {
+            codes.push(legs[i].arrivalAirportCode);
+          }
+        }
+      }
+      return codes;
+    }
+
     trip.stopCode = getStopCode(legs);
 
     trip.airlineCodes = concatListsToList(legs.map(function(leg){
@@ -1075,6 +1105,10 @@ module.exports = {
     trip.overnight = hasOvernightLeg(legs);
 
     trip.longStopover = hasLongStopoverLeg(legs);
+
+    trip.destinationAirportCodes = getDestinationAirportCodes(legs);
+
+    trip.originAirportCodes = getOriginAirportCodes(legs)
   },
 
   prepareLeg: function(leg, staticData) {
@@ -1122,6 +1156,7 @@ module.exports = {
   prepareFare: function(fare, currency, staticData) {
     fare.provider = staticData.providers[fare.providerCode];
     fare.price = this.convertPrice(fare.price, currency);
+    fare.paymentFees = this.convertPaymentFees(fare.paymentFees, currency);
   },
 
   prepareFilterOption: function(option, type, currency, staticData) {
@@ -1145,20 +1180,51 @@ module.exports = {
     if (!price) return null;
     var amount = price.amount;
     var totalAmount = price.totalAmount;
+    var originalAmount = price.originalAmount;
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = Math.round(price.totalAmountUsd * exchangeRate);
+      originalAmount = Math.round(price.originalAmountUsd * exchangeRate);
     }
 
     return {
       currency: currency,
       amount: amount,
+      originalAmount: originalAmount,
       totalAmount: totalAmount,
       amountUsd: price.amountUsd,
       totalAmountUsd: price.totalAmountUsd,
+      originalAmountUsd: price.originalAmountUsd
     };
+  },
+
+  convertPaymentFee: function(paymentFee, currency) {
+    if (!currency) return paymentFee;
+    if (!paymentFee) return null;
+
+    var amount = paymentFee.amount;
+    if (paymentFee.currencyCode !== currency.code) {
+      var exchangeRate = currency.rate;
+      amount = paymentFee.amountUsd * exchangeRate;
+    }
+
+    return {
+      paymentMethodId: paymentFee.paymentMethodId,
+      currencyCode: currency.code,
+      amount: amount,
+      amountUsd: paymentFee.amountUsd
+    };
+  },
+
+  convertPaymentFees: function(paymentFees, currency) {
+    if (!paymentFees) return null;
+
+    var self = this;
+    return paymentFees.map(function(paymentFee) {
+      return self.convertPaymentFee(paymentFee, currency)
+    });
   },
 
   __filterOptionTypeToStaticDataType: {
@@ -1255,8 +1321,8 @@ module.exports = {
         && filterByAirlines(trip, airlineCodeMap)
         && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
         && filterByTripOptions(trip, filter.tripOptions)
-        && utils.filterByKey(trip.departureAirportCode, originAirportCodeMap)
-        && utils.filterByKey(trip.arrivalAirportCode, destinationAirportCodeMap)
+        && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
+        && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
         && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
         && filterByStopoverOptions(trip, filter.stopoverOptions)
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
@@ -1752,7 +1818,7 @@ function filterByReviewScore(hotel, filter) {
 }
 
 function filterByReviewerGroups(hotel, reviewerGroups) {
-  if (!reviewerGroups) return true;
+  if (!reviewerGroups || reviewerGroups.length === 0) return true;
   for (var i = 0; i < reviewerGroups.length; i++) {
     var review = hotel.reviewMap[reviewerGroups[i]];
     if (review && review.score >= 80 && review.count >= 100) {

@@ -88,6 +88,34 @@ module.exports = {
       return ans;
     }
 
+    // Destination and origin will not work for multi city
+    // as there is no concept of destination or origin
+    function getDestinationAirportCodes(legs) {
+      var codes = [legs[0].arrivalAirportCode];
+      if (legs.length > 1) {
+        for (var i = 1; i < legs.length; i ++) {
+          var code = legs[i].departureAirportCode;
+          if (!codes.includes(code)) {
+            codes.push(legs[i].departureAirportCode);
+          }
+        }
+      }
+      return codes;
+    }
+
+    function getOriginAirportCodes(legs) {
+      var codes = [legs[0].departureAirportCode];
+      if (legs.length > 1) {
+        for (var i = 1; i < legs.length; i ++) {
+          var code = legs[i].arrivalAirportCode;
+          if (!codes.includes(code)) {
+            codes.push(legs[i].arrivalAirportCode);
+          }
+        }
+      }
+      return codes;
+    }
+
     trip.stopCode = getStopCode(legs);
 
     trip.airlineCodes = concatListsToList(legs.map(function(leg){
@@ -125,6 +153,10 @@ module.exports = {
     trip.overnight = hasOvernightLeg(legs);
 
     trip.longStopover = hasLongStopoverLeg(legs);
+
+    trip.destinationAirportCodes = getDestinationAirportCodes(legs);
+
+    trip.originAirportCodes = getOriginAirportCodes(legs)
   },
 
   prepareLeg: function(leg, staticData) {

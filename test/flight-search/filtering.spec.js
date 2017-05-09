@@ -170,15 +170,15 @@ describe('filtering', function() {
 
     it('filtering by originAirportCodes', function() {
       var trip1 = {
-        departureAirportCode: 'A3',
+        originAirportCodes: ['A3'],
       };
 
       var trip2 = {
-        departureAirportCode: 'A1',
+        originAirportCodes: ['A1'],
       };
 
       var trip3 = {
-        departureAirportCode: 'A5',
+        originAirportCodes: ['A5'],
       };
 
       var filter = {
@@ -188,24 +188,24 @@ describe('filtering', function() {
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
     });
 
-    it('filtering by arrivalAirportCodes', function() {
+    it('filtering by destinationAirportCodes', function() {
       var trip1 = {
-        arrivalAirportCode: 'A3',
+        destinationAirportCodes: ['A3', 'A1'],
       };
 
       var trip2 = {
-        arrivalAirportCode: 'A1',
+        destinationAirportCodes: ['A1'],
       };
 
       var trip3 = {
-        arrivalAirportCode: 'A5',
+        destinationAirportCodes: ['A5'],
       };
 
       var filter = {
         destinationAirportCodes: ['A3', 'A5'],
       };
 
-      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
+      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip3]);
     });
 
     it('filtering by stopoverAirportCodes', function() {
