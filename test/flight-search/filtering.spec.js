@@ -170,15 +170,15 @@ describe('filtering', function() {
 
     it('filtering by originAirportCodes', function() {
       var trip1 = {
-        departureAirportCode: 'A3',
+        originAirportCodes: ['A3'],
       };
 
       var trip2 = {
-        departureAirportCode: 'A1',
+        originAirportCodes: ['A1'],
       };
 
       var trip3 = {
-        departureAirportCode: 'A5',
+        originAirportCodes: ['A5'],
       };
 
       var filter = {
