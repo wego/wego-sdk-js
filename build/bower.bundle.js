@@ -178,11 +178,11 @@ module.exports = utils;
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://srv.wegostaging.com',
+      metasearch: 'https://srv.wegostaging.com/v2',
       place: 'https://srv.wego.com'
     },
     production: {
-      metasearch: 'https://srv.wego.com',
+      metasearch: 'https://srv.wego.com/v2',
       place: 'https://srv.wego.com'
     }
   },
