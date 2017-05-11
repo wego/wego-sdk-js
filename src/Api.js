@@ -1,7 +1,7 @@
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://services-desktop-staging.bezurk.org',
+      metasearch: 'https://srv.wegostaging.com',
       place: 'https://srv.wego.com'
     },
     production: {
