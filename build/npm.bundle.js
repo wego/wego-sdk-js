@@ -178,7 +178,7 @@ module.exports = utils;
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://services-desktop-staging.bezurk.org',
+      metasearch: 'https://srv.wegostaging.com',
       place: 'https://srv.wego.com'
     },
     production: {
@@ -1747,8 +1747,8 @@ module.exports = {
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
     return {
