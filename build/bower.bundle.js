@@ -178,11 +178,11 @@ module.exports = utils;
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://services-desktop-staging.bezurk.org',
+      metasearch: 'https://srv.wegostaging.com/v2',
       place: 'https://srv.wego.com'
     },
     production: {
-      metasearch: 'https://srv.wego.com',
+      metasearch: 'https://srv.wego.com/v2',
       place: 'https://srv.wego.com'
     }
   },
@@ -192,7 +192,7 @@ var Api = {
   },
 
   getEnvironment: function() {
-    return this.env || 'staging';
+    return this.env || Wego.ENV || 'staging';
   },
 
   searchTrips: function(requestBody, query) {
@@ -1747,8 +1747,8 @@ module.exports = {
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = price.amountUsd * exchangeRate;
-      totalAmount = price.totalAmountUsd * exchangeRate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
     return {
