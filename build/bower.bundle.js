@@ -192,7 +192,7 @@ var Api = {
   },
 
   getEnvironment: function() {
-    return this.env || 'staging';
+    return this.env || Wego.ENV || 'staging';
   },
 
   searchTrips: function(requestBody, query) {
