@@ -617,8 +617,8 @@ describe('data-utils', function() {
       var totalAmount = 40;
       var price = {
         currencyCode: 'FC',
-        amountUsd: 5,
-        totalAmountUsd: 20,
+        amountUsd: 5.2,
+        totalAmountUsd: 20.8,
         originalAmountUsd: 4
       };
 
