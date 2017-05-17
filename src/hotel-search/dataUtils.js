@@ -63,7 +63,7 @@ module.exports = {
 
   isBetterRate: function(firstRate, secondRate) {
     function processRateAmount(rate) {
-      var amount = rate.price.amount;
+      var amount = Math.round(rate.price.amount);
       if (amount > 99999) {
         amount = (amount / 100) * 100;
       }
