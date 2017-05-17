@@ -189,14 +189,14 @@ describe('dataUtils', function() {
     it('resolve by ecpc', function() {
       var r1 = {
         price: {
-          amount: 100000,
+          amount: 100000.3,
           ecpc: 1,
         }
       };
 
       var r2 = {
         price: {
-          amount: 100099,
+          amount: 100099.2,
           ecpc: 2,
         }
       };
