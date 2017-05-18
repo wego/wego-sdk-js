@@ -1702,7 +1702,9 @@ module.exports = HotelSearchClient;
 
 /***/ }),
 /* 11 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
 
 module.exports = {
   prepareHotel: function(hotel, staticData) {
@@ -1751,13 +1753,12 @@ module.exports = {
       totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
-    return {
-      currency: currency,
-      amount: amount,
-      totalAmount: totalAmount,
-      amountUsd: price.amountUsd,
-      totalAmountUsd: price.totalAmountUsd,
-    };
+    var convertedPrice = utils.cloneObject(price);
+    convertedPrice.currency = currency;
+    convertedPrice.amount = amount;
+    convertedPrice.totalAmount = totalAmount;
+    
+    return convertedPrice;
   },
 
   prepareFilterOption: function(option, type, staticData) {
@@ -1789,7 +1790,7 @@ module.exports = {
     var secondRateAmount = processRateAmount(secondRate);
     if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
 
-    return firstRate.ecpc > secondRate.ecpc;
+    return firstRate.price.ecpc > secondRate.price.ecpc;
   },
 
   __filterOptionTypeToStaticDataType: {
