@@ -144,6 +144,42 @@ describe('dataUtils', function() {
       expect(convertedPrice.amount).to.equal(amount);
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
     });
+
+    it('#returns converted price include all other fields', function() {
+      var currencyCode = 'CC';
+      var amount = 10;
+      var amountUsd = 1;
+      var totalAmount = 40;
+      var totalAmountUsd = 2;
+      var taxAmountUsd = 1;
+      var ecpc = 0.5;
+      var localTaxAmount = 1;
+      var price = {
+        currencyCode: currencyCode,
+        amount: amount,
+        totalAmount: totalAmount,
+        amountUsd: amountUsd,
+        totalAmountUsd: totalAmountUsd,
+        taxAmountUsd: taxAmountUsd,
+        ecpc: ecpc,
+        localTaxAmount: localTaxAmount,
+      };
+
+      var currency = {
+        code: currencyCode,
+      };
+
+      var convertedPrice = dataUtils.convertPrice(price, currency);
+
+      expect(convertedPrice.currency).to.equal(currency);
+      expect(convertedPrice.amount).to.equal(amount);
+      expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.amountUsd).to.equal(amountUsd);
+      expect(convertedPrice.totalAmountUsd).to.equal(totalAmountUsd);
+      expect(convertedPrice.taxAmountUsd).to.equal(taxAmountUsd);
+      expect(convertedPrice.ecpc).to.equal(ecpc);
+      expect(convertedPrice.localTaxAmount).to.equal(localTaxAmount);
+    });
   });
 
   describe('#isBetterRate', function() {
