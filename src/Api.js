@@ -28,6 +28,11 @@ var Api = {
     return this.post(requestBody, uri, query);
   },
 
+  fetchHotelDetails: function(hotelId, query) {
+    var uri = this.__host[this.getEnvironment()].place + '/hotels/hotels/' + hotelId;
+    return this.get(uri, query);
+  },
+
   fetchCities: function(query) {
     var uri = this.__host[this.getEnvironment()].place + '/places/cities';
     return this.get(uri, query);
