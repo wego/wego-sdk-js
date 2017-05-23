@@ -211,12 +211,6 @@ var Api = {
     return this.post(requestBody, uri, query);
   },
 
-  fetchHotelRates: function(hotelId, query) {
-    var uri = this.__host[this.getEnvironment()].v2 + '/metasearch/hotels/' + hotelId + '/rates';
-
-    return this.get(uri, query);
-  },
-
   fetchHotelDetails: function(hotelId, query) {
     var uri = this.__host[this.getEnvironment()].v1 + '/hotels/hotels/' + hotelId;
     return this.get(uri, query);
@@ -544,8 +538,7 @@ var HotelDetailsClient = function(options) {
     delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
     pollLimit: 7,
     callApi: function() {
-      return Api.fetchHotelRates(self.getSearchRequestBody().search.hotelId, {
-        searchId: self.searchId,
+      return Api.searchHotel(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale,
       });
@@ -592,25 +585,33 @@ HotelDetailsClient.prototype = {
   },
 
   getSearchRequestBody: function() {
-    var hotelSearch = this.search || {};
-    var currency = this.currency || {};
-    var currencyCode = currency.code;
-    var locale = this.locale;
+    var self = this,
+        hotelSearch = self.search || {},
+        currency = self.currency || {},
+        currencyCode = currency.code,
+        locale = self.locale
+        searchRequestBody = {};
 
-    return {
-        'search': {
-          'cityCode': hotelSearch.cityCode,
-          'roomsCount': hotelSearch.roomsCount,
-          'guestsCount': hotelSearch.guestsCount,
-          'hotelId': hotelSearch.hotelId,
-          'checkIn': hotelSearch.checkIn,
-          'checkOut': hotelSearch.checkOut,
-          'locale': locale,
-          'siteCode': this.siteCode,
-          'currencyCode': currencyCode,
-          'deviceType': this.deviceType
-        }
-      };
+    searchRequestBody = {
+      'search': {
+        'cityCode': hotelSearch.cityCode,
+        'roomsCount': hotelSearch.roomsCount,
+        'guestsCount': hotelSearch.guestsCount,
+        'hotelId': hotelSearch.hotelId,
+        'checkIn': hotelSearch.checkIn,
+        'checkOut': hotelSearch.checkOut,
+        'locale': locale,
+        'siteCode': self.siteCode,
+        'currencyCode': currencyCode,
+        'deviceType': self.deviceType
+      }
+    };
+
+    if (self.searchId !== undefined) {
+      searchRequestBody.search.id = self.searchId;
+    }
+
+    return searchRequestBody;
   },
 };
 
