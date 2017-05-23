@@ -36,6 +36,7 @@ HotelDetailsClient.prototype = {
     self.search = search;
 
     if (mainSearchId !== undefined) {
+      self.reset();
       self.searchId = mainSearchId;
       self.poller.start();
     } else {
