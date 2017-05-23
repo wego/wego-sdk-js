@@ -566,7 +566,7 @@ HotelDetailsClient.prototype = {
       }).then(function (hotelSearch) {
         self.reset();
         self.searchId = hotelSearch.search.id;
-        self.onSearchCreated(hotelSearch);
+        self.onSearchCreated(hotelSearch.search);
         self.poller.start();
       });
     }
