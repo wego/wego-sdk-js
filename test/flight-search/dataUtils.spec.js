@@ -639,7 +639,7 @@ describe('data-utils', function() {
       var currencyCode = 'CC';
       var amount = 5;
       var originalAmount = 8;
-      var totalAmount = 40;
+      var totalAmount = 35;
       var price = {
         currencyCode: 'FC',
         amountUsd: 2.7,

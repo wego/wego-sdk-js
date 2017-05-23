@@ -566,14 +566,10 @@ HotelDetailsClient.prototype = {
       }).then(function (hotelSearch) {
         self.reset();
         self.searchId = hotelSearch.search.id;
-        self.handleSearchResponse(hotelSearch);
+        self.onSearchCreated(hotelSearch);
         self.poller.start();
       });
     }
-  },
-
-  handleSearchResponse: function(response) {
-    this.onSearchCreated(response.search);
   },
 
   reset: function() {
@@ -593,17 +589,17 @@ HotelDetailsClient.prototype = {
         searchRequestBody = {};
 
     searchRequestBody = {
-      'search': {
-        'cityCode': hotelSearch.cityCode,
-        'roomsCount': hotelSearch.roomsCount,
-        'guestsCount': hotelSearch.guestsCount,
-        'hotelId': hotelSearch.hotelId,
-        'checkIn': hotelSearch.checkIn,
-        'checkOut': hotelSearch.checkOut,
-        'locale': locale,
-        'siteCode': self.siteCode,
-        'currencyCode': currencyCode,
-        'deviceType': self.deviceType
+      search: {
+        cityCode: hotelSearch.cityCode,
+        roomsCount: hotelSearch.roomsCount,
+        guestsCount: hotelSearch.guestsCount,
+        hotelId: hotelSearch.hotelId,
+        checkIn: hotelSearch.checkIn,
+        checkOut: hotelSearch.checkOut,
+        locale: locale,
+        siteCode: self.siteCode,
+        currencyCode: currencyCode,
+        deviceType: self.deviceType
       }
     };
 
