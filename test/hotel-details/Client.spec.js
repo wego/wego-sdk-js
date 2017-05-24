@@ -27,6 +27,24 @@ describe('HotelDetailsClient', function() {
     })
   });
 
+  describe('#searchHotelRates', function() {
+    it('start poller', function() {
+      client.poller.timer = 0;
+      client.poller.start();
+      expect(client.poller.timer).not.equal(0);
+    })
+
+    it('calls onProgressChanged', () => {
+      var onProgressChanged = sinon.spy();
+      client = new HotelDetailsClient({
+        onProgressChanged: onProgressChanged
+      });
+
+      client.handleSearchResponse({});
+      expect(onProgressChanged).to.have.been.calledOnce();
+    });
+  });
+
   it('#getSearchRequestBody', function() {
     var locale = 'en';
     var currencyCode = 'currencyCode';

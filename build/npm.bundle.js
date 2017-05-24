@@ -548,8 +548,7 @@ var HotelDetailsClient = function(options) {
       });
     },
     onSuccessResponse: function(response) {
-      self.onProgressChanged(self.poller.getProgress());
-      self.onHotelRatesChanged(response);
+      return self.handleSearchResponse(response);
     },
   });
   self.reset();
@@ -577,6 +576,13 @@ HotelDetailsClient.prototype = {
         self.poller.start();
       });
     }
+  },
+
+  handleSearchResponse: function(response) {
+    var self = this;
+
+    self.onProgressChanged(self.poller.getProgress());
+    self.onHotelRatesChanged(response);
   },
 
   reset: function() {
