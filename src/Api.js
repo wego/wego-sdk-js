@@ -1,12 +1,12 @@
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://srv.wegostaging.com/v2',
-      place: 'https://srv.wego.com'
+      v2: 'https://srv.wegostaging.com/v2',
+      v1: 'https://srv.wego.com'
     },
     production: {
-      metasearch: 'https://srv.wego.com/v2',
-      place: 'https://srv.wego.com'
+      v2: 'https://srv.wego.com/v2',
+      v1: 'https://srv.wego.com'
     }
   },
 
@@ -19,27 +19,33 @@ var Api = {
   },
 
   searchTrips: function(requestBody, query) {
-    var uri = this.__host[this.getEnvironment()].metasearch + '/metasearch/flights/searches';
+    var uri = this.__host[this.getEnvironment()].v2 + '/metasearch/flights/searches';
     return this.post(requestBody, uri, query);
   },
 
   searchHotels: function(requestBody, query) {
-    var uri = this.__host[this.getEnvironment()].metasearch + '/metasearch/hotels/searches';
+    var uri = this.__host[this.getEnvironment()].v2 + '/metasearch/hotels/searches';
+    return this.post(requestBody, uri, query);
+  },
+
+  searchHotel: function(requestBody, query) {
+    var hotelId = requestBody.search.hotelId,
+        uri = this.__host[this.getEnvironment()].v2 + '/metasearch/hotels/' + hotelId + '/searches';
     return this.post(requestBody, uri, query);
   },
 
   fetchHotelDetails: function(hotelId, query) {
-    var uri = this.__host[this.getEnvironment()].place + '/hotels/hotels/' + hotelId;
+    var uri = this.__host[this.getEnvironment()].v1 + '/hotels/hotels/' + hotelId;
     return this.get(uri, query);
   },
 
   fetchCities: function(query) {
-    var uri = this.__host[this.getEnvironment()].place + '/places/cities';
+    var uri = this.__host[this.getEnvironment()].v1 + '/places/cities';
     return this.get(uri, query);
   },
 
   fetchAirports: function(query) {
-    var uri = this.__host[this.getEnvironment()].place + '/places/airports';
+    var uri = this.__host[this.getEnvironment()].v1 + '/places/airports';
     return this.get(uri, query);
   },
 

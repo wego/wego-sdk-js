@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -178,12 +178,12 @@ module.exports = utils;
 var Api = {
   __host: {
     staging: {
-      metasearch: 'https://srv.wegostaging.com/v2',
-      place: 'https://srv.wego.com'
+      v2: 'https://srv.wegostaging.com/v2',
+      v1: 'https://srv.wego.com'
     },
     production: {
-      metasearch: 'https://srv.wego.com/v2',
-      place: 'https://srv.wego.com'
+      v2: 'https://srv.wego.com/v2',
+      v1: 'https://srv.wego.com'
     }
   },
 
@@ -196,27 +196,33 @@ var Api = {
   },
 
   searchTrips: function(requestBody, query) {
-    var uri = this.__host[this.getEnvironment()].metasearch + '/metasearch/flights/searches';
+    var uri = this.__host[this.getEnvironment()].v2 + '/metasearch/flights/searches';
     return this.post(requestBody, uri, query);
   },
 
   searchHotels: function(requestBody, query) {
-    var uri = this.__host[this.getEnvironment()].metasearch + '/metasearch/hotels/searches';
+    var uri = this.__host[this.getEnvironment()].v2 + '/metasearch/hotels/searches';
+    return this.post(requestBody, uri, query);
+  },
+
+  searchHotel: function(requestBody, query) {
+    var hotelId = requestBody.search.hotelId,
+        uri = this.__host[this.getEnvironment()].v2 + '/metasearch/hotels/' + hotelId + '/searches';
     return this.post(requestBody, uri, query);
   },
 
   fetchHotelDetails: function(hotelId, query) {
-    var uri = this.__host[this.getEnvironment()].place + '/hotels/hotels/' + hotelId;
+    var uri = this.__host[this.getEnvironment()].v1 + '/hotels/hotels/' + hotelId;
     return this.get(uri, query);
   },
 
   fetchCities: function(query) {
-    var uri = this.__host[this.getEnvironment()].place + '/places/cities';
+    var uri = this.__host[this.getEnvironment()].v1 + '/places/cities';
     return this.get(uri, query);
   },
 
   fetchAirports: function(query) {
-    var uri = this.__host[this.getEnvironment()].place + '/places/airports';
+    var uri = this.__host[this.getEnvironment()].v1 + '/places/airports';
     return this.get(uri, query);
   },
 
@@ -365,9 +371,9 @@ module.exports = Poller;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(6);
-var sorting = __webpack_require__(9);
-var filtering = __webpack_require__(8);
+var FlightSearchMerger = __webpack_require__(7);
+var sorting = __webpack_require__(10);
+var filtering = __webpack_require__(9);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -513,9 +519,107 @@ module.exports = FlightSearchClient;
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(10);
-var sorting = __webpack_require__(13);
-var filtering = __webpack_require__(12);
+var Api = __webpack_require__(1);
+var Poller = __webpack_require__(2);
+
+var HotelDetailsClient = function(options) {
+  var self = this;
+
+  options = options || {};
+  self.currency  = options.currency || {};
+  self.locale = options.locale;
+  self.searchId = options.searchId;
+  self.siteCode = options.siteCode;
+  self.deviceType = options.deviceType || "DESKTOP";
+  self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
+  self.onSearchCreated = options.onSearchCreated || function() {};
+
+  self.poller = new Poller({
+    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
+    pollLimit: 7,
+    callApi: function() {
+      return Api.searchHotel(self.getSearchRequestBody(), {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+      });
+    },
+    onSuccessResponse: function(response) {
+      self.onHotelRatesChanged(response);
+    },
+  });
+  self.reset();
+};
+
+HotelDetailsClient.prototype = {
+  searchHotelRates: function(search, mainSearchId) {
+    var self = this;
+    self.search = search;
+
+    if (mainSearchId !== undefined) {
+      self.reset();
+      self.searchId = mainSearchId;
+      self.poller.start();
+    } else {
+      Api.searchHotel(self.getSearchRequestBody(), {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+      }).then(function (hotelSearch) {
+        self.reset();
+        self.searchId = hotelSearch.search.id;
+        self.onSearchCreated(hotelSearch.search);
+        self.poller.start();
+      });
+    }
+  },
+
+  reset: function() {
+    this.poller.reset();
+  },
+
+  updateCurrency: function(currency) {
+    this.currency = currency;
+  },
+
+  getSearchRequestBody: function() {
+    var self = this,
+        hotelSearch = self.search || {},
+        currency = self.currency || {},
+        currencyCode = currency.code,
+        locale = self.locale
+        searchRequestBody = {};
+
+    searchRequestBody = {
+      search: {
+        cityCode: hotelSearch.cityCode,
+        roomsCount: hotelSearch.roomsCount,
+        guestsCount: hotelSearch.guestsCount,
+        hotelId: hotelSearch.hotelId,
+        checkIn: hotelSearch.checkIn,
+        checkOut: hotelSearch.checkOut,
+        locale: locale,
+        siteCode: self.siteCode,
+        currencyCode: currencyCode,
+        deviceType: self.deviceType
+      }
+    };
+
+    if (self.searchId !== undefined) {
+      searchRequestBody.search.id = self.searchId;
+    }
+
+    return searchRequestBody;
+  },
+};
+
+module.exports = HotelDetailsClient;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var HotelSearchMerger = __webpack_require__(11);
+var sorting = __webpack_require__(14);
+var filtering = __webpack_require__(13);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -644,24 +748,26 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Api = __webpack_require__(1);
 var FlightSearchClient = __webpack_require__(3);
-var HotelSearchClient = __webpack_require__(4);
+var HotelSearchClient = __webpack_require__(5);
+var HotelDetailsClient = __webpack_require__(4);
 
 module.exports = {
   Api: Api,
   FlightSearchClient: FlightSearchClient,
   HotelSearchClient: HotelSearchClient,
+  HotelDetailsClient: HotelDetailsClient,
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(7);
+var dataUtils = __webpack_require__(8);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -952,7 +1058,7 @@ module.exports = FlightSearchMerger;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1244,7 +1350,7 @@ module.exports = {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1340,7 +1446,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1436,11 +1542,11 @@ module.exports = {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
-var dataUtils = __webpack_require__(11);
+var dataUtils = __webpack_require__(12);
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -1706,7 +1812,7 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1812,7 +1918,7 @@ module.exports = {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1881,7 +1987,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1952,10 +2058,10 @@ module.exports = {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var WegoSdk = __webpack_require__(5);
+var WegoSdk = __webpack_require__(6);
 window.WegoSdk = WegoSdk;
 
 /***/ })
