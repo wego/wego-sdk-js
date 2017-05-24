@@ -34,6 +34,7 @@ HotelDetailsClient.prototype = {
   searchHotelRates: function(search, mainSearchId) {
     var self = this;
     self.search = search;
+    self.searchId = undefined;
 
     if (mainSearchId !== undefined) {
       self.reset();
