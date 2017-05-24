@@ -313,6 +313,9 @@ Poller.prototype = {
       return 100;
     }
 
+    if (this.resultCount === undefined) {
+      return this.pollCount / this.pollLimit * 100;
+    }
     return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
   },
 
@@ -531,6 +534,7 @@ var HotelDetailsClient = function(options) {
   self.searchId = options.searchId;
   self.siteCode = options.siteCode;
   self.deviceType = options.deviceType || "DESKTOP";
+  self.onProgressChanged = options.onProgressChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
   self.onSearchCreated = options.onSearchCreated || function() {};
 
@@ -544,7 +548,7 @@ var HotelDetailsClient = function(options) {
       });
     },
     onSuccessResponse: function(response) {
-      self.onHotelRatesChanged(response);
+      return self.handleSearchResponse(response);
     },
   });
   self.reset();
@@ -557,6 +561,7 @@ HotelDetailsClient.prototype = {
 
     if (mainSearchId !== undefined) {
       self.reset();
+      self.onProgressChanged(self.poller.getProgress());
       self.searchId = mainSearchId;
       self.poller.start();
     } else {
@@ -565,11 +570,19 @@ HotelDetailsClient.prototype = {
         locale: self.locale,
       }).then(function (hotelSearch) {
         self.reset();
+        self.onProgressChanged(self.poller.getProgress());
         self.searchId = hotelSearch.search.id;
         self.onSearchCreated(hotelSearch.search);
         self.poller.start();
       });
     }
+  },
+
+  handleSearchResponse: function(response) {
+    var self = this;
+
+    self.onProgressChanged(self.poller.getProgress());
+    self.onHotelRatesChanged(response);
   },
 
   reset: function() {
