@@ -25,6 +25,9 @@ Poller.prototype = {
       return 100;
     }
 
+    if (this.resultCount === undefined) {
+      return this.pollCount / this.pollLimit * 100;
+    }
     return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
   },
 
