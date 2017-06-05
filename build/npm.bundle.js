@@ -1594,7 +1594,7 @@ HotelSearchClient.prototype = {
     if (emptyBrands.length > 0) {
       console.log("Got empty brands", emptyBrands)
       emptyBrands.forEach(function(b) {
-        emptyHotels = Object.values(this.__hotels).filter(function(v) {return v.brandId == b.code;})
+        emptyHotels = Object.values(this.__hotels).filter(function(v) {return v.brandId == parseInt(b.code);})
         console.log("With hotels: ", emptyHotel);
         emptyHotels.forEach(function(h) {
           console.log("With rates: ", h.rates);
