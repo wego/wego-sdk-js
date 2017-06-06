@@ -18,12 +18,16 @@ describe('FlightSearchMerger', function() {
         price: {
           currencyCode: 'vnd',
           amountUsd: 10,
+          originalAmountUsd: 10,
+          totalAmountUsd: 10,
         },
         paymentFees: [
           {
             currencyCode: 'vnd',
             amount: 1.3,
-            amountUsd: 1
+            amountUsd: 1,
+            originalAmountUsd: 1,
+            totalAmountUsd: 1,
           }
         ]
       };
@@ -62,6 +66,8 @@ describe('FlightSearchMerger', function() {
         price: {
           currencyCode: 'vnd',
           amountUsd: 10,
+          originalAmountUsd: 10,
+          totalAmountUsd: 10,
         }
       };
 
@@ -92,6 +98,8 @@ describe('FlightSearchMerger', function() {
           minPrice: {
             currencyCode: 'vnd',
             amountUsd: 10,
+            originalAmountUsd: 10,
+            totalAmountUsd: 10,
           }
         }
       });
@@ -118,6 +126,8 @@ describe('FlightSearchMerger', function() {
           maxPrice: {
             currencyCode: 'vnd',
             amountUsd: 10,
+            originalAmountUsd: 10,
+            totalAmountUsd: 10,
           }
         }
       });
@@ -313,6 +323,8 @@ describe('FlightSearchMerger', function() {
       providerCode: providerCode,
       price: {
         amountUsd: 10,
+        originalAmountUsd: 10,
+        totalAmountUsd: 10,
       }
     };
 
@@ -322,6 +334,8 @@ describe('FlightSearchMerger', function() {
       providerCode: providerCode,
       price: {
         amountUsd: 5,
+        originalAmountUsd: 5,
+        totalAmountUsd: 5,
       }
     };
 
@@ -331,6 +345,8 @@ describe('FlightSearchMerger', function() {
       providerCode: providerCode,
       price: {
         amountUsd: 7,
+        originalAmountUsd: 7,
+        totalAmountUsd: 7,
       }
     };
 
@@ -340,6 +356,8 @@ describe('FlightSearchMerger', function() {
       providerCode: providerCode,
       price: {
         amountUsd: 7,
+        originalAmountUsd: 7,
+        totalAmountUsd: 7,
       }
     };
 
@@ -373,11 +391,15 @@ describe('FlightSearchMerger', function() {
     it('updating price for existing options', function() {
       var price = {
         amountUsd: 5,
+        originalAmountUsd: 5,
+        totalAmountUsd: 5,
         currencyCode: 'VND',
       };
 
       var newPrice = {
         amountUsd: 20,
+        originalAmountUsd: 20,
+        totalAmountUsd: 20,
         currencyCode: 'VND',
       };
 
@@ -624,6 +646,8 @@ describe('FlightSearchMerger', function() {
       var price  = {
         currencyCode: 'sgd',
         amountUsd: 10,
+        originalAmountUsd: 10,
+        totalAmountUsd: 10,
       };
 
       merger.currency = {
@@ -645,6 +669,8 @@ describe('FlightSearchMerger', function() {
       var price  = {
         currencyCode: 'sgd',
         amountUsd: 10,
+        originalAmountUsd: 10,
+        totalAmountUsd: 10,
       };
 
       merger.currency = {

@@ -595,6 +595,7 @@ describe('data-utils', function() {
         totalAmount: totalAmount,
         amountUsd: amountUsd,
         totalAmountUsd: totalAmountUsd,
+        paymentFeeAmountUsd: 2
       };
 
       var currency = {
@@ -614,7 +615,7 @@ describe('data-utils', function() {
       var currencyCode = 'CC';
       var amount = 10;
       var originalAmount = 8;
-      var totalAmount = 40;
+      var totalAmount = 32;
       var price = {
         currencyCode: 'FC',
         amountUsd: 5.2,
@@ -630,8 +631,34 @@ describe('data-utils', function() {
       var convertedPrice = dataUtils.convertPrice(price, currency);
 
       expect(convertedPrice.currency).to.equal(currency);
-      expect(convertedPrice.amount).to.equal(amount);
+      expect(convertedPrice.amount).to.equal(originalAmount);
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.originalAmount).to.equal(originalAmount);
+    });
+
+    it('#converting amountUsd, totalAmountUsd, originalAmountUsd to different currency when having different currency with paymentFee', function() {
+      var currencyCode = 'CC';
+      var amount = 10;
+      var originalAmount = 8;
+      var totalAmount = 40;
+      var price = {
+        currencyCode: 'FC',
+        amountUsd: 5.2,
+        totalAmountUsd: 20.8,
+        originalAmountUsd: 4,
+        paymentFeeAmountUsd: 2
+      };
+
+      var currency = {
+        code: currencyCode,
+        rate: 2,
+      };
+
+      var convertedPrice = dataUtils.convertPrice(price, currency);
+
+      expect(convertedPrice.currency).to.equal(currency);
+      expect(convertedPrice.amount).to.equal(12);
+      expect(convertedPrice.totalAmount).to.equal(48);
       expect(convertedPrice.originalAmount).to.equal(originalAmount);
     });
 
@@ -644,7 +671,8 @@ describe('data-utils', function() {
         currencyCode: 'FC',
         amountUsd: 2.7,
         totalAmountUsd: 20,
-        originalAmountUsd: 3.75
+        originalAmountUsd: 3.75,
+        paymentFeeAmountUsd: 2
       };
 
       var currency = {
@@ -655,8 +683,8 @@ describe('data-utils', function() {
       var convertedPrice = dataUtils.convertPrice(price, currency);
 
       expect(convertedPrice.currency).to.equal(currency);
-      expect(convertedPrice.amount).to.equal(amount);
-      expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.amount).to.equal(12);
+      expect(convertedPrice.totalAmount).to.equal(84);
       expect(convertedPrice.originalAmount).to.equal(originalAmount);
     });
 
