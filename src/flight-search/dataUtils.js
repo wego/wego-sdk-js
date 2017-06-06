@@ -229,13 +229,17 @@ module.exports = {
     var amount = price.amount;
     var totalAmount = price.totalAmount;
     var originalAmount = price.originalAmount;
-    var paymentFeeAmountUsd = price.paymentFeeAmountUsd;
+    var paymentFeeAmountUsd = 0;
+
+    if (price.paymentFeeAmountUsd) {
+      paymentFeeAmountUsd = price.paymentFeeAmountUsd;
+    }
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
       originalAmount = Math.round(price.originalAmountUsd * exchangeRate);
       amount = originalAmount + Math.round(paymentFeeAmountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
     return {
