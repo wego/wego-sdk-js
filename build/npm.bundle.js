@@ -644,7 +644,7 @@ var HotelSearchClient = function(options) {
   this.locale = options.locale;
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
-  this.appType = options.appType;
+  this.appType = options.appType || "WEB_APP";
   this.rateAmenityIds = options.rateAmenityIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
@@ -1587,6 +1587,20 @@ HotelSearchClient.prototype = {
     this._mergeRatesCounts(response.providerRatesCounts);
 
     this._cloneHotels(hotelIds);
+    console.log("MergeResponse");
+    console.log(this);
+    brands = this.__filterOptionsMap.brands
+    emptyBrands = Object.values(brands).filter(function(v) {return v.name == undefined;})
+    if (emptyBrands.length > 0) {
+      console.log("Got empty brands", emptyBrands)
+      emptyBrands.forEach(function(b) {
+        emptyHotels = Object.values(this.__hotels).filter(function(v) {return v.brandId == parseInt(b.code);})
+        console.log("With hotels: ", emptyHotel);
+        emptyHotels.forEach(function(h) {
+          console.log("With rates: ", h.rates);
+        });
+      });
+    }
   },
 
   getFilter: function() {
