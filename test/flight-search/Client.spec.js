@@ -207,6 +207,8 @@ describe('FlightSearchClient', function() {
             currencyCode: 'SGD',
             amount: 1000,
             amountUsd: 100,
+            originalAmountUsd: 100,
+            totalAmountUsd: 100,
           },
         },
       ],
@@ -217,6 +219,8 @@ describe('FlightSearchClient', function() {
               currencyCode: 'SGD',
               amount: 1000,
               amountUsd: 50,
+              originalAmountUsd: 50,
+              totalAmountUsd: 50,
             }
           }
         ]
@@ -453,6 +457,8 @@ describe('FlightSearchClient', function() {
         tripId: 1,
         price:  {
           amountUsd: 100,
+          originalAmountUsd: 100,
+          totalAmountUsd: 100,
         },
       };
 
@@ -463,6 +469,8 @@ describe('FlightSearchClient', function() {
         tripId: 2,
         price:  {
           amountUsd: 70,
+          originalAmountUsd: 70,
+          totalAmountUsd: 70,
         },
       };
 
@@ -502,6 +510,8 @@ describe('FlightSearchClient', function() {
         tripId: 1,
         price:  {
           amountUsd: 100,
+          originalAmountUsd: 100,
+          totalAmountUsd: 100,
         },
       };
 
@@ -512,6 +522,8 @@ describe('FlightSearchClient', function() {
         tripId: 2,
         price:  {
           amountUsd: 70,
+          originalAmountUsd: 70,
+          totalAmountUsd: 70,
         },
       };
 
@@ -543,6 +555,8 @@ describe('FlightSearchClient', function() {
         tripId: 1,
         price:  {
           amountUsd: 100,
+          originalAmountUsd: 100,
+          totalAmountUsd: 100,
         },
       };
 
@@ -556,6 +570,8 @@ describe('FlightSearchClient', function() {
         tripId: 2,
         price:  {
           amountUsd: 70,
+          originalAmountUsd: 70,
+          totalAmountUsd: 70,
         },
       };
 
@@ -587,6 +603,8 @@ describe('FlightSearchClient', function() {
         tripId: 1,
         price:  {
           amountUsd: 100,
+          originalAmountUsd: 100,
+          totalAmountUsd: 100,
         },
       };
 
@@ -600,6 +618,8 @@ describe('FlightSearchClient', function() {
         tripId: 2,
         price:  {
           amountUsd: 70,
+          originalAmountUsd: 70,
+          totalAmountUsd: 70,
         },
       };
 
