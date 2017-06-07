@@ -1306,12 +1306,17 @@ module.exports = {
     var amount = price.amount;
     var totalAmount = price.totalAmount;
     var originalAmount = price.originalAmount;
+    var paymentFeeAmountUsd = 0;
+
+    if (price.paymentFeeAmountUsd) {
+      paymentFeeAmountUsd = price.paymentFeeAmountUsd;
+    }
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
-      amount = Math.round(price.amountUsd * exchangeRate);
-      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
       originalAmount = Math.round(price.originalAmountUsd * exchangeRate);
+      amount = originalAmount + Math.round(paymentFeeAmountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
     }
 
     return {
@@ -1321,7 +1326,8 @@ module.exports = {
       totalAmount: totalAmount,
       amountUsd: price.amountUsd,
       totalAmountUsd: price.totalAmountUsd,
-      originalAmountUsd: price.originalAmountUsd
+      originalAmountUsd: price.originalAmountUsd,
+      paymentFeeAmountUsd: paymentFeeAmountUsd
     };
   },
 
@@ -1332,7 +1338,7 @@ module.exports = {
     var amount = paymentFee.amount;
     if (paymentFee.currencyCode !== currency.code) {
       var exchangeRate = currency.rate;
-      amount = paymentFee.amountUsd * exchangeRate;
+      amount = Math.round(paymentFee.amountUsd * exchangeRate);
     }
 
     return {
