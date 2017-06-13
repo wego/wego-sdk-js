@@ -12,6 +12,7 @@ var HotelSearchClient = function(options) {
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
   this.appType = options.appType || "WEB_APP";
+  this.userLoggedIn = options.userLoggedIn || "";
   this.rateAmenityIds = options.rateAmenityIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
@@ -118,7 +119,8 @@ HotelSearchClient.prototype = {
         checkIn: search.checkIn,
         checkOut: search.checkOut,
         deviceType: this.deviceType,
-        appType: this.appType
+        appType: this.appType,
+        userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
       offset: this.lastRatesCount,

@@ -534,6 +534,8 @@ var HotelDetailsClient = function(options) {
   self.searchId = options.searchId;
   self.siteCode = options.siteCode;
   self.deviceType = options.deviceType || "DESKTOP";
+  self.appType = options.appType || "WEB_APP";
+  self.userLoggedIn = options.userLoggedIn || "";
   self.onProgressChanged = options.onProgressChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
   self.onSearchCreated = options.onSearchCreated || function() {};
@@ -613,7 +615,9 @@ HotelDetailsClient.prototype = {
         locale: locale,
         siteCode: self.siteCode,
         currencyCode: currencyCode,
-        deviceType: self.deviceType
+        deviceType: self.deviceType,
+        appType: self.appType,
+        userLoggedIn: self.userLoggedIn
       }
     };
 
@@ -645,6 +649,7 @@ var HotelSearchClient = function(options) {
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
   this.appType = options.appType || "WEB_APP";
+  this.userLoggedIn = options.userLoggedIn || "";
   this.rateAmenityIds = options.rateAmenityIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
@@ -751,7 +756,8 @@ HotelSearchClient.prototype = {
         checkIn: search.checkIn,
         checkOut: search.checkOut,
         deviceType: this.deviceType,
-        appType: this.appType
+        appType: this.appType,
+        userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
       offset: this.lastRatesCount,
