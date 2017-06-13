@@ -11,7 +11,7 @@ var HotelDetailsClient = function(options) {
   self.siteCode = options.siteCode;
   self.deviceType = options.deviceType || "DESKTOP";
   self.appType = options.appType || "WEB_APP";
-  self.userLoggedIn = options.userLoggedIn || "";
+  self.userLoggedIn = options.userLoggedIn;
   self.onProgressChanged = options.onProgressChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
   self.onSearchCreated = options.onSearchCreated || function() {};
@@ -93,7 +93,7 @@ HotelDetailsClient.prototype = {
         currencyCode: currencyCode,
         deviceType: self.deviceType,
         appType: self.appType,
-        userLoggedIn: self.userLoggedIn
+        userLoggedIn: hotelSearch.userLoggedIn
       }
     };
 
