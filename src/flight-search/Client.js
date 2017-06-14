@@ -120,6 +120,9 @@ FlightSearchClient.prototype = {
       search: {
         id: this.responseSearch.id,
         cabin: search.cabin,
+        deviceType: this.deviceType,
+        appType: this.appType,
+        userLoggedIn: this.userLoggedIn,
         adultsCount: search.adultsCount,
         childrenCount: search.childrenCount,
         infantsCount: search.infantsCount,
@@ -139,9 +142,6 @@ FlightSearchClient.prototype = {
       offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
       providerTypes: this.providerTypes,
-      deviceType: this.deviceType,
-      appType: this.appType,
-      userLoggedIn: this.userLoggedIn
     }
   },
 };
