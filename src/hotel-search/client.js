@@ -120,7 +120,7 @@ HotelSearchClient.prototype = {
         checkOut: search.checkOut,
         deviceType: this.deviceType,
         appType: this.appType,
-        userLoggedIn: search.userLoggedIn
+        userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
       offset: this.lastRatesCount,

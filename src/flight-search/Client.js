@@ -10,6 +10,9 @@ var FlightSearchClient = function(options) {
   this.currency  = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
+  this.deviceType = options.deviceType || "DESKTOP";
+  this.appType = options.appType || "WEB_APP";
+  this.userLoggedIn = options.userLoggedIn;
   this.paymentMethodIds = options.paymentMethodIds || [];
   this.providerTypes = options.providerTypes || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
@@ -136,6 +139,9 @@ FlightSearchClient.prototype = {
       offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
       providerTypes: this.providerTypes,
+      deviceType: this.deviceType,
+      appType: this.appType,
+      userLoggedIn: this.userLoggedIn
     }
   },
 };

@@ -386,6 +386,9 @@ var FlightSearchClient = function(options) {
   this.currency  = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
+  this.deviceType = options.deviceType || "DESKTOP";
+  this.appType = options.appType || "WEB_APP";
+  this.userLoggedIn = options.userLoggedIn;
   this.paymentMethodIds = options.paymentMethodIds || [];
   this.providerTypes = options.providerTypes || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
@@ -512,6 +515,9 @@ FlightSearchClient.prototype = {
       offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
       providerTypes: this.providerTypes,
+      deviceType: this.deviceType,
+      appType: this.appType,
+      userLoggedIn: this.userLoggedIn
     }
   },
 };
@@ -617,7 +623,7 @@ HotelDetailsClient.prototype = {
         currencyCode: currencyCode,
         deviceType: self.deviceType,
         appType: self.appType,
-        userLoggedIn: hotelSearch.userLoggedIn
+        userLoggedIn: self.userLoggedIn
       }
     };
 
@@ -757,7 +763,7 @@ HotelSearchClient.prototype = {
         checkOut: search.checkOut,
         deviceType: this.deviceType,
         appType: this.appType,
-        userLoggedIn: search.userLoggedIn
+        userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
       offset: this.lastRatesCount,

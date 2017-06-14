@@ -93,7 +93,7 @@ HotelDetailsClient.prototype = {
         currencyCode: currencyCode,
         deviceType: self.deviceType,
         appType: self.appType,
-        userLoggedIn: hotelSearch.userLoggedIn
+        userLoggedIn: self.userLoggedIn
       }
     };
 
