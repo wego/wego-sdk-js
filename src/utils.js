@@ -36,6 +36,8 @@ var utils = {
 
   filterByAllKeys: function(keys, filterMap) {
     if (!filterMap) return true;
+    if (keys.length === 0) return false;
+
     for (var i = 0; i < keys.length; i++) {
       if (!filterMap[keys[i]]) return false;
     }
