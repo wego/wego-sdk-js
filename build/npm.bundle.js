@@ -230,6 +230,7 @@ var Api = {
 
   post: function(requestBody, uri, query) {
     return fetch(this.buildUrl(uri, query), {
+      credentials: 'include',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
