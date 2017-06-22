@@ -1453,7 +1453,7 @@ function isBothAirlineAndInstant(value) {
   return (value.provider.type === 'airline') || (value.provider.instant || value.provider.code.includes('wego.com'));
 }
 
-function filterByFares(filteredTrips, providerTypes) {
+function filterFaresByProviderTypes(filteredTrips, providerTypes) {
   var allFaresOrig = filteredTrips.filter(function(v){ return v.faresOrig;});
 
   if (allFaresOrig.length > 0) {
@@ -1510,7 +1510,7 @@ module.exports = {
         && filterByProviderTypes(trip, filter.providerTypes);
     });
 
-    filteredTrips = filterByFares(filteredTrips, filter.providerTypes);
+    filteredTrips = filterFaresByProviderTypes(filteredTrips, filter.providerTypes);
 
     return filteredTrips;
   }
