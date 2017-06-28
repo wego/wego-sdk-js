@@ -11,7 +11,7 @@ function filterByProviderTypes(trip, providerTypes) {
 
   if (!fares) return false;
   for (var i = 0; i < fares.length; i++) {
-    if (fares[i].provider.code.includes('wego.com') && providerTypes.includes('instant')) return true;
+    if (fares[i].provider.instant && providerTypes.includes('instant')) return true;
     if (providerTypes.includes(fares[i].provider.type)) return true;
   }
 
@@ -60,7 +60,7 @@ function filterByAirlines(trip, airlineCodeMap) {
 }
 
 function isBothAirlineAndInstant(value) {
-  return (value.provider.type === 'airline') || (value.provider.instant || value.provider.code.includes('wego.com'));
+  return value.provider.type === 'airline' || value.provider.instant;
 }
 
 function filterFaresByProviderTypes(filteredTrips, providerTypes) {
@@ -81,9 +81,9 @@ function filterFaresByProviderTypes(filteredTrips, providerTypes) {
       if (providerTypes.includes('airline') && providerTypes.includes('instant')) {
         filteredTrips[i].fares = filteredTrips[i].fares.filter(isBothAirlineAndInstant);
       } else if (providerTypes.includes('airline')) {
-        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.type === 'airline';});
+        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.type === 'airline' && !v.provider.instant; });
       } else if (providerTypes.includes('instant')) {
-        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.instant || v.provider.code.includes('wego.com');});
+        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.instant; });
       }
     }
   }
