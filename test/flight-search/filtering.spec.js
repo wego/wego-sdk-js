@@ -509,10 +509,12 @@ describe('filtering', function() {
   }
 
   function createFareWithProvider(providerType, providerCode) {
+    var isInstant = (providerCode && providerCode.includes('wego.com')) ? true : false;
     return {
       provider: {
         type: providerType,
-        code: providerCode || 'some-provider.com'
+        code: providerCode || 'some-provider.com',
+        instant: isInstant
       }
     }
   }

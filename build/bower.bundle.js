@@ -1453,34 +1453,6 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
-function filterFaresByProviderTypes(filteredTrips, providerTypes) {
-  var allFaresOrig = filteredTrips.filter(function(v){ return v.faresOrig;});
-
-  if (allFaresOrig.length > 0) {
-    for (var i = 0; i < allFaresOrig.length; i++) {
-      allFaresOrig[i].fares = allFaresOrig[i].faresOrig;
-      delete allFaresOrig[i].faresOrig;
-    }
-  }
-
-  if (providerTypes) {
-    for (var i = 0; i < filteredTrips.length; i++) {
-      if (filteredTrips[i].faresOrig === undefined) {
-        filteredTrips[i].faresOrig = filteredTrips[i].fares;
-      }
-      if (providerTypes.includes('airline') && providerTypes.includes('instant')) {
-        filteredTrips[i].fares = filteredTrips[i].fares.filter(isBothAirlineAndInstant);
-      } else if (providerTypes.includes('airline')) {
-        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.type === 'airline' && !v.provider.instant; });
-      } else if (providerTypes.includes('instant')) {
-        filteredTrips[i].fares = filteredTrips[i].fares.filter(function(v) { return v.provider.instant; });
-      }
-    }
-  }
-
-  return filteredTrips;
-}
-
 module.exports = {
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
@@ -1509,8 +1481,6 @@ module.exports = {
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviderTypes(trip, filter.providerTypes);
     });
-
-    filteredTrips = filterFaresByProviderTypes(filteredTrips, filter.providerTypes);
 
     return filteredTrips;
   }
