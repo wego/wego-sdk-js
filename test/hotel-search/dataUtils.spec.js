@@ -264,58 +264,6 @@ describe('dataUtils', function() {
 
       expect(bestRateOf([r1, r2, r3])).to.equal(r3);
     });
-
-    it('compare two rates when price and provider type same', function() {
-      var r1 = {
-        price: {
-          amount: 10000,
-          ecpc: 1
-        },
-        provider: {
-          code: 'provider1',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
-
-      var r2 = {
-        price: {
-          amount: 10000,
-          ecpc: 2
-        },
-        provider: {
-          code: 'provider2',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
-
-      expect(bestRateOf([r1, r2])).to.equals(r2);
-    });
-
-    it('compare two rates when price is same but first with direct_priority provider', function() {
-      var r1 = {
-        price: {
-          amount: 10000,
-          ecpc: 1
-        },
-        provider: {
-          code: 'provider1',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
-
-      var r2 = {
-        price: {
-          amount: 10000,
-          ecpc: 2
-        },
-        provider: {
-          code: 'provider2',
-          type: 'OTA'
-        }
-      };
-
-      expect(bestRateOf([r1, r2])).to.equals(r1)
-    });
   });
 
   function createStaticData(data) {
