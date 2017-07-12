@@ -84,6 +84,12 @@ module.exports = {
     var secondRateAmount = processRateAmount(secondRate);
     if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
 
+    if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
+      return true;
+    } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
+      return false;
+    }
+
     return firstRate.price.ecpc > secondRate.price.ecpc;
   },
 
