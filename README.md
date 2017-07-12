@@ -90,3 +90,14 @@ Make a new search
 ```
 client.searchHotelRates(hotelSearch, mainSearchId);
 ```
+
+### Test
+```
+npm run test
+```
+
+### Commit
+Need to update and commit bower.bundle.js and npm.bundle.js files
+```
+npm run build
+```
