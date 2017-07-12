@@ -62,9 +62,31 @@ var client = new WegoSdk.HotelSearchClient({
   onProgressChanged: function(progress) {
     // Do something with progress
   },
+  onSearchCreated: function(newSearch) {
+    // Do something with newSearch
+  }
 });
 ```
 Make a new search
 ```
 client.searchHotels(search);
+```
+### Hotel Details Rates SDK Client
+Create client
+```
+var client = new WegoSdk.HotelDetailsClient({
+  onHotelRatesChanged: function(rates) {
+    // Do something with rates
+  },
+  onProgressChanged: function(progress) {
+    // Do something with progress
+  },
+  onSearchCreated: function(newSearch) {
+    // Do something with newSearch
+  }
+});
+```
+Make a new search
+```
+client.searchHotelRates(hotelSearch, mainSearchId);
 ```
