@@ -48,19 +48,23 @@ describe('sorting', function() {
     var trip1 = {
       durationMinutes: 2,
       fares: [createFare(3)],
+      legs: [createLeg(1), createLeg(1)],
     };
 
     var trip2 = {
       durationMinutes: 4,
+      legs: [createLeg(2), createLeg(2)],
     };
 
     var trip3 = {
       durationMinutes: 2,
       fares: [createFare(5)],
+      legs: [createLeg(1), createLeg(1)],
     };
 
     var trip4 = {
       durationMinutes: 3,
+      legs: [createLeg(2), createLeg(1)],
     };
 
     var trips = sorting.sortTrips([trip1, trip2, trip3, trip4], {
@@ -296,6 +300,7 @@ describe('sorting', function() {
     var trip1 = {
       id: 1,
       durationMinutes: 4,
+      legs: [createLeg(2), createLeg(2)],
     };
 
     var trip2 = {
@@ -307,12 +312,14 @@ describe('sorting', function() {
             amountUsd: 2,
           }
         }
-      ]
+      ],
+      legs: [createLeg(2), createLeg(1)],
     };
 
     var trip3 = {
       id: 3,
       durationMinutes: 5,
+      legs: [createLeg(3), createLeg(2)],
     };
 
     var trip4 = {
@@ -324,7 +331,8 @@ describe('sorting', function() {
             amountUsd: 1,
           }
         }
-      ]
+      ],
+      legs: [createLeg(2), createLeg(1)],
     };
 
     expect(sorting.getFastestTrip([trip1, trip2, trip3, trip4])).to.equal(trip4);
@@ -372,19 +380,23 @@ describe('sorting', function() {
     var trip1 = {
       durationMinutes: 2,
       fares: [createFare(3)],
+      legs: [createLeg(1), createLeg(1)],
     };
 
     var trip2 = {
       durationMinutes: 4,
+      legs: [createLeg(2), createLeg(2)],
     };
 
     var trip3 = {
       durationMinutes: 2,
       fares: [createFare(5)],
+      legs: [createLeg(1), createLeg(1)],
     };
 
     var trip4 = {
       durationMinutes: 3,
+      legs: [createLeg(1), createLeg(2)],
     };
 
     var trips = [trip1, trip2, trip3, trip4];
@@ -410,6 +422,12 @@ describe('sorting', function() {
       price: {
         amountUsd: amountUsd,
       }
+    }
+  }
+
+  function createLeg(durationMinutes) {
+    return {
+      durationMinutes: durationMinutes
     }
   }
 });
