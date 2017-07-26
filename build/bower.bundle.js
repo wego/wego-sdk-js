@@ -1502,6 +1502,10 @@ module.exports = {
     }
 
     function getDuration(trip) {
+      if (trip.legs.length > 1) {
+        return trip.legs[0].durationMinutes + trip.legs[1].durationMinutes;
+      }
+
       return trip.durationMinutes;
     }
 
@@ -1554,11 +1558,25 @@ module.exports = {
   },
 
   getFastestTrip: function(trips) {
+    var betterTripDurationMinutes = '';
+    var tripDurationMinutes = '';
+
     return this._getBestTripBy(trips, function(betterTrip, trip) {
-      if (betterTrip.durationMinutes === trip.durationMinutes) {
+      betterTripDurationMinutes = betterTrip.durationMinutes;
+      tripDurationMinutes = trip.durationMinutes;
+
+      if (betterTrip.legs.length > 1) {
+        betterTripDurationMinutes = betterTrip.legs[0].durationMinutes + betterTrip.legs[1].durationMinutes;
+      }
+
+      if (trip.legs.length > 1) {
+        tripDurationMinutes = trip.legs[0].durationMinutes + trip.legs[1].durationMinutes;
+      }
+
+      if (betterTripDurationMinutes === tripDurationMinutes) {
         return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
       }
-      return betterTrip.durationMinutes < trip.durationMinutes;
+      return betterTripDurationMinutes < tripDurationMinutes;
     });
   },
 
