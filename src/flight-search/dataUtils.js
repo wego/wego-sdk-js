@@ -52,6 +52,12 @@ module.exports = {
       return false;
     }
 
+    function getDurationMinutes(legs) {
+      return legs.reduce(function(sum, value) {
+        return sum + value.durationMinutes;
+      }, 0);
+    }
+
     function getMarketingAirline(legs) {
       var marketingAirline = null;
       for (var i = 0; i < legs.length; i++) {
@@ -140,9 +146,7 @@ module.exports = {
       return leg.stopoverDurationMinutes;
     }));
 
-    trip.durationMinutes = max(legs.map(function(leg) {
-      return leg.durationMinutes;
-    }));
+    trip.durationMinutes = getDurationMinutes(legs);
 
     trip.departureTimeMinutes = firstLeg.departureTimeMinutes;
 
