@@ -13,6 +13,7 @@ var HotelDetailsClient = function(options) {
   self.appType = options.appType || "WEB_APP";
   self.userLoggedIn = options.userLoggedIn;
   self.onProgressChanged = options.onProgressChanged || function() {};
+  self.onPollingStatusChanged = options.onPollingStatusChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
   self.onSearchCreated = options.onSearchCreated || function() {};
 
@@ -41,6 +42,7 @@ HotelDetailsClient.prototype = {
     if (mainSearchId !== undefined) {
       self.reset();
       self.onProgressChanged(self.poller.getProgress());
+      self.onPollingStatusChanged(self.poller.pollingStatus());
       self.searchId = mainSearchId;
       self.poller.start();
     } else {
@@ -50,6 +52,7 @@ HotelDetailsClient.prototype = {
       }).then(function (hotelSearch) {
         self.reset();
         self.onProgressChanged(self.poller.getProgress());
+        self.onPollingStatusChanged(self.poller.pollingStatus());
         self.searchId = hotelSearch.search.id;
         self.onSearchCreated(hotelSearch.search);
         self.poller.start();
@@ -61,6 +64,7 @@ HotelDetailsClient.prototype = {
     var self = this;
 
     self.onProgressChanged(self.poller.getProgress());
+    self.onPollingStatusChanged(self.poller.pollingStatus());
     self.onHotelRatesChanged(response);
   },
 
