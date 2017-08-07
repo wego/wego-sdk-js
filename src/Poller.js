@@ -78,6 +78,14 @@ Poller.prototype = {
       self.handleErrorResponse();
     });
   },
+
+  pollingStatus: function() {
+    if (this.pollCount == this.pollLimit) {
+      return 100;
+    }
+
+    return this.pollCount / this.pollLimit * 50 + this.resultCount / 1000 * 50;
+  }
 };
 
 module.exports = Poller;

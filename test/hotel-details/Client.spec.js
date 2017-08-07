@@ -43,6 +43,16 @@ describe('HotelDetailsClient', function() {
       client.handleSearchResponse({});
       expect(onProgressChanged).to.have.been.calledOnce();
     });
+
+    it('calls onPollingStatusChanged', () => {
+      var onPollingStatusChanged = sinon.spy();
+      client = new HotelDetailsClient({
+        onPollingStatusChanged: onPollingStatusChanged
+      });
+
+      client.handleSearchResponse({});
+      expect(onPollingStatusChanged).to.have.been.calledOnce();
+    });
   });
 
   it('#getSearchRequestBody', function() {
