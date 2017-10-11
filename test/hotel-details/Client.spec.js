@@ -1,7 +1,7 @@
-var sinon = require('sinon');
-var HotelDetailsClient = require('../../src/hotel-details/Client');
+var sinon = require("sinon");
+var HotelDetailsClient = require("../../src/hotel-details/Client");
 
-describe('HotelDetailsClient', function() {
+describe("HotelDetailsClient", function() {
   var client;
   beforeEach(function() {
     client = new HotelDetailsClient();
@@ -12,29 +12,29 @@ describe('HotelDetailsClient', function() {
     client._callApi = function() {};
   }
 
-  describe('#reset', function() {
-    it('resets poller', function() {
+  describe("#reset", function() {
+    it("resets poller", function() {
       client.poller.pollCount = 4;
       client.reset();
       expect(client.poller.pollCount).to.equal(0);
     });
 
-    it('abort last request call', function() {
+    it("abort last request call", function() {
       var abort = sinon.spy();
       client.__abortLastRequest = abort;
       client.reset();
       expect(abort).to.have.been.calledOnce;
-    })
+    });
   });
 
-  describe('#searchHotelRates', function() {
-    it('start poller', function() {
+  describe("#searchHotelRates", function() {
+    it("start poller", function() {
       client.poller.timer = 0;
       client.poller.start();
       expect(client.poller.timer).not.equal(0);
-    })
+    });
 
-    it('calls onProgressChanged', () => {
+    it("calls onProgressChanged", () => {
       var onProgressChanged = sinon.spy();
       client = new HotelDetailsClient({
         onProgressChanged: onProgressChanged
@@ -45,17 +45,17 @@ describe('HotelDetailsClient', function() {
     });
   });
 
-  it('#getSearchRequestBody', function() {
-    var locale = 'en';
-    var currencyCode = 'currencyCode';
-    var hotelId = '258101';
-    var siteCode = 'SGD';
-    var cityCode = 'cd';
+  it("#getSearchRequestBody", function() {
+    var locale = "en";
+    var currencyCode = "currencyCode";
+    var hotelId = "258101";
+    var siteCode = "SGD";
+    var cityCode = "cd";
     var roomsCount = 1;
     var guestsCount = 2;
-    var checkIn = '2017-02-07';
-    var checkOut = '2017-02-07';
-    var deviceType = 'desktop';
+    var checkIn = "2017-02-07";
+    var checkOut = "2017-02-07";
+    var deviceType = "desktop";
 
     var client = new HotelDetailsClient({
       siteCode: siteCode,
@@ -72,7 +72,7 @@ describe('HotelDetailsClient', function() {
       roomsCount: roomsCount,
       guestsCount: guestsCount,
       checkIn: checkIn,
-      checkOut: checkOut,
+      checkOut: checkOut
     };
 
     var requestBody = client.getSearchRequestBody();
