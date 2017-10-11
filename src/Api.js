@@ -1,3 +1,5 @@
+var fetch = require("node-fetch");
+
 var Api = {
   __host: {
     staging: {
@@ -15,11 +17,7 @@ var Api = {
   },
 
   getEnvironment: function() {
-    let env;
-    if (Wego !== undefined) {
-      env = Wego.ENV;
-    }
-    return this.env || env || "staging";
+    return this.env || "staging";
   },
 
   searchTrips: function(requestBody, query) {

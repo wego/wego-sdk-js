@@ -64,7 +64,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -176,7 +176,12 @@ module.exports = utils;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function(module) {throw new Error("Cannot find module \"node-fetch\"");
+
 
 var Api = {
   __host: {
@@ -241,7 +246,7 @@ var Api = {
   },
 
   post: function(requestBody, uri, query) {
-    return fetch(this.buildUrl(uri, query), {
+    return __WEBPACK_IMPORTED_MODULE_0_node_fetch___default()(this.buildUrl(uri, query), {
       credentials: "include",
       method: "POST",
       headers: {
@@ -262,7 +267,7 @@ var Api = {
   },
 
   get: function(uri, query) {
-    return fetch(this.buildUrl(uri, query), {
+    return __WEBPACK_IMPORTED_MODULE_0_node_fetch___default()(this.buildUrl(uri, query), {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -301,6 +306,7 @@ var Api = {
 
 module.exports = Api;
 
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(7)(module)))
 
 /***/ }),
 /* 2 */
@@ -394,9 +400,9 @@ module.exports = Poller;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(7);
-var sorting = __webpack_require__(10);
-var filtering = __webpack_require__(9);
+var FlightSearchMerger = __webpack_require__(8);
+var sorting = __webpack_require__(11);
+var filtering = __webpack_require__(10);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -661,9 +667,9 @@ module.exports = HotelDetailsClient;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(11);
-var sorting = __webpack_require__(14);
-var filtering = __webpack_require__(13);
+var HotelSearchMerger = __webpack_require__(12);
+var sorting = __webpack_require__(15);
+var filtering = __webpack_require__(14);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -812,9 +818,39 @@ module.exports = {
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports) {
+
+module.exports = function(originalModule) {
+	if(!originalModule.webpackPolyfill) {
+		var module = Object.create(originalModule);
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		Object.defineProperty(module, "exports", {
+			enumerable: true,
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(8);
+var dataUtils = __webpack_require__(9);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -1105,7 +1141,7 @@ module.exports = FlightSearchMerger;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1407,7 +1443,7 @@ module.exports = {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1509,7 +1545,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1605,11 +1641,11 @@ module.exports = {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
-var dataUtils = __webpack_require__(12);
+var dataUtils = __webpack_require__(13);
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -1875,7 +1911,7 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1987,7 +2023,7 @@ module.exports = {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2056,7 +2092,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2127,7 +2163,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var WegoSdk = __webpack_require__(6);

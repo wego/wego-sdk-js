@@ -4,8 +4,7 @@
   "description": "Wego SDK",
   "main": "src/index.js",
   "scripts": {
-    "test":
-      "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
+    "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js --reporter nyan",
     "build": "./node_modules/.bin/webpack --config webpack.config.js"
   },
   "repository": {
@@ -29,5 +28,8 @@
     "uglify-js": "^2.8.22",
     "uglifyjs-webpack-plugin": "^0.4.1",
     "webpack": "^2.3.3"
+  },
+  "dependencies": {
+    "node-fetch": "^2.0.0-alpha.9"
   }
 }
