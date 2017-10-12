@@ -28,7 +28,8 @@ var Api = {
 
   searchTrips: function(requestBody, query) {
     var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/flights/searches";
+      this.__host[this.getEnvironment()].default +
+      "/metasearch/flights/searches";
     return this.post(requestBody, uri, query);
   },
 
@@ -42,7 +43,7 @@ var Api = {
   searchHotel: function(requestBody, query) {
     var hotelId = requestBody.search.hotelId,
       uri =
-        this.__host[this.getEnvironment()].v2 +
+        this.__host[this.getEnvironment()].default +
         "/metasearch/hotels/" +
         hotelId +
         "/searches";
@@ -51,17 +52,17 @@ var Api = {
 
   fetchHotelDetails: function(hotelId, query) {
     var uri =
-      this.__host[this.getEnvironment()].v1 + "/hotels/hotels/" + hotelId;
+      this.__host[this.getEnvironment()].default + "/hotels/hotels/" + hotelId;
     return this.get(uri, query);
   },
 
   fetchCities: function(query) {
-    var uri = this.__host[this.getEnvironment()].v1 + "/places/cities";
+    var uri = this.__host[this.getEnvironment()].default + "/places/cities";
     return this.get(uri, query);
   },
 
   fetchAirports: function(query) {
-    var uri = this.__host[this.getEnvironment()].v1 + "/places/airports";
+    var uri = this.__host[this.getEnvironment()].default + "/places/airports";
     return this.get(uri, query);
   },
 
