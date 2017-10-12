@@ -2,12 +2,20 @@ var Api = {
   __host: {
     staging: {
       v2: "https://srv.wegostaging.com/v2",
-      v1: "https://srv.wego.com"
+      default: "https://srv.wegostaging.com"
     },
     production: {
       v2: "https://srv.wego.com/v2",
-      v1: "https://srv.wego.com"
+      default: "https://srv.wego.com"
     }
+  },
+
+  __headers: {
+    "Content-Type": "application/json"
+  },
+
+  addHeader: function(header) {
+    this.__headers = Object.assign({}, this.__headers, header);
   },
 
   setEnvironment: function(env) {
@@ -15,11 +23,7 @@ var Api = {
   },
 
   getEnvironment: function() {
-    let env;
-    if (Wego !== undefined) {
-      env = Wego.ENV;
-    }
-    return this.env || env || "staging";
+    return this.env || "staging";
   },
 
   searchTrips: function(requestBody, query) {
@@ -30,7 +34,8 @@ var Api = {
 
   searchHotels: function(requestBody, query) {
     var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/hotels/searches";
+      this.__host[this.getEnvironment()].default +
+      "/metasearch/hotels/searches";
     return this.post(requestBody, uri, query);
   },
 
@@ -64,9 +69,7 @@ var Api = {
     return fetch(this.buildUrl(uri, query), {
       credentials: "include",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.__headers,
       body: JSON.stringify(requestBody)
     })
       .then(function(response) {
@@ -84,9 +87,7 @@ var Api = {
   get: function(uri, query) {
     return fetch(this.buildUrl(uri, query), {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: this.__headers
     })
       .then(function(response) {
         if (response.ok) {
