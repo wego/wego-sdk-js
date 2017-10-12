@@ -181,12 +181,20 @@ var Api = {
   __host: {
     staging: {
       v2: "https://srv.wegostaging.com/v2",
-      v1: "https://srv.wego.com"
+      default: "https://srv.wegostaging.com"
     },
     production: {
       v2: "https://srv.wego.com/v2",
-      v1: "https://srv.wego.com"
+      default: "https://srv.wego.com"
     }
+  },
+
+  __headers: {
+    "Content-Type": "application/json"
+  },
+
+  addHeader: function(header) {
+    this.__headers = Object.assign({}, this.__headers, header);
   },
 
   setEnvironment: function(env) {
@@ -194,29 +202,27 @@ var Api = {
   },
 
   getEnvironment: function() {
-    let env;
-    if (Wego !== undefined) {
-      env = Wego.ENV;
-    }
-    return this.env || env || "staging";
+    return this.env || "staging";
   },
 
   searchTrips: function(requestBody, query) {
     var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/flights/searches";
+      this.__host[this.getEnvironment()].default +
+      "/metasearch/flights/searches";
     return this.post(requestBody, uri, query);
   },
 
   searchHotels: function(requestBody, query) {
     var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/hotels/searches";
+      this.__host[this.getEnvironment()].default +
+      "/metasearch/hotels/searches";
     return this.post(requestBody, uri, query);
   },
 
   searchHotel: function(requestBody, query) {
     var hotelId = requestBody.search.hotelId,
       uri =
-        this.__host[this.getEnvironment()].v2 +
+        this.__host[this.getEnvironment()].default +
         "/metasearch/hotels/" +
         hotelId +
         "/searches";
@@ -225,17 +231,17 @@ var Api = {
 
   fetchHotelDetails: function(hotelId, query) {
     var uri =
-      this.__host[this.getEnvironment()].v1 + "/hotels/hotels/" + hotelId;
+      this.__host[this.getEnvironment()].default + "/hotels/hotels/" + hotelId;
     return this.get(uri, query);
   },
 
   fetchCities: function(query) {
-    var uri = this.__host[this.getEnvironment()].v1 + "/places/cities";
+    var uri = this.__host[this.getEnvironment()].default + "/places/cities";
     return this.get(uri, query);
   },
 
   fetchAirports: function(query) {
-    var uri = this.__host[this.getEnvironment()].v1 + "/places/airports";
+    var uri = this.__host[this.getEnvironment()].default + "/places/airports";
     return this.get(uri, query);
   },
 
@@ -243,9 +249,7 @@ var Api = {
     return fetch(this.buildUrl(uri, query), {
       credentials: "include",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: this.__headers,
       body: JSON.stringify(requestBody)
     })
       .then(function(response) {
@@ -263,9 +267,7 @@ var Api = {
   get: function(uri, query) {
     return fetch(this.buildUrl(uri, query), {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers: this.__headers
     })
       .then(function(response) {
         if (response.ok) {
@@ -402,7 +404,7 @@ var Poller = __webpack_require__(2);
 var FlightSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency  = options.currency || {};
+  this.currency = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
@@ -415,11 +417,19 @@ var FlightSearchClient = function(options) {
   this.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
   this.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
   this.onFastestTripChanged = options.onFastestTripChanged || function() {};
-  this.onBestExperienceTripChanged = options.onBestExperienceTripChanged || function() {};
-  this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
+  this.onBestExperienceTripChanged =
+    options.onBestExperienceTripChanged || function() {};
+  this.onDisplayedFilterChanged =
+    options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
   this.merger = new FlightSearchMerger();
+
+  Api.setEnvironment(options.env || "staging");
+
+  if (options.accessToken) {
+    Api.addHeader({ Authorization: "Bearer " + options.accessToken });
+  }
 
   this.poller = new Poller({
     delays: [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000],
@@ -427,12 +437,12 @@ var FlightSearchClient = function(options) {
     callApi: function() {
       return Api.searchTrips(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
+        locale: self.locale
       });
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
-    },
+    }
   });
   this.reset();
 };
@@ -502,7 +512,9 @@ FlightSearchClient.prototype = {
     this.onTripsChanged(sortedTrips);
     this.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
     this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
-    this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
+    this.onBestExperienceTripChanged(
+      sorting.getBestExperienceTrip(filteredTrips)
+    );
     this.onTotalTripsChanged(trips);
     this.onDisplayedFilterChanged(this.merger.getFilter());
     this.onProgressChanged(this.poller.getProgress());
@@ -530,18 +542,19 @@ FlightSearchClient.prototype = {
             departureAirportCode: leg.departureAirportCode,
             arrivalCityCode: leg.arrivalCityCode,
             arrivalAirportCode: leg.arrivalAirportCode,
-            outboundDate: leg.outboundDate,
+            outboundDate: leg.outboundDate
           };
-        }),
+        })
       },
       offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
-      providerTypes: this.providerTypes,
-    }
-  },
+      providerTypes: this.providerTypes
+    };
+  }
 };
 
 module.exports = FlightSearchClient;
+
 
 /***/ }),
 /* 4 */
@@ -669,7 +682,7 @@ var Poller = __webpack_require__(2);
 var HotelSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency  = options.currency || {};
+  this.currency = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
@@ -679,8 +692,15 @@ var HotelSearchClient = function(options) {
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
-  this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
+  this.onDisplayedFilterChanged =
+    options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
+
+  Api.setEnvironment(options.env || "staging");
+
+  if (options.accessToken) {
+    Api.addHeader({ Authorization: "Bearer " + options.accessToken });
+  }
 
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
@@ -689,12 +709,12 @@ var HotelSearchClient = function(options) {
     callApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
+        locale: self.locale
       });
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
-    },
+    }
   });
   this.reset();
 };
@@ -785,12 +805,13 @@ HotelSearchClient.prototype = {
         userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
-      offset: this.lastRatesCount,
+      offset: this.lastRatesCount
     };
-  },
+  }
 };
 
 module.exports = HotelSearchClient;
+
 
 /***/ }),
 /* 6 */
