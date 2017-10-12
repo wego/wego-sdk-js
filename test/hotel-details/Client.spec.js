@@ -1,6 +1,6 @@
 var sinon = require("sinon");
-var HotelSearchClient = require("../../src/hotel-search/Client");
-var HotelDetailsClient = require("../../src/hotel-details/Client");
+var HotelSearchClient = require("src/hotel-search/Client");
+var HotelDetailsClient = require("src/hotel-details/Client");
 
 describe("HotelDetailsClient", function() {
   var client;
