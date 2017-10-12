@@ -16,6 +16,7 @@ npm install wego-sdk
 Create client
 ```
 var client = new WegoSdk.FlightSearchClient({
+  accessToken: '',
   onTotalTripsChanged: function(trips) {
     // Do something with trips
   },
@@ -50,6 +51,7 @@ client.searchTrips(search);
 Create client
 ```
 var client = new WegoSdk.HotelSearchClient({
+  accessToken: '',
   onTotalHotelsChanged: function(hotels) {
     // Do something with hotels
   },
