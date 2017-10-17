@@ -8,6 +8,11 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "build"),
-    filename: "[name].bundle.js"
+    filename: "[name].bundle.js",
+    libraryTarget: "commonjs-module"
+  },
+  resolve: {
+    extensions: ["*", ".js"],
+    modules: [path.join(__dirname, "src")]
   }
 };
