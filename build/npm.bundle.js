@@ -64,7 +64,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -176,12 +176,9 @@ module.exports = utils;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(module) {throw new Error("Cannot find module \"node-fetch\"");
-
+var fetch = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"node-fetch\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
 var Api = {
   __host: {
@@ -200,11 +197,7 @@ var Api = {
   },
 
   getEnvironment: function() {
-    let env;
-    if (Wego !== undefined) {
-      env = Wego.ENV;
-    }
-    return this.env || env || "staging";
+    return this.env || "staging";
   },
 
   searchTrips: function(requestBody, query) {
@@ -246,7 +239,7 @@ var Api = {
   },
 
   post: function(requestBody, uri, query) {
-    return __WEBPACK_IMPORTED_MODULE_0_node_fetch___default()(this.buildUrl(uri, query), {
+    return fetch(this.buildUrl(uri, query), {
       credentials: "include",
       method: "POST",
       headers: {
@@ -267,7 +260,7 @@ var Api = {
   },
 
   get: function(uri, query) {
-    return __WEBPACK_IMPORTED_MODULE_0_node_fetch___default()(this.buildUrl(uri, query), {
+    return fetch(this.buildUrl(uri, query), {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -306,7 +299,6 @@ var Api = {
 
 module.exports = Api;
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(7)(module)))
 
 /***/ }),
 /* 2 */
@@ -400,9 +392,207 @@ module.exports = Poller;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(8);
-var sorting = __webpack_require__(11);
-var filtering = __webpack_require__(10);
+var utils = __webpack_require__(0);
+
+function filterByPrice(trip, priceRange) {
+  if (!priceRange) return true;
+  return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
+}
+
+function filterByProviderTypes(trip, providerTypes) {
+  if (!providerTypes) return true;
+  var fares = trip.fares;
+
+  if (!fares) return false;
+  for (var i = 0; i < fares.length; i++) {
+    if (fares[i].provider.instant && providerTypes.includes('instant')) return true;
+    if (providerTypes.includes(fares[i].provider.type)) return true;
+  }
+
+  return false;
+}
+
+function filterByTripOptions(trip, tripOptions) {
+  if (!tripOptions) return true;
+  for (var i = 0; i < tripOptions.length; i++) {
+    if (tripOptions[i] === 'SAME_AIRLINE' && trip.airlineCodes.length > 1) return false;
+  }
+  return true;
+}
+
+function filterByStopoverOptions(trip, stopoverOptions) {
+  if (!stopoverOptions || stopoverOptions.length === 0) return true;
+  for (var i = 0; i < stopoverOptions.length; i++) {
+    if (stopoverOptions[i] === 'NOT_CHANGE_AIRPORT' && trip.changeAirportAtStopover) return false
+  }
+  return true;
+}
+
+function filterByItineraryOptions(trip, itineraryOptions) {
+  if (!itineraryOptions) return true;
+  for (var i = 0; i < itineraryOptions.length; i++) {
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
+  }
+  return false;
+}
+
+function filterByRanges(trip, ranges, field) {
+  if (!ranges) return true;
+  for (var i = 0; i < ranges.length; i++) {
+    var range = ranges[i];
+    var leg = trip.legs[range.legIndex];
+    if (!utils.filterByRange(leg[field], range)) return false;
+  }
+  return true;
+}
+
+function filterByAirlines(trip, airlineCodeMap) {
+  if (!airlineCodeMap) return true;
+  if (!trip.marketingAirline) return false;
+  return utils.filterByKey(trip.marketingAirline.code, airlineCodeMap);
+}
+
+function isBothAirlineAndInstant(value) {
+  return value.provider.type === 'airline' || value.provider.instant;
+}
+
+module.exports = {
+  filterTrips: function(trips, filter) {
+    if (!filter) return trips;
+
+    var stopCodeMap = utils.arrayToMap(filter.stopCodes);
+    var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
+    var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
+    var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
+    var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
+
+    var filteredTrips = trips.filter(function(trip) {
+      return filterByPrice(trip, filter.priceRange)
+        && utils.filterByKey(trip.stopCode, stopCodeMap)
+        && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
+        && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
+        && filterByAirlines(trip, airlineCodeMap)
+        && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
+        && filterByTripOptions(trip, filter.tripOptions)
+        && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
+        && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
+        && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
+        && filterByStopoverOptions(trip, filter.stopoverOptions)
+        && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
+        && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
+        && filterByItineraryOptions(trip, filter.itineraryOptions)
+        && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
+        && filterByProviderTypes(trip, filter.providerTypes);
+    });
+
+    return filteredTrips;
+  }
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+module.exports = {
+  sortTrips: function(trips, sort) {
+    if (!sort) return trips;
+
+    function getBestFare(trip) {
+      if (!trip.fares[0]) return null;
+      return trip.fares[0].price.amountUsd;
+    }
+
+    function getDuration(trip) {
+      return trip.durationMinutes;
+    }
+
+    function getDepartureTime(legIndex) {
+      return function(trip) {
+        return trip.legs[legIndex].departureTimeMinutes;
+      }
+    }
+
+    function getArrivalTime(legIndex) {
+      return function(trip) {
+        var leg = trip.legs[legIndex];
+        return leg.arrivalTimeMinutes + leg.durationDays * 24 * 60;
+      }
+    }
+
+    function getScore(trip) {
+      return trip.score;
+    }
+
+    var getterMap = {
+      PRICE: getBestFare,
+      DURATION: getDuration,
+      OUTBOUND_DEPARTURE_TIME: getDepartureTime(0),
+      INBOUND_DEPARTURE_TIME: getDepartureTime(1),
+      OUTBOUND_ARRIVAL_TIME: getArrivalTime(0),
+      INBOUND_ARRIVAL_TIME: getArrivalTime(1),
+      SCORE: getScore,
+    };
+
+    var propertyGetter = getterMap[sort.by] || function() {};
+    var clonedTrips = utils.cloneArray(trips);
+
+    clonedTrips.sort(function(trip1, trip2) {
+      var compareResult = utils.compare(trip1, trip2, propertyGetter, sort.order);
+      if (compareResult == 0 && sort.by != 'PRICE') {
+        return utils.compare(trip1, trip2, getBestFare, 'ASC');
+      } else {
+        return compareResult;
+      }
+    });
+
+    return clonedTrips;
+  },
+
+  getCheapestTrip: function(trips) {
+    return this._getBestTripBy(trips, function(betterTrip, trip) {
+      return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+    });
+  },
+
+  getFastestTrip: function(trips) {
+    return this._getBestTripBy(trips, function(betterTrip, trip) {
+      if (betterTrip.durationMinutes === trip.durationMinutes) {
+        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      }
+      return betterTrip.durationMinutes < trip.durationMinutes;
+    });
+  },
+
+  getBestExperienceTrip: function(trips) {
+    return this._getBestTripBy(trips, function(betterTrip, trip) {
+      if (betterTrip.score === trip.score) {
+        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      }
+      return betterTrip.score > trip.score;
+    });
+  },
+
+  _getBestTripBy: function(trips, isBetterFunc) {
+    var bestTrip = trips[0];
+    for (var i = 1; i < trips.length; i++) {
+      if (isBetterFunc(trips[i], bestTrip)) {
+        bestTrip = trips[i];
+      }
+    }
+    return bestTrip;
+  }
+};
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var FlightSearchMerger = __webpack_require__(9);
+var sorting = __webpack_require__(4);
+var filtering = __webpack_require__(3);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -551,7 +741,7 @@ FlightSearchClient.prototype = {
 module.exports = FlightSearchClient;
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Api = __webpack_require__(1);
@@ -664,12 +854,12 @@ HotelDetailsClient.prototype = {
 module.exports = HotelDetailsClient;
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(12);
-var sorting = __webpack_require__(15);
-var filtering = __webpack_require__(14);
+var HotelSearchMerger = __webpack_require__(11);
+var sorting = __webpack_require__(14);
+var filtering = __webpack_require__(13);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -800,57 +990,30 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Api = __webpack_require__(1);
-var FlightSearchClient = __webpack_require__(3);
-var HotelSearchClient = __webpack_require__(5);
-var HotelDetailsClient = __webpack_require__(4);
-
-module.exports = {
-  Api: Api,
-  FlightSearchClient: FlightSearchClient,
-  HotelSearchClient: HotelSearchClient,
-  HotelDetailsClient: HotelDetailsClient
-};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-module.exports = function(originalModule) {
-	if(!originalModule.webpackPolyfill) {
-		var module = Object.create(originalModule);
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		Object.defineProperty(module, "exports", {
-			enumerable: true,
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(9);
+var Api = __webpack_require__(1);
+var FlightSearchClient = __webpack_require__(5);
+var HotelSearchClient = __webpack_require__(7);
+var HotelDetailsClient = __webpack_require__(6);
+var FlightSorting = __webpack_require__(4);
+var FlightFiltering = __webpack_require__(3);
+
+module.exports = {
+    Api: Api,
+    FlightSearchClient: FlightSearchClient,
+    FlightSorting: FlightSorting,
+    FlightFiltering: FlightFiltering,
+    HotelSearchClient: HotelSearchClient,
+    HotelDetailsClient: HotelDetailsClient
+};
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dataUtils = __webpack_require__(10);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -1141,7 +1304,7 @@ module.exports = FlightSearchMerger;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1443,209 +1606,11 @@ module.exports = {
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var utils = __webpack_require__(0);
-
-function filterByPrice(trip, priceRange) {
-  if (!priceRange) return true;
-  return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
-}
-
-function filterByProviderTypes(trip, providerTypes) {
-  if (!providerTypes) return true;
-  var fares = trip.fares;
-
-  if (!fares) return false;
-  for (var i = 0; i < fares.length; i++) {
-    if (fares[i].provider.instant && providerTypes.includes('instant')) return true;
-    if (providerTypes.includes(fares[i].provider.type)) return true;
-  }
-
-  return false;
-}
-
-function filterByTripOptions(trip, tripOptions) {
-  if (!tripOptions) return true;
-  for (var i = 0; i < tripOptions.length; i++) {
-    if (tripOptions[i] === 'SAME_AIRLINE' && trip.airlineCodes.length > 1) return false;
-  }
-  return true;
-}
-
-function filterByStopoverOptions(trip, stopoverOptions) {
-  if (!stopoverOptions || stopoverOptions.length === 0) return true;
-  for (var i = 0; i < stopoverOptions.length; i++) {
-    if (stopoverOptions[i] === 'NOT_CHANGE_AIRPORT' && trip.changeAirportAtStopover) return false
-  }
-  return true;
-}
-
-function filterByItineraryOptions(trip, itineraryOptions) {
-  if (!itineraryOptions) return true;
-  for (var i = 0; i < itineraryOptions.length; i++) {
-    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
-    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
-  }
-  return false;
-}
-
-function filterByRanges(trip, ranges, field) {
-  if (!ranges) return true;
-  for (var i = 0; i < ranges.length; i++) {
-    var range = ranges[i];
-    var leg = trip.legs[range.legIndex];
-    if (!utils.filterByRange(leg[field], range)) return false;
-  }
-  return true;
-}
-
-function filterByAirlines(trip, airlineCodeMap) {
-  if (!airlineCodeMap) return true;
-  if (!trip.marketingAirline) return false;
-  return utils.filterByKey(trip.marketingAirline.code, airlineCodeMap);
-}
-
-function isBothAirlineAndInstant(value) {
-  return value.provider.type === 'airline' || value.provider.instant;
-}
-
-module.exports = {
-  filterTrips: function(trips, filter) {
-    if (!filter) return trips;
-
-    var stopCodeMap = utils.arrayToMap(filter.stopCodes);
-    var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
-    var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
-    var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
-    var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
-
-    var filteredTrips = trips.filter(function(trip) {
-      return filterByPrice(trip, filter.priceRange)
-        && utils.filterByKey(trip.stopCode, stopCodeMap)
-        && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
-        && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
-        && filterByAirlines(trip, airlineCodeMap)
-        && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
-        && filterByTripOptions(trip, filter.tripOptions)
-        && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
-        && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
-        && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
-        && filterByStopoverOptions(trip, filter.stopoverOptions)
-        && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
-        && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
-        && filterByItineraryOptions(trip, filter.itineraryOptions)
-        && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
-        && filterByProviderTypes(trip, filter.providerTypes);
-    });
-
-    return filteredTrips;
-  }
-};
-
-/***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
-
-module.exports = {
-  sortTrips: function(trips, sort) {
-    if (!sort) return trips;
-
-    function getBestFare(trip) {
-      if (!trip.fares[0]) return null;
-      return trip.fares[0].price.amountUsd;
-    }
-
-    function getDuration(trip) {
-      return trip.durationMinutes;
-    }
-
-    function getDepartureTime(legIndex) {
-      return function(trip) {
-        return trip.legs[legIndex].departureTimeMinutes;
-      }
-    }
-
-    function getArrivalTime(legIndex) {
-      return function(trip) {
-        var leg = trip.legs[legIndex];
-        return leg.arrivalTimeMinutes + leg.durationDays * 24 * 60;
-      }
-    }
-
-    function getScore(trip) {
-      return trip.score;
-    }
-
-    var getterMap = {
-      PRICE: getBestFare,
-      DURATION: getDuration,
-      OUTBOUND_DEPARTURE_TIME: getDepartureTime(0),
-      INBOUND_DEPARTURE_TIME: getDepartureTime(1),
-      OUTBOUND_ARRIVAL_TIME: getArrivalTime(0),
-      INBOUND_ARRIVAL_TIME: getArrivalTime(1),
-      SCORE: getScore,
-    };
-
-    var propertyGetter = getterMap[sort.by] || function() {};
-    var clonedTrips = utils.cloneArray(trips);
-
-    clonedTrips.sort(function(trip1, trip2) {
-      var compareResult = utils.compare(trip1, trip2, propertyGetter, sort.order);
-      if (compareResult == 0 && sort.by != 'PRICE') {
-        return utils.compare(trip1, trip2, getBestFare, 'ASC');
-      } else {
-        return compareResult;
-      }
-    });
-
-    return clonedTrips;
-  },
-
-  getCheapestTrip: function(trips) {
-    return this._getBestTripBy(trips, function(betterTrip, trip) {
-      return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
-    });
-  },
-
-  getFastestTrip: function(trips) {
-    return this._getBestTripBy(trips, function(betterTrip, trip) {
-      if (betterTrip.durationMinutes === trip.durationMinutes) {
-        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
-      }
-      return betterTrip.durationMinutes < trip.durationMinutes;
-    });
-  },
-
-  getBestExperienceTrip: function(trips) {
-    return this._getBestTripBy(trips, function(betterTrip, trip) {
-      if (betterTrip.score === trip.score) {
-        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
-      }
-      return betterTrip.score > trip.score;
-    });
-  },
-
-  _getBestTripBy: function(trips, isBetterFunc) {
-    var bestTrip = trips[0];
-    for (var i = 1; i < trips.length; i++) {
-      if (isBetterFunc(trips[i], bestTrip)) {
-        bestTrip = trips[i];
-      }
-    }
-    return bestTrip;
-  }
-};
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var utils = __webpack_require__(0);
-var dataUtils = __webpack_require__(13);
+var dataUtils = __webpack_require__(12);
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -1911,7 +1876,7 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2023,7 +1988,7 @@ module.exports = {
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2092,7 +2057,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
