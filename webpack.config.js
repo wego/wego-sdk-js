@@ -13,6 +13,6 @@ module.exports = {
   },
   resolve: {
     extensions: ["*", ".js"],
-    modules: [path.join(__dirname, "src")]
+    modules: [path.join(__dirname, "src"), path.join(__dirname, "node_modules")]
   }
 };

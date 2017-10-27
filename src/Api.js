@@ -1,4 +1,5 @@
-var fetch = require("node-fetch");
+require("es6-promise").polyfill();
+require("isomorphic-fetch");
 
 var Api = {
   __host: {

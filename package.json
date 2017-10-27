@@ -2,10 +2,12 @@
   "name": "wego-sdk",
   "version": "1.0.0-beta-1",
   "description": "Wego SDK",
-  "main": "src/index.js",
+  "main": "build/npm.bundle.js",
   "scripts": {
-    "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js --reporter nyan",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js"
+    "test":
+      "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js --reporter nyan",
+    "build":
+      "./node_modules/.bin/webpack --display-error-details --config webpack.config.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,8 @@
     "webpack": "^2.3.3"
   },
   "dependencies": {
+    "es6-promise": "^4.1.1",
+    "isomorphic-fetch": "^2.2.1",
     "node-fetch": "^2.0.0-alpha.9"
   }
 }
