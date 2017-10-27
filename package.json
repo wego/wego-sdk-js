@@ -2,7 +2,7 @@
   "name": "wego-sdk",
   "version": "1.0.0-beta-1",
   "description": "Wego SDK",
-  "main": "build/npm.bundle.js",
+  "main": "src/index.js",
   "scripts": {
     "test":
       "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js --reporter nyan",
