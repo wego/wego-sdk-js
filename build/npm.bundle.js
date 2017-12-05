@@ -931,6 +931,14 @@ FlightSearchMerger.prototype = {
         if (newFare.price.amountUsd < fares[i].price.amountUsd) break;
       }
       fares.splice(i, 0, newFare);
+
+      i++;
+      for (; i < fares.length; i++) {
+        if (newFare.providerCode === fares[i].providerCode) {
+          rates.splice(i, 1);
+          break;
+        }
+      }
     });
   },
 
