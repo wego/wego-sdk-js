@@ -745,12 +745,14 @@ HotelSearchClient.prototype = {
   },
 
   getSearchRequestBody: function() {
-    var search = this.search || {};
-    var currency = this.currency || {};
-    var currencyCode = currency.code;
-    var locale = this.locale;
+    var search = this.search || {},
+      currency = this.currency || {},
+      currencyCode = currency.code,
+      locale = this.locale,
+      searchParams,
+      selectedHotelIds = search.selectedHotelIds;
 
-    return {
+    searchParams = {
       search: {
         id: this.responseSearch.id,
         siteCode: this.siteCode,
@@ -771,10 +773,17 @@ HotelSearchClient.prototype = {
       rateAmenityIds: this.rateAmenityIds,
       offset: this.lastRatesCount,
     };
+
+    if (selectedHotelIds !== undefined && Array.isArray(selectedHotelIds)) {
+      searchParams.selectedHotelIds = selectedHotelIds;
+    }
+
+    return searchParams;
   },
 };
 
 module.exports = HotelSearchClient;
+
 
 /***/ }),
 /* 6 */
