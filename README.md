@@ -69,7 +69,32 @@ var client = new WegoSdk.HotelSearchClient({
 ```
 Make a new search
 ```
-client.searchHotels(search);
+// valid search object
+var searchParams = {
+  "search": {
+    "id": "2d8805fd14337580",
+    "siteCode": "SG",
+    "locale": "en",
+    "currencyCode": "SGD",
+    "cityCode": "SIN",
+    "countryCode": "SG",
+    "roomsCount": 1,
+    "guestsCount": 2,
+    "checkIn": "2017-12-11",
+    "checkOut": "2017-12-16",
+    "deviceType": "DESKTOP",
+    "appType": "WEB_APP",
+
+    "hotelId": "12345", // optional
+    "districtId": "12345", // optional
+    "userLoggedIn": true
+  },
+  "rateAmenityIds": ???,
+  "offset": 500,
+  "selectedHotelIds": ['258101'] // optional
+}
+
+client.searchHotels(searchParams);
 ```
 ### Hotel Details Rates SDK Client
 Create client
