@@ -67,7 +67,7 @@ var client = new WegoSdk.HotelSearchClient({
   }
 });
 ```
-Make a new search
+Make a new search ([More Info](https://github.com/wego/wego-api-docs#create-new-hotels-search))
 ```
 // valid search object
 var searchParams = {
@@ -84,12 +84,10 @@ var searchParams = {
     "checkOut": "2017-12-16",
     "deviceType": "DESKTOP",
     "appType": "WEB_APP",
-
-    "hotelId": "12345", // optional
-    "districtId": "12345", // optional
     "userLoggedIn": true
+    "hotelId": "12345", // optional
+    "districtId": "12345" // optional
   },
-  "rateAmenityIds": ???,
   "offset": 500,
   "selectedHotelIds": ['258101'] // optional
 }
