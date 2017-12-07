@@ -1,13 +1,13 @@
-var HotelSearchMerger = require('./Merger');
-var sorting = require('./sorting');
-var filtering = require('./filtering');
-var Api = require('../Api');
-var Poller = require('../Poller');
+var HotelSearchMerger = require("./Merger");
+var sorting = require("./sorting");
+var filtering = require("./filtering");
+var Api = require("../Api");
+var Poller = require("../Poller");
 
 var HotelSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency  = options.currency || {};
+  this.currency = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
@@ -17,22 +17,29 @@ var HotelSearchClient = function(options) {
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
-  this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
+  this.onDisplayedFilterChanged =
+    options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
     delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
     pollLimit: 7,
-    callApi: function() {
+    initialCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
+        locale: self.locale
+      });
+    },
+    callApi: function(searchId) {
+      return Api.fetchHotels(searchId, {
+        currencyCode: self.currency.code,
+        locale: self.locale
       });
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
-    },
+    }
   });
   this.reset();
 };
@@ -123,9 +130,9 @@ HotelSearchClient.prototype = {
         userLoggedIn: this.userLoggedIn
       },
       rateAmenityIds: this.rateAmenityIds,
-      offset: this.lastRatesCount,
+      offset: this.lastRatesCount
     };
-  },
+  }
 };
 
 module.exports = HotelSearchClient;
