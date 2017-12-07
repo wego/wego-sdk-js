@@ -1,7 +1,7 @@
-var sinon = require('sinon');
-var HotelSearchClient = require('../../src/hotel-search/Client');
+var sinon = require("sinon");
+var HotelSearchClient = require("../../src/hotel-search/Client");
 
-describe('HotelSearchClient', function() {
+describe("HotelSearchClient", function() {
   var client;
   beforeEach(function() {
     client = new HotelSearchClient();
@@ -12,24 +12,22 @@ describe('HotelSearchClient', function() {
     client._callApi = function() {};
   }
 
-  describe('#reset', function() {
-    it('reset lastRatesCount', function() {
+  describe("#reset", function() {
+    it("reset lastRatesCount", function() {
       client.lastRatesCount = 10;
       client.reset();
       expect(client.lastRatesCount).to.equal(0);
     });
 
-    it('resets poller', function() {
+    it("resets poller", function() {
       client.poller.pollCount = 4;
       client.reset();
       expect(client.poller.pollCount).to.equal(0);
     });
 
-    it('#reset merger', function() {
+    it("#reset merger", function() {
       client.handleSearchResponse({
-        brands: [
-          { id: 1 }
-        ]
+        brands: [{ id: 1 }]
       });
 
       client.reset();
@@ -37,15 +35,15 @@ describe('HotelSearchClient', function() {
       expect(client.merger.__staticData.brands).to.deep.equal({});
     });
 
-    it('abort last request call', function() {
+    it("abort last request call", function() {
       var abort = sinon.spy();
       client.__abortLastRequest = abort;
       client.reset();
       expect(abort).to.have.been.calledOnce;
-    })
+    });
   });
 
-  it('#updateSort', function() {
+  it("#updateSort", function() {
     var hotels;
     var client = new HotelSearchClient({
       onHotelsChanged: function(_hotels) {
@@ -57,29 +55,31 @@ describe('HotelSearchClient', function() {
 
     var hotel1 = {
       id: 1,
-      star: 1,
+      star: 1
     };
 
     var hotel2 = {
       id: 2,
-      star: 2,
+      star: 2
     };
 
     client.mergeResponse({
-      hotels: [hotel1, hotel2],
+      hotels: [hotel1, hotel2]
     });
 
     client.updateSort({
-      by: 'STAR',
-      order: 'DESC',
+      by: "STAR",
+      order: "DESC"
     });
 
-    var hotelIds = hotels.map(function(hotel) { return hotel.id });
+    var hotelIds = hotels.map(function(hotel) {
+      return hotel.id;
+    });
 
     expect(hotelIds).to.deep.equal([2, 1]);
   });
 
-  it('#updateFilter', function() {
+  it("#updateFilter", function() {
     var hotels;
     var client = new HotelSearchClient({
       onHotelsChanged: function(_hotels) {
@@ -91,28 +91,30 @@ describe('HotelSearchClient', function() {
 
     var hotel1 = {
       id: 1,
-      districtId: 1,
+      districtId: 1
     };
 
     var hotel2 = {
       id: 2,
-      districtId: 2,
+      districtId: 2
     };
 
     client.mergeResponse({
-      hotels: [hotel1, hotel2],
+      hotels: [hotel1, hotel2]
     });
 
     client.updateFilter({
-      districtIds: [2],
+      districtIds: [2]
     });
 
-    var hotelIds = hotels.map(function(hotel) { return hotel.id });
+    var hotelIds = hotels.map(function(hotel) {
+      return hotel.id;
+    });
 
     expect(hotelIds).to.deep.equal([2]);
   });
 
-  it('#updateCurrency', function() {
+  it("#updateCurrency", function() {
     var hotels, filter;
     var client = new HotelSearchClient({
       onHotelsChanged: function(_hotels) {
@@ -125,9 +127,8 @@ describe('HotelSearchClient', function() {
 
     mockAjaxCall(client);
 
-
     var hotel = {
-      id: 1,
+      id: 1
     };
 
     client.handleSearchResponse({
@@ -136,43 +137,42 @@ describe('HotelSearchClient', function() {
         {
           hotelId: 1,
           price: {
-            currencyCode: 'SGD',
+            currencyCode: "SGD",
             amount: 1000,
-            amountUsd: 100,
-          },
-        },
-      ],
+            amountUsd: 100
+          }
+        }
+      ]
     });
 
-
     client.updateCurrency({
-      code: 'VND',
+      code: "VND",
       rate: 2
     });
 
     expect(hotels[0].rates[0].price.amount).to.equal(200);
   });
 
-  describe('#searchHotels', function() {
-    it('start poller', function() {
+  describe("#searchHotels", function() {
+    it("start poller", function() {
       client.poller.timer = null;
       client.searchHotels({});
       expect(client.poller.timer).not.equal(null);
-    })
+    });
   });
 
-  describe('#handleSearchResponse', function() {
-    it('update lastRatesCount', function() {
+  describe("#handleSearchResponse", function() {
+    it("update lastRatesCount", function() {
       var lastRatesCount = 10;
 
       client.handleSearchResponse({
-        count: lastRatesCount,
+        count: lastRatesCount
       });
 
       expect(client.lastRatesCount).to.equal(lastRatesCount);
     });
 
-    it('onDisplayedFilterChanged', function() {
+    it("onDisplayedFilterChanged", function() {
       var price = {};
       var displayedFilter;
 
@@ -186,16 +186,16 @@ describe('HotelSearchClient', function() {
 
       client.handleSearchResponse({
         filter: {
-          minPrice: price,
-        },
+          minPrice: price
+        }
       });
 
       expect(displayedFilter.minPrice).to.equal(price);
     });
 
-    it('onHotelsChanged', function() {
+    it("onHotelsChanged", function() {
       var hotel = {
-        id: 1,
+        id: 1
       };
 
       var hotels;
@@ -213,35 +213,36 @@ describe('HotelSearchClient', function() {
         rates: [
           {
             hotelId: 1,
-            price: {},
+            price: {}
           }
         ]
       });
 
-      var hotelIds = hotels.map(function(hotel) { return hotel.id });
+      var hotelIds = hotels.map(function(hotel) {
+        return hotel.id;
+      });
       expect(hotelIds).to.deep.equal([1]);
     });
   });
 
-  it('#getSearchRequestBody', function() {
+  it("#getSearchRequestBody", function() {
     var lastRatesCount = 10;
-    var locale = 'en';
-    var currencyCode = 'currencyCode';
-    var siteCode = 'SGD';
-    var cityCode = 'cd';
+    var locale = "en";
+    var currencyCode = "currencyCode";
+    var siteCode = "SGD";
+    var cityCode = "cd";
     var roomsCount = 1;
     var guestsCount = 2;
-    var checkIn = '2017-02-07';
-    var checkOut = '2017-02-07';
-    var countryCode = 'SG';
-    var deviceType = 'desktop';
-    var appType = 'IOS_APP';
+    var checkIn = "2017-02-07";
+    var checkOut = "2017-02-07";
+    var countryCode = "SG";
+    var deviceType = "desktop";
+    var appType = "IOS_APP";
     var searchId = 111;
 
     var responseSearch = {
-      id: searchId,
+      id: searchId
     };
-
 
     var client = new HotelSearchClient({
       siteCode: siteCode,
@@ -259,7 +260,7 @@ describe('HotelSearchClient', function() {
       guestsCount: guestsCount,
       checkIn: checkIn,
       checkOut: checkOut,
-      countryCode: countryCode,
+      countryCode: countryCode
     };
 
     client.responseSearch = responseSearch;
@@ -283,25 +284,25 @@ describe('HotelSearchClient', function() {
     expect(requestSearch.appType).to.equal(appType);
   });
 
-  describe('#mergerRespnose', function() {
-    it('responseSearch', function() {
+  describe("#mergerRespnose", function() {
+    it("responseSearch", function() {
       var search = {};
       client.handleSearchResponse({
-        search: search,
+        search: search
       });
 
       expect(client.responseSearch).to.equal(search);
     });
 
-    it('lastRatesCount', function() {
+    it("lastRatesCount", function() {
       var lastRatesCount = 15;
       client.handleSearchResponse({
-        count: lastRatesCount,
+        count: lastRatesCount
       });
       expect(client.lastRatesCount).to.equal(lastRatesCount);
     });
 
-    it('merge response by merger', function() {
+    it("merge response by merger", function() {
       var brand = {
         id: 1
       };
@@ -314,8 +315,8 @@ describe('HotelSearchClient', function() {
     });
   });
 
-  describe('#updateResults', function() {
-    it('totalHotels', function() {
+  describe("#updateResults", function() {
+    it("totalHotels", function() {
       var hotels;
 
       var client = new HotelSearchClient({
@@ -327,7 +328,7 @@ describe('HotelSearchClient', function() {
       var hotel = { id: 1 };
 
       client.handleSearchResponse({
-        hotels: [hotel],
+        hotels: [hotel]
       });
 
       var hotelIds = hotels.map(function(hotel) {
@@ -337,7 +338,7 @@ describe('HotelSearchClient', function() {
       expect(hotelIds).to.deep.equal([1]);
     });
 
-    it('hotels', function() {
+    it("hotels", function() {
       var hotels;
       var client = new HotelSearchClient({
         onHotelsChanged: function(_hotels) {
@@ -350,9 +351,9 @@ describe('HotelSearchClient', function() {
       var rate1 = {
         id: 1,
         hotelId: 1,
-        price:  {
-          amountUsd: 100,
-        },
+        price: {
+          amountUsd: 100
+        }
       };
 
       var hotel1 = { id: 1 };
@@ -360,9 +361,9 @@ describe('HotelSearchClient', function() {
       var rate2 = {
         id: 2,
         hotelId: 2,
-        price:  {
-          amountUsd: 70,
-        },
+        price: {
+          amountUsd: 70
+        }
       };
 
       var hotel2 = { id: 2 };
@@ -370,24 +371,24 @@ describe('HotelSearchClient', function() {
       var hotel3 = { id: 3 };
 
       client.sort = {
-        by: 'PRICE',
-        order: 'ASC'
+        by: "PRICE",
+        order: "ASC"
       };
 
       client.currency = {
-        rate: 2,
+        rate: 2
       };
 
       client.updateFilter({
         priceRange: {
           min: 60,
-          max: 120,
+          max: 120
         }
       });
 
       client.handleSearchResponse({
         rates: [rate1, rate2],
-        hotels: [hotel1, hotel2, hotel3],
+        hotels: [hotel1, hotel2, hotel3]
       });
 
       var hotelIds = hotels.map(function(hotel) {
@@ -397,7 +398,7 @@ describe('HotelSearchClient', function() {
       expect(hotelIds).to.deep.equal([2, 1]);
     });
 
-    it('calls onProgressChanged', () => {
+    it("calls onProgressChanged", () => {
       var onProgressChanged = sinon.spy();
       client = new HotelSearchClient({
         onProgressChanged: onProgressChanged
@@ -406,5 +407,37 @@ describe('HotelSearchClient', function() {
       client.handleSearchResponse({});
       expect(onProgressChanged).to.have.been.calledOnce();
     });
+  });
+
+  describe("#fetchHotelsParams", function() {
+    var lastRatesCount = 10;
+    var locale = "ar";
+    var currencyCode = "currencyCode";
+    var siteCode = "SGD";
+    var cityCode = "cd";
+    var roomsCount = 1;
+    var guestsCount = 2;
+    var checkIn = "2017-02-07";
+    var checkOut = "2017-02-07";
+    var countryCode = "SG";
+    var deviceType = "desktop";
+    var appType = "IOS_APP";
+    var searchId = 111;
+    var client = new HotelSearchClient({
+      siteCode: siteCode,
+      deviceType: deviceType,
+      appType: appType,
+      locale: locale,
+      currency: {
+        code: currencyCode
+      }
+    });
+
+    client.lastRatesCount = lastRatesCount;
+
+    var params = client.fetchHotelsParams();
+    expect(params.offset).to.equal(lastRatesCount);
+    expect(params.locale).to.equal(locale);
+    expect(params.currencyCode).to.equal(currencyCode);
   });
 });
