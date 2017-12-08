@@ -327,6 +327,7 @@ module.exports = Api;
 
 var Poller = function(options) {
   options = options || {};
+  this.initCallApi = options.initCallApi;
   this.callApi = options.callApi;
   this.delays = options.delays;
   this.onSuccessResponse = options.onSuccessResponse;
@@ -339,6 +340,8 @@ Poller.prototype = {
     this.timer = setTimeout(function() {
       self.pollCount++;
       self.retryCount = 0;
+      console.log(self.initCallApi, "initCallApi");
+      console.log(self.callApi, "callApi");
       self.fetch(self.initCallApi || self.callApi);
     }, 0);
   },
@@ -825,7 +828,7 @@ HotelSearchClient.prototype = {
     return {
       currencyCode: this.currency.code,
       locale: this.locale,
-      offset: this.lastRatesCount
+      offset: this.lastRatesCount || 0
     };
   }
 };

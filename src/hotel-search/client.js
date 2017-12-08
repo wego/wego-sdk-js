@@ -135,7 +135,7 @@ HotelSearchClient.prototype = {
     return {
       currencyCode: this.currency.code,
       locale: this.locale,
-      offset: this.lastRatesCount
+      offset: this.lastRatesCount || 0
     };
   }
 };
