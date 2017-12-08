@@ -1,6 +1,7 @@
 var HotelSearchMerger = require('./Merger');
 var sorting = require('./sorting');
 var filtering = require('./filtering');
+var dataUtils = require('./dataUtils');
 var Api = require('../Api');
 var Poller = require('../Poller');
 
@@ -106,11 +107,7 @@ HotelSearchClient.prototype = {
       currencyCode = currency.code,
       locale = self.locale,
       searchParams,
-      selectedHotelIds = self.selectedHotelIds.filter(
-        function(value) {
-          return value.trim() != '';
-        }
-      );
+      selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
 
     searchParams = {
       search: {

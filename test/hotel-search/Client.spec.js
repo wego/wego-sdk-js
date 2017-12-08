@@ -283,15 +283,15 @@ describe('HotelSearchClient', function() {
     });
 
     it('allows to pass an array of selectedHotelIds', function() {
-      client.search.selectedHotelIds = selectedHotelIds;
+      client.selectedHotelIds = selectedHotelIds;
 
       var requestBody = client.getSearchRequestBody();
 
-      expect(requestBody.selectedHotelIds).to.equal(selectedHotelIds);
+      expect(requestBody.selectedHotelIds).to.deep.equal(selectedHotelIds);
     });
 
     it('does not allow to pass a string of selectedHotelIds', function() {
-      client.search.selectedHotelIds = '957766';
+      client.selectedHotelIds = '957766';
 
       var requestBody = client.getSearchRequestBody();
 
