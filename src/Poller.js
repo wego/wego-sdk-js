@@ -13,8 +13,6 @@ Poller.prototype = {
     this.timer = setTimeout(function() {
       self.pollCount++;
       self.retryCount = 0;
-      console.log(self.initCallApi, "initCallApi");
-      console.log(self.callApi, "callApi");
       self.fetch(self.initCallApi || self.callApi);
     }, 0);
   },
@@ -45,10 +43,6 @@ Poller.prototype = {
     this.preparePoll();
   },
 
-  handleErrorResponse: function() {
-    this.retry();
-  },
-
   preparePoll: function() {
     var self = this;
     if (this.pollCount < this.delays.length) {
@@ -64,10 +58,10 @@ Poller.prototype = {
     this.fetch(this.callApi);
   },
 
-  retry: function() {
+  retry: function(callApiFn) {
     if (this.retryCount < 3) {
       this.retryCount++;
-      this.fetch(this.callApi);
+      this.fetch(callApiFn);
     }
   },
 
@@ -85,7 +79,7 @@ Poller.prototype = {
         }
       })
       .catch(function() {
-        self.handleErrorResponse();
+        self.retry(callApiFn);
       });
   }
 };

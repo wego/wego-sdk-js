@@ -5,13 +5,18 @@ describe("Poller", () => {
   var poller;
 
   var callApiCallbackFn = sinon.spy(() => Promise.resolve());
-
+  var clock;
   beforeEach(() => {
+    clock = sinon.useFakeTimers();
     poller = new Poller({
       callApi: callApiCallbackFn,
       onSuccessResponse: function() {},
       delays: []
     });
+  });
+
+  afterEach(() => {
+    clock.restore();
   });
 
   describe("#start", () => {
@@ -25,17 +30,22 @@ describe("Poller", () => {
     });
     it("calls callApi when initCallApi not provided", function() {
       poller.start();
+      clock.tick(510);
       expect(callApiCallbackFn).to.have.been.called();
     });
 
     it("calls initCallApi when provided", function() {
-      poller = new Poller({
-        initCallApi: callApiCallbackFn,
+      var fn = sinon.spy(() => {
+        return Promise.resolve();
+      });
+      anotherPoller = new Poller({
+        initCallApi: fn,
         onSuccessResponse: function() {},
         delays: []
       });
-      poller.start();
-      expect(callApiCallbackFn).to.have.been.called();
+      anotherPoller.start();
+      clock.tick(510);
+      expect(fn).to.have.been.called();
     });
   });
 
@@ -111,16 +121,19 @@ describe("Poller", () => {
     });
   });
 
-  describe("#hanldeErrorResponse", () => {
+  describe("#retry", () => {
+    var fn = sinon.spy(() => {
+      return Promise.resolve();
+    });
     it("increases retryCount", () => {
       poller.retryCount = 1;
-      poller.handleErrorResponse();
+      poller.retry(fn);
       expect(poller.retryCount).to.equal(2);
     });
 
     it("does nothing when reach the limit of retry", () => {
       poller.retryCount = 3;
-      poller.handleErrorResponse();
+      poller.retry(fn);
       expect(poller.retryCount).to.equal(3);
     });
   });
