@@ -68,6 +68,7 @@ module.exports = {
     if (Array.isArray(value)) {
       value = value.filter(
         function(entry) {
+          if (!entry) return false;
           return entry.trim() != '';
         }
       );
