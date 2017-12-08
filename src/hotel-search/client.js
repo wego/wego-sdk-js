@@ -14,6 +14,7 @@ var HotelSearchClient = function(options) {
   this.appType = options.appType || "WEB_APP";
   this.userLoggedIn = options.userLoggedIn;
   this.rateAmenityIds = options.rateAmenityIds || [];
+  this.selectedHotelIds = options.selectedHotelIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
@@ -99,17 +100,22 @@ HotelSearchClient.prototype = {
   },
 
   getSearchRequestBody: function() {
-    var search = this.search || {},
-      currency = this.currency || {},
+    var self = this,
+      search = self.search || {},
+      currency = self.currency || {},
       currencyCode = currency.code,
-      locale = this.locale,
+      locale = self.locale,
       searchParams,
-      selectedHotelIds = search.selectedHotelIds;
+      selectedHotelIds = self.selectedHotelIds.filter(
+        function(value) {
+          return value.trim() != '';
+        }
+      );
 
     searchParams = {
       search: {
-        id: this.responseSearch.id,
-        siteCode: this.siteCode,
+        id: self.responseSearch.id,
+        siteCode: self.siteCode,
         locale: locale,
         currencyCode: currencyCode,
         cityCode: search.cityCode,
@@ -120,15 +126,15 @@ HotelSearchClient.prototype = {
         guestsCount: search.guestsCount,
         checkIn: search.checkIn,
         checkOut: search.checkOut,
-        deviceType: this.deviceType,
-        appType: this.appType,
-        userLoggedIn: this.userLoggedIn
+        deviceType: self.deviceType,
+        appType: self.appType,
+        userLoggedIn: self.userLoggedIn
       },
-      rateAmenityIds: this.rateAmenityIds,
-      offset: this.lastRatesCount,
+      rateAmenityIds: self.rateAmenityIds,
+      offset: self.lastRatesCount,
     };
 
-    if (selectedHotelIds !== undefined && Array.isArray(selectedHotelIds)) {
+    if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       searchParams.selectedHotelIds = selectedHotelIds;
     }
 
