@@ -2011,6 +2011,17 @@ function filterByPrice(hotel, priceRange) {
   return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
 }
 
+function filterByName(hotel, name) {
+  if (!name) return true;
+  // check with name from previous logic
+  if (utils.filterByTextMatching(hotel.name, name)) return true;
+  // check if match with any translation names
+  for (var locale in hotel.nameTranslations) {
+    if (utils.filterByTextMatching(hotel.nameTranslations[locale], name)) return true;
+  }
+  return false; // cannot found
+}
+
 module.exports = {
   filterHotels: function(hotels, filter) {
     if (!filter) return hotels;
@@ -2029,7 +2040,7 @@ module.exports = {
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
-        && utils.filterByTextMatching(hotel.name, filter.name)
+        && filterByName(hotel, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds);
