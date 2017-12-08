@@ -89,13 +89,12 @@ describe('wego-hotel-filtering-behavior_test', function() {
 
     it('filtering by name', function() {
       var hotel1 = createHotel({ name: 'wEgo' });
-      var hotel2 = createHotel({ name: 'weho', nameTranslations: { en: "weho", ar: "xxxxx"}});
+      var hotel2 = createHotel({ name: 'weho', nameI18n: { en: "weho", ar: "xxxxx"}});
       var hotel3 = createHotel({ name: 'legh' });
 
       expect(filtering.filterHotels([hotel1, hotel2, hotel3], {
         name: 'eg'
       })).to.deep.equal([hotel1, hotel3]);
-      // check filter only match on translation names
       expect(filtering.filterHotels([hotel1, hotel2, hotel3], {
         name: 'xx'
       })).to.deep.equal([hotel2]);

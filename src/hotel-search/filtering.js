@@ -39,13 +39,11 @@ function filterByPrice(hotel, priceRange) {
 
 function filterByName(hotel, name) {
   if (!name) return true;
-  // check with name from previous logic
   if (utils.filterByTextMatching(hotel.name, name)) return true;
-  // check if match with any translation names
-  for (var locale in hotel.nameTranslations) {
-    if (utils.filterByTextMatching(hotel.nameTranslations[locale], name)) return true;
+  for (var locale in hotel.nameI18n) {
+    if (utils.filterByTextMatching(hotel.nameI18n[locale], name)) return true;
   }
-  return false; // cannot found
+  return false;
 }
 
 module.exports = {
