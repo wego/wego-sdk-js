@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -377,9 +377,135 @@ module.exports = Poller;
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(7);
-var sorting = __webpack_require__(10);
-var filtering = __webpack_require__(9);
+var utils = __webpack_require__(0);
+
+module.exports = {
+  prepareHotel: function(hotel, staticData) {
+    function arrayToMap (items, getKeyFunc) {
+      if (!items) return {};
+      var map = {};
+      items.forEach(function(item) {
+        map[getKeyFunc(item)] = item;
+      });
+      return map;
+    }
+
+    hotel.district = staticData.districts[hotel.districtId];
+    hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
+      return review.reviewerGroup;
+    });
+
+    hotel.ratesCounts = {
+      total: 0,
+    };
+
+    var amenityIdMap = {};
+    var amenityIds = hotel.amenityIds || [];
+    amenityIds.forEach(function(id) {
+      amenityIdMap[id] = true;
+    });
+    hotel.amenityIdMap = amenityIdMap;
+    hotel.rates = [];
+    hotel.images = hotel.images || [];
+  },
+
+  prepareRate: function(rate, currency, staticData) {
+    rate.provider = staticData.providers[rate.providerCode];
+    rate.price = this.convertPrice(rate.price, currency);
+  },
+
+  convertPrice: function(price, currency) {
+    if (!currency) return price;
+    if (!price) return null;
+    var amount = price.amount;
+    var totalAmount = price.totalAmount;
+
+    if (price.currencyCode != currency.code) {
+      var exchangeRate = currency.rate;
+      amount = Math.round(price.amountUsd * exchangeRate);
+      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
+    }
+
+    var convertedPrice = utils.cloneObject(price);
+    convertedPrice.currency = currency;
+    convertedPrice.amount = amount;
+    convertedPrice.totalAmount = totalAmount;
+
+    return convertedPrice;
+  },
+
+  prepareFilterOption: function(option, type, staticData) {
+    var staticDataType = this.__filterOptionTypeToStaticDataType[type];
+    var itemMap = staticData[staticDataType] || {};
+    var item = itemMap[option.code] || {};
+    option.name = item.name;
+  },
+
+  trimArray: function(value) {
+    if (!value) return;
+
+    if (Array.isArray(value)) {
+      value = value.filter(
+        function(entry) {
+          return entry.trim() != '';
+        }
+      );
+    }
+
+    return value;
+  },
+
+  isBetterRate: function(firstRate, secondRate) {
+    function processRateAmount(rate) {
+      var amount = Math.round(rate.price.amount);
+      if (amount > 99999) {
+        amount = (amount / 100) * 100;
+      }
+      return amount;
+    }
+
+    function getPriceTaxAmountInclusive(rate) {
+      return rate.price.taxAmountUsd < 0 ? -1 : 1;
+    }
+
+    var firstTax = getPriceTaxAmountInclusive(firstRate);
+    var secondTax = getPriceTaxAmountInclusive(secondRate);
+
+    if (firstTax != secondTax) return firstTax > secondTax;
+
+    var firstRateAmount = processRateAmount(firstRate);
+    var secondRateAmount = processRateAmount(secondRate);
+    if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
+
+    if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
+      return true;
+    } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
+      return false;
+    }
+
+    return firstRate.price.ecpc > secondRate.price.ecpc;
+  },
+
+  __filterOptionTypeToStaticDataType: {
+    stars: 'stars',
+    brands: 'brands',
+    propertyTypes: 'propertyTypes',
+    districts: 'districts',
+    amenities: 'amenities',
+    rateAmenities: 'rateAmenities',
+    chains: 'chains',
+    reviewerGroups: 'reviewerGroups',
+  }
+};
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var FlightSearchMerger = __webpack_require__(8);
+var sorting = __webpack_require__(11);
+var filtering = __webpack_require__(10);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -528,7 +654,7 @@ FlightSearchClient.prototype = {
 module.exports = FlightSearchClient;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Api = __webpack_require__(1);
@@ -641,12 +767,13 @@ HotelDetailsClient.prototype = {
 module.exports = HotelDetailsClient;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(11);
+var HotelSearchMerger = __webpack_require__(12);
 var sorting = __webpack_require__(14);
 var filtering = __webpack_require__(13);
+var dataUtils = __webpack_require__(3);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -660,6 +787,7 @@ var HotelSearchClient = function(options) {
   this.appType = options.appType || "WEB_APP";
   this.userLoggedIn = options.userLoggedIn;
   this.rateAmenityIds = options.rateAmenityIds || [];
+  this.selectedHotelIds = options.selectedHotelIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
@@ -745,15 +873,18 @@ HotelSearchClient.prototype = {
   },
 
   getSearchRequestBody: function() {
-    var search = this.search || {};
-    var currency = this.currency || {};
-    var currencyCode = currency.code;
-    var locale = this.locale;
+    var self = this,
+      search = self.search || {},
+      currency = self.currency || {},
+      currencyCode = currency.code,
+      locale = self.locale,
+      searchParams,
+      selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
 
-    return {
+    searchParams = {
       search: {
-        id: this.responseSearch.id,
-        siteCode: this.siteCode,
+        id: self.responseSearch.id,
+        siteCode: self.siteCode,
         locale: locale,
         currencyCode: currencyCode,
         cityCode: search.cityCode,
@@ -764,26 +895,33 @@ HotelSearchClient.prototype = {
         guestsCount: search.guestsCount,
         checkIn: search.checkIn,
         checkOut: search.checkOut,
-        deviceType: this.deviceType,
-        appType: this.appType,
-        userLoggedIn: this.userLoggedIn
+        deviceType: self.deviceType,
+        appType: self.appType,
+        userLoggedIn: self.userLoggedIn
       },
-      rateAmenityIds: this.rateAmenityIds,
-      offset: this.lastRatesCount,
+      rateAmenityIds: self.rateAmenityIds,
+      offset: self.lastRatesCount,
     };
+
+    if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
+      searchParams.selectedHotelIds = selectedHotelIds;
+    }
+
+    return searchParams;
   },
 };
 
 module.exports = HotelSearchClient;
 
+
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Api = __webpack_require__(1);
-var FlightSearchClient = __webpack_require__(3);
-var HotelSearchClient = __webpack_require__(5);
-var HotelDetailsClient = __webpack_require__(4);
+var FlightSearchClient = __webpack_require__(4);
+var HotelSearchClient = __webpack_require__(6);
+var HotelDetailsClient = __webpack_require__(5);
 
 module.exports = {
   Api: Api,
@@ -793,10 +931,10 @@ module.exports = {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(8);
+var dataUtils = __webpack_require__(9);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -1087,7 +1225,7 @@ module.exports = FlightSearchMerger;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1389,7 +1527,7 @@ module.exports = {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1491,7 +1629,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1587,11 +1725,11 @@ module.exports = {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
-var dataUtils = __webpack_require__(12);
+var dataUtils = __webpack_require__(3);
 
 var HotelSearchClient = function(options) {
   options = options || {};
@@ -1855,118 +1993,6 @@ HotelSearchClient.prototype = {
 };
 
 module.exports = HotelSearchClient;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var utils = __webpack_require__(0);
-
-module.exports = {
-  prepareHotel: function(hotel, staticData) {
-    function arrayToMap (items, getKeyFunc) {
-      if (!items) return {};
-      var map = {};
-      items.forEach(function(item) {
-        map[getKeyFunc(item)] = item;
-      });
-      return map;
-    }
-
-    hotel.district = staticData.districts[hotel.districtId];
-    hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
-      return review.reviewerGroup;
-    });
-
-    hotel.ratesCounts = {
-      total: 0,
-    };
-
-    var amenityIdMap = {};
-    var amenityIds = hotel.amenityIds || [];
-    amenityIds.forEach(function(id) {
-      amenityIdMap[id] = true;
-    });
-    hotel.amenityIdMap = amenityIdMap;
-    hotel.rates = [];
-    hotel.images = hotel.images || [];
-  },
-
-  prepareRate: function(rate, currency, staticData) {
-    rate.provider = staticData.providers[rate.providerCode];
-    rate.price = this.convertPrice(rate.price, currency);
-  },
-
-  convertPrice: function(price, currency) {
-    if (!currency) return price;
-    if (!price) return null;
-    var amount = price.amount;
-    var totalAmount = price.totalAmount;
-
-    if (price.currencyCode != currency.code) {
-      var exchangeRate = currency.rate;
-      amount = Math.round(price.amountUsd * exchangeRate);
-      totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
-    }
-
-    var convertedPrice = utils.cloneObject(price);
-    convertedPrice.currency = currency;
-    convertedPrice.amount = amount;
-    convertedPrice.totalAmount = totalAmount;
-    
-    return convertedPrice;
-  },
-
-  prepareFilterOption: function(option, type, staticData) {
-    var staticDataType = this.__filterOptionTypeToStaticDataType[type];
-    var itemMap = staticData[staticDataType] || {};
-    var item = itemMap[option.code] || {};
-    option.name = item.name;
-  },
-
-  isBetterRate: function(firstRate, secondRate) {
-    function processRateAmount(rate) {
-      var amount = Math.round(rate.price.amount);
-      if (amount > 99999) {
-        amount = (amount / 100) * 100;
-      }
-      return amount;
-    }
-
-    function getPriceTaxAmountInclusive(rate) {
-      return rate.price.taxAmountUsd < 0 ? -1 : 1;
-    }
-
-    var firstTax = getPriceTaxAmountInclusive(firstRate);
-    var secondTax = getPriceTaxAmountInclusive(secondRate);
-
-    if (firstTax != secondTax) return firstTax > secondTax;
-
-    var firstRateAmount = processRateAmount(firstRate);
-    var secondRateAmount = processRateAmount(secondRate);
-    if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
-
-    if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
-      return true;
-    } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
-      return false;
-    }
-
-    return firstRate.price.ecpc > secondRate.price.ecpc;
-  },
-
-  __filterOptionTypeToStaticDataType: {
-    stars: 'stars',
-    brands: 'brands',
-    propertyTypes: 'propertyTypes',
-    districts: 'districts',
-    amenities: 'amenities',
-    rateAmenities: 'rateAmenities',
-    chains: 'chains',
-    reviewerGroups: 'reviewerGroups',
-  }
-};
-
 
 /***/ }),
 /* 13 */
