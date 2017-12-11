@@ -2014,6 +2014,7 @@ function filterByPrice(hotel, priceRange) {
 function filterByName(hotel, name) {
   if (!name) return true;
   if (utils.filterByTextMatching(hotel.name, name)) return true;
+  if (!hotel.nameI18n) return false;
   for (var locale in hotel.nameI18n) {
     if (utils.filterByTextMatching(hotel.nameI18n[locale], name)) return true;
   }
