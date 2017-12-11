@@ -2037,6 +2037,16 @@ function filterByPrice(hotel, priceRange) {
   return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
 }
 
+function filterByName(hotel, name) {
+  if (!name) return true;
+  if (utils.filterByTextMatching(hotel.name, name)) return true;
+  if (!hotel.nameI18n) return false;
+  for (var locale in hotel.nameI18n) {
+    if (utils.filterByTextMatching(hotel.nameI18n[locale], name)) return true;
+  }
+  return false;
+}
+
 module.exports = {
   filterHotels: function(hotels, filter) {
     if (!filter) return hotels;
@@ -2055,7 +2065,7 @@ module.exports = {
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
-        && utils.filterByTextMatching(hotel.name, filter.name)
+        && filterByName(hotel, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds);
