@@ -482,6 +482,7 @@ describe("FlightSearchClient", function() {
       };
 
       client.handleSearchResponse({
+        fares: [fare1, fare2],
         trips: [trip1, trip2]
       });
 
