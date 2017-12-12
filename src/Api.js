@@ -10,7 +10,7 @@ var Api = {
     }
   },
 
-  hotelEndoints: {
+  hotelEndpoints: {
     searchHotelsUrl: function() {
       return Api.getHost("v2") + "/metasearch/hotels/searches";
     },
@@ -50,23 +50,23 @@ var Api = {
   },
 
   searchHotels: function(requestBody, query) {
-    var uri = this.hotelEndoints.searchHotelsUrl();
+    var uri = this.hotelEndpoints.searchHotelsUrl();
     return this.post(requestBody, uri, query);
   },
 
   fetchHotels: function(searchId, query = {}) {
-    var uri = this.hotelEndoints.fetchHotelsUrl(searchId);
+    var uri = this.hotelEndpoints.fetchHotelsUrl(searchId);
     return this.get(uri, query);
   },
 
   searchHotel: function(requestBody, query) {
     var hotelId = requestBody.search.hotelId,
-      uri = this.hotelEndoints.searchSingleHotelUrl(hotelId);
+      uri = this.hotelEndpoints.searchSingleHotelUrl(hotelId);
     return this.post(requestBody, uri, query);
   },
 
   fetchHotelDetails: function(hotelId, query) {
-    var uri = this.hotelEndoints.hotelDetailsUrl(hotelId);
+    var uri = this.hotelEndpoints.hotelDetailsUrl(hotelId);
     return this.get(uri, query);
   },
 

@@ -7,22 +7,22 @@ describe("API", () => {
         Api.setEnvironment("production");
       });
       it("returns searchHotelsUrl", function() {
-        expect(Api.hotelEndoints.searchHotelsUrl()).to.equal(
+        expect(Api.hotelEndpoints.searchHotelsUrl()).to.equal(
           "https://srv.wego.com/v2/metasearch/hotels/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
-        expect(Api.hotelEndoints.fetchHotelsUrl("searchId12312")).to.equal(
+        expect(Api.hotelEndpoints.fetchHotelsUrl("searchId12312")).to.equal(
           "https://srv.wego.com/v2/metasearch/hotels/searches/searchId12312/results"
         );
       });
       it("returns searchSingleHotelUrl", function() {
-        expect(Api.hotelEndoints.searchSingleHotelUrl(9001)).to.equal(
+        expect(Api.hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
           "https://srv.wego.com/v2/metasearch/hotels/9001/searches"
         );
       });
       it("returns hotelDetailsUrl", function() {
-        expect(Api.hotelEndoints.hotelDetailsUrl(9001)).to.equal(
+        expect(Api.hotelEndpoints.hotelDetailsUrl(9001)).to.equal(
           "https://srv.wego.com/hotels/hotels/9001"
         );
       });
@@ -32,22 +32,22 @@ describe("API", () => {
         Api.setEnvironment("staging");
       });
       it("returns searchHotelsUrl", function() {
-        expect(Api.hotelEndoints.searchHotelsUrl()).to.equal(
+        expect(Api.hotelEndpoints.searchHotelsUrl()).to.equal(
           "https://srv.wegostaging.com/v2/metasearch/hotels/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
-        expect(Api.hotelEndoints.fetchHotelsUrl("searchId12312")).to.equal(
+        expect(Api.hotelEndpoints.fetchHotelsUrl("searchId12312")).to.equal(
           "https://srv.wegostaging.com/v2/metasearch/hotels/searches/searchId12312/results"
         );
       });
       it("returns searchSingleHotelUrl", function() {
-        expect(Api.hotelEndoints.searchSingleHotelUrl(9001)).to.equal(
+        expect(Api.hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
           "https://srv.wegostaging.com/v2/metasearch/hotels/9001/searches"
         );
       });
       it("returns hotelDetailsUrl", function() {
-        expect(Api.hotelEndoints.hotelDetailsUrl(9001)).to.equal(
+        expect(Api.hotelEndpoints.hotelDetailsUrl(9001)).to.equal(
           "https://srv.wegostaging.com/hotels/hotels/9001"
         );
       });
