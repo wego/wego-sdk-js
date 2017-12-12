@@ -1,13 +1,13 @@
-var FlightSearchMerger = require('./Merger');
-var sorting = require('./sorting');
-var filtering = require('./filtering');
-var Api = require('../Api');
-var Poller = require('../Poller');
+var FlightSearchMerger = require("./Merger");
+var sorting = require("./sorting");
+var filtering = require("./filtering");
+var Api = require("../Api");
+var Poller = require("../Poller");
 
 var FlightSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency  = options.currency || {};
+  this.currency = options.currency || {};
   this.locale = options.locale;
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
@@ -20,8 +20,10 @@ var FlightSearchClient = function(options) {
   this.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
   this.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
   this.onFastestTripChanged = options.onFastestTripChanged || function() {};
-  this.onBestExperienceTripChanged = options.onBestExperienceTripChanged || function() {};
-  this.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function() {};
+  this.onBestExperienceTripChanged =
+    options.onBestExperienceTripChanged || function() {};
+  this.onDisplayedFilterChanged =
+    options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
   this.merger = new FlightSearchMerger();
@@ -29,15 +31,18 @@ var FlightSearchClient = function(options) {
   this.poller = new Poller({
     delays: [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000],
     pollLimit: 7,
-    callApi: function() {
+    initCallApi: function() {
       return Api.searchTrips(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
+        locale: self.locale
       });
+    },
+    callApi: function() {
+      return Api.fetchTrips(self.responseSearch.id, self.fetchTripsParams());
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
-    },
+    }
   });
   this.reset();
 };
@@ -107,7 +112,9 @@ FlightSearchClient.prototype = {
     this.onTripsChanged(sortedTrips);
     this.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
     this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
-    this.onBestExperienceTripChanged(sorting.getBestExperienceTrip(filteredTrips));
+    this.onBestExperienceTripChanged(
+      sorting.getBestExperienceTrip(filteredTrips)
+    );
     this.onTotalTripsChanged(trips);
     this.onDisplayedFilterChanged(this.merger.getFilter());
     this.onProgressChanged(this.poller.getProgress());
@@ -135,15 +142,23 @@ FlightSearchClient.prototype = {
             departureAirportCode: leg.departureAirportCode,
             arrivalCityCode: leg.arrivalCityCode,
             arrivalAirportCode: leg.arrivalAirportCode,
-            outboundDate: leg.outboundDate,
+            outboundDate: leg.outboundDate
           };
-        }),
+        })
       },
       offset: this.processedFaresCount,
       paymentMethodIds: this.paymentMethodIds,
-      providerTypes: this.providerTypes,
-    }
+      providerTypes: this.providerTypes
+    };
   },
+
+  fetchTripsParams: function() {
+    return {
+      currencyCode: this.currency.code,
+      locale: this.locale,
+      paymentMethodIds: this.paymentMethodIds || []
+    };
+  }
 };
 
 module.exports = FlightSearchClient;

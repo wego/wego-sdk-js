@@ -15,12 +15,8 @@ var Api = {
       return Api.getHost("v2") + "/metasearch/hotels/searches";
     },
     fetchHotelsUrl: function(searchId) {
-      return (
-        Api.getHost("v2") +
-        "/metasearch/hotels/searches/" +
-        searchId +
-        "/results"
-      );
+      var path = "/metasearch/hotels/searches/" + searchId + "/results";
+      return Api.getHost("v2") + path;
     },
     searchSingleHotelUrl: function(hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
@@ -28,6 +24,17 @@ var Api = {
     },
     hotelDetailsUrl: function(hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
+    }
+  },
+
+  flightEndpoints: {
+    searchTrips: function() {
+      var path = "/metasearch/flights/searches";
+      return Api.getHost("v2") + path;
+    },
+    fetchTrips: function(searchId) {
+      var path = "/metasearch/flights/searches/" + searchId + "/results";
+      return Api.getHost("v2") + path;
     }
   },
 
@@ -44,9 +51,13 @@ var Api = {
   },
 
   searchTrips: function(requestBody, query) {
-    var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/flights/searches";
+    var uri = this.flightEndpoints.searchTrips();
     return this.post(requestBody, uri, query);
+  },
+
+  fetchTrips: function(searchId, query = {}) {
+    var uri = this.flightEndpoints.fetchTrips(searchId);
+    return this.get(uri, query);
   },
 
   searchHotels: function(requestBody, query) {
