@@ -53,6 +53,38 @@ describe("API", () => {
       });
     });
   });
+  describe("flightEndpoints", function() {
+    describe("production env", function() {
+      beforeEach(function() {
+        Api.setEnvironment("production");
+      });
+      it("returns searchHotelsUrl", function() {
+        expect(Api.flightEndpoints.searchTrips()).to.equal(
+          "https://srv.wego.com/v2/metasearch/flights/searches"
+        );
+      });
+      it("returns fetchHotelsUrl", function() {
+        expect(Api.flightEndpoints.fetchTrips("searchId12312")).to.equal(
+          "https://srv.wego.com/v2/metasearch/flights/searches/searchId12312/results"
+        );
+      });
+    });
+    describe("non production env", function() {
+      beforeEach(function() {
+        Api.setEnvironment("staging");
+      });
+      it("returns searchHotelsUrl", function() {
+        expect(Api.flightEndpoints.searchTrips()).to.equal(
+          "https://srv.wegostaging.com/v2/metasearch/flights/searches"
+        );
+      });
+      it("returns fetchHotelsUrl", function() {
+        expect(Api.flightEndpoints.fetchTrips("searchId12312")).to.equal(
+          "https://srv.wegostaging.com/v2/metasearch/flights/searches/searchId12312/results"
+        );
+      });
+    });
+  });
   describe("buildUrl", function() {
     it("build url when query value type is primitive", () => {
       var uri = "url";
