@@ -989,11 +989,10 @@ HotelSearchClient.prototype = {
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
-    if (
-      !!this.selectedHotelIds.length &&
-      Array.isArray(this.selectedHotelIds)
-    ) {
-      params.selectedHotelIds = this.selectedHotelIds;
+
+    var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
+    if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
+      params.selectedHotelIds = selectedHotelIds;
     }
     return params;
   }
