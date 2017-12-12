@@ -452,9 +452,35 @@ describe("HotelSearchClient", function() {
 
     client.lastRatesCount = lastRatesCount;
 
-    var params = client.fetchHotelsParams();
-    expect(params.offset).to.equal(lastRatesCount);
-    expect(params.locale).to.equal(locale);
-    expect(params.currencyCode).to.equal(currencyCode);
+    it("returns offset", function() {
+      var params = client.fetchHotelsParams();
+      expect(params.offset).to.equal(lastRatesCount);
+    });
+    it("returns locale", function() {
+      var params = client.fetchHotelsParams();
+      expect(params.locale).to.equal(locale);
+    });
+    it("returns currencyCode", function() {
+      var params = client.fetchHotelsParams();
+      expect(params.currencyCode).to.equal(currencyCode);
+    });
+    it("has not selectedHotelIds", function() {
+      var params = client.fetchHotelsParams();
+      expect(params.selectedHotelIds).to.equal(undefined);
+    });
+    it("returns selectedHotelIds", function() {
+      var client = new HotelSearchClient({
+        siteCode: siteCode,
+        deviceType: deviceType,
+        appType: appType,
+        locale: locale,
+        currency: {
+          code: currencyCode
+        },
+        selectedHotelIds: ["957766"]
+      });
+      var params = client.fetchHotelsParams();
+      expect(params.selectedHotelIds).to.deep.equal(["957766"]);
+    });
   });
 });

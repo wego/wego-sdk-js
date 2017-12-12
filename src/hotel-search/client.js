@@ -143,11 +143,18 @@ HotelSearchClient.prototype = {
   },
 
   fetchHotelsParams: function() {
-    return {
+    var params = {
       currencyCode: this.currency.code,
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
+    if (
+      !!this.selectedHotelIds.length &&
+      Array.isArray(this.selectedHotelIds)
+    ) {
+      params.selectedHotelIds = this.selectedHotelIds;
+    }
+    return params;
   }
 };
 
