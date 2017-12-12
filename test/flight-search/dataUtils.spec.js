@@ -255,7 +255,7 @@ describe('data-utils', function() {
 
       dataUtils.prepareTrip(trip, createStaticData());
 
-      expect(trip.durationMinutes).to.equal(6);
+      expect(trip.durationMinutes).to.equal(10);
     });
 
     it('departureTimeMinutes', function() {

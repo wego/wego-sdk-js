@@ -51,7 +51,7 @@ module.exports = {
     convertedPrice.currency = currency;
     convertedPrice.amount = amount;
     convertedPrice.totalAmount = totalAmount;
-    
+
     return convertedPrice;
   },
 
@@ -60,6 +60,21 @@ module.exports = {
     var itemMap = staticData[staticDataType] || {};
     var item = itemMap[option.code] || {};
     option.name = item.name;
+  },
+
+  trimArray: function(value) {
+    if (!value) return;
+
+    if (Array.isArray(value)) {
+      value = value.filter(
+        function(entry) {
+          if (!entry) return false;
+          return entry.trim() != '';
+        }
+      );
+    }
+
+    return value;
   },
 
   isBetterRate: function(firstRate, secondRate) {

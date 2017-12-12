@@ -225,34 +225,33 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  it("#getSearchRequestBody", function() {
-    var lastRatesCount = 10;
-    var locale = "en";
-    var currencyCode = "currencyCode";
-    var siteCode = "SGD";
-    var cityCode = "cd";
-    var roomsCount = 1;
-    var guestsCount = 2;
-    var checkIn = "2017-02-07";
-    var checkOut = "2017-02-07";
-    var countryCode = "SG";
-    var deviceType = "desktop";
-    var appType = "IOS_APP";
-    var searchId = 111;
-
-    var responseSearch = {
-      id: searchId
-    };
-
-    var client = new HotelSearchClient({
-      siteCode: siteCode,
-      deviceType: deviceType,
-      appType: appType,
-      locale: locale,
-      currency: {
-        code: currencyCode
-      }
-    });
+  describe("#getSearchRequestBody", function() {
+    var lastRatesCount = 10,
+      locale = "en",
+      currencyCode = "currencyCode",
+      siteCode = "SGD",
+      cityCode = "cd",
+      roomsCount = 1,
+      guestsCount = 2,
+      checkIn = "2017-02-07",
+      checkOut = "2017-02-07",
+      countryCode = "SG",
+      deviceType = "desktop",
+      appType = "IOS_APP",
+      searchId = 111,
+      selectedHotelIds = ["957766"],
+      responseSearch = {
+        id: searchId
+      },
+      client = new HotelSearchClient({
+        siteCode: siteCode,
+        deviceType: deviceType,
+        appType: appType,
+        locale: locale,
+        currency: {
+          code: currencyCode
+        }
+      });
 
     client.search = {
       cityCode: cityCode,
@@ -266,25 +265,43 @@ describe("HotelSearchClient", function() {
     client.responseSearch = responseSearch;
     client.lastRatesCount = lastRatesCount;
 
-    var requestBody = client.getSearchRequestBody();
-    var requestSearch = requestBody.search;
+    it("passes the correct parameters", function() {
+      var requestBody = client.getSearchRequestBody(),
+        requestSearch = requestBody.search;
 
-    expect(requestBody.offset).to.equal(lastRatesCount);
-    expect(requestSearch.id).to.equal(searchId);
-    expect(requestSearch.cityCode).to.equal(cityCode);
-    expect(requestSearch.locale).to.equal(locale);
-    expect(requestSearch.currencyCode).to.equal(currencyCode);
-    expect(requestSearch.siteCode).to.equal(siteCode);
-    expect(requestSearch.roomsCount).to.equal(roomsCount);
-    expect(requestSearch.guestsCount).to.equal(guestsCount);
-    expect(requestSearch.checkIn).to.equal(checkIn);
-    expect(requestSearch.checkOut).to.equal(checkOut);
-    expect(requestSearch.countryCode).to.equal(countryCode);
-    expect(requestSearch.deviceType).to.equal(deviceType);
-    expect(requestSearch.appType).to.equal(appType);
+      expect(requestBody.offset).to.equal(lastRatesCount);
+      expect(requestSearch.id).to.equal(searchId);
+      expect(requestSearch.cityCode).to.equal(cityCode);
+      expect(requestSearch.locale).to.equal(locale);
+      expect(requestSearch.currencyCode).to.equal(currencyCode);
+      expect(requestSearch.siteCode).to.equal(siteCode);
+      expect(requestSearch.roomsCount).to.equal(roomsCount);
+      expect(requestSearch.guestsCount).to.equal(guestsCount);
+      expect(requestSearch.checkIn).to.equal(checkIn);
+      expect(requestSearch.checkOut).to.equal(checkOut);
+      expect(requestSearch.countryCode).to.equal(countryCode);
+      expect(requestSearch.deviceType).to.equal(deviceType);
+      expect(requestSearch.appType).to.equal(appType);
+    });
+
+    it("allows to pass an array of selectedHotelIds", function() {
+      client.selectedHotelIds = selectedHotelIds;
+
+      var requestBody = client.getSearchRequestBody();
+
+      expect(requestBody.selectedHotelIds).to.deep.equal(selectedHotelIds);
+    });
+
+    it("does not allow to pass a string of selectedHotelIds", function() {
+      client.selectedHotelIds = "957766";
+
+      var requestBody = client.getSearchRequestBody();
+
+      expect(requestBody.selectedHotelIds).to.equal(undefined);
+    });
   });
 
-  describe("#mergerRespnose", function() {
+  describe("#mergeResponse", function() {
     it("responseSearch", function() {
       var search = {};
       client.handleSearchResponse({
