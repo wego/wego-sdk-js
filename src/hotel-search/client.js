@@ -1,6 +1,7 @@
 var HotelSearchMerger = require("./Merger");
 var sorting = require("./sorting");
 var filtering = require("./filtering");
+var dataUtils = require("./dataUtils");
 var Api = require("../Api");
 var Poller = require("../Poller");
 
@@ -14,6 +15,7 @@ var HotelSearchClient = function(options) {
   this.appType = options.appType || "WEB_APP";
   this.userLoggedIn = options.userLoggedIn;
   this.rateAmenityIds = options.rateAmenityIds || [];
+  this.selectedHotelIds = options.selectedHotelIds || [];
   this.onProgressChanged = options.onProgressChanged || function() {};
   this.onHotelsChanged = options.onHotelsChanged || function() {};
   this.onTotalHotelsChanged = options.onTotalHotelsChanged || function() {};
@@ -103,15 +105,18 @@ HotelSearchClient.prototype = {
   },
 
   getSearchRequestBody: function() {
-    var search = this.search || {};
-    var currency = this.currency || {};
-    var currencyCode = currency.code;
-    var locale = this.locale;
+    var self = this,
+      search = self.search || {},
+      currency = self.currency || {},
+      currencyCode = currency.code,
+      locale = self.locale,
+      searchParams,
+      selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
 
-    return {
+    searchParams = {
       search: {
-        id: this.responseSearch.id,
-        siteCode: this.siteCode,
+        id: self.responseSearch.id,
+        siteCode: self.siteCode,
         locale: locale,
         currencyCode: currencyCode,
         cityCode: search.cityCode,
@@ -122,21 +127,34 @@ HotelSearchClient.prototype = {
         guestsCount: search.guestsCount,
         checkIn: search.checkIn,
         checkOut: search.checkOut,
-        deviceType: this.deviceType,
-        appType: this.appType,
-        userLoggedIn: this.userLoggedIn
+        deviceType: self.deviceType,
+        appType: self.appType,
+        userLoggedIn: self.userLoggedIn
       },
-      rateAmenityIds: this.rateAmenityIds,
-      offset: this.lastRatesCount
+      rateAmenityIds: self.rateAmenityIds,
+      offset: self.lastRatesCount
     };
+
+    if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
+      searchParams.selectedHotelIds = selectedHotelIds;
+    }
+
+    return searchParams;
   },
 
   fetchHotelsParams: function() {
-    return {
+    var params = {
       currencyCode: this.currency.code,
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
+    if (
+      !!this.selectedHotelIds.length &&
+      Array.isArray(this.selectedHotelIds)
+    ) {
+      params.selectedHotelIds = this.selectedHotelIds;
+    }
+    return params;
   }
 };
 

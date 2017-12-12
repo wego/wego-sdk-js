@@ -182,6 +182,12 @@ describe('dataUtils', function() {
     });
   });
 
+  describe('#trimArray', function() {
+    it('removes invalid array value', function() {
+      expect(dataUtils.trimArray(['', '12345', undefined])).to.deep.equal(['12345']);
+    });
+  });
+
   describe('#isBetterRate', function() {
     function bestRateOf(rates) {
       rates.sort(function(rate1, rate2) {
