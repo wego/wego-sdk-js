@@ -151,7 +151,7 @@ HotelSearchClient.prototype = {
 
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
-      params.selectedHotelIds = this.selectedHotelIds;
+      params.selectedHotelIds = selectedHotelIds;
     }
     return params;
   }

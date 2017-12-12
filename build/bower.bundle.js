@@ -957,11 +957,17 @@ HotelSearchClient.prototype = {
   },
 
   fetchHotelsParams: function() {
-    return {
+    var params = {
       currencyCode: this.currency.code,
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
+
+    var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
+    if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
+      params.selectedHotelIds = selectedHotelIds;
+    }
+    return params;
   }
 };
 
