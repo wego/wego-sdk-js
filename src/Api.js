@@ -10,17 +10,13 @@ var Api = {
     }
   },
 
-  hotelEndpoints: {
+  _hotelEndpoints: {
     searchHotelsUrl: function() {
       return Api.getHost("v2") + "/metasearch/hotels/searches";
     },
     fetchHotelsUrl: function(searchId) {
-      return (
-        Api.getHost("v2") +
-        "/metasearch/hotels/searches/" +
-        searchId +
-        "/results"
-      );
+      var path = "/metasearch/hotels/searches/" + searchId + "/results";
+      return Api.getHost("v2") + path;
     },
     searchSingleHotelUrl: function(hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
@@ -28,6 +24,17 @@ var Api = {
     },
     hotelDetailsUrl: function(hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
+    }
+  },
+
+  _flightEndpoints: {
+    searchTrips: function() {
+      var path = "/metasearch/flights/searches";
+      return Api.getHost("v2") + path;
+    },
+    fetchTrips: function(searchId) {
+      var path = "/metasearch/flights/searches/" + searchId + "/results";
+      return Api.getHost("v2") + path;
     }
   },
 
@@ -44,29 +51,33 @@ var Api = {
   },
 
   searchTrips: function(requestBody, query) {
-    var uri =
-      this.__host[this.getEnvironment()].v2 + "/metasearch/flights/searches";
+    var uri = this._flightEndpoints.searchTrips();
     return this.post(requestBody, uri, query);
   },
 
+  fetchTrips: function(searchId, query = {}) {
+    var uri = this._flightEndpoints.fetchTrips(searchId);
+    return this.get(uri, query);
+  },
+
   searchHotels: function(requestBody, query) {
-    var uri = this.hotelEndpoints.searchHotelsUrl();
+    var uri = this._hotelEndpoints.searchHotelsUrl();
     return this.post(requestBody, uri, query);
   },
 
   fetchHotels: function(searchId, query = {}) {
-    var uri = this.hotelEndpoints.fetchHotelsUrl(searchId);
+    var uri = this._hotelEndpoints.fetchHotelsUrl(searchId);
     return this.get(uri, query);
   },
 
   searchHotel: function(requestBody, query) {
     var hotelId = requestBody.search.hotelId,
-      uri = this.hotelEndpoints.searchSingleHotelUrl(hotelId);
+      uri = this._hotelEndpoints.searchSingleHotelUrl(hotelId);
     return this.post(requestBody, uri, query);
   },
 
   fetchHotelDetails: function(hotelId, query) {
-    var uri = this.hotelEndpoints.hotelDetailsUrl(hotelId);
+    var uri = this._hotelEndpoints.hotelDetailsUrl(hotelId);
     return this.get(uri, query);
   },
 
