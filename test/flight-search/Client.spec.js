@@ -675,6 +675,14 @@ describe("FlightSearchClient", function() {
       params = client.fetchTripsParams();
       expect(params.locale).to.equal("ar");
     });
+    it("returns offset", function() {
+      const client = new FlightSearchClient({
+        locale: "ar"
+      });
+      client.processedFaresCount = 1000;
+      params = client.fetchTripsParams();
+      expect(params.offset).to.equal(1000);
+    });
     it("returns empty paymentMethodIds", function() {
       const client = new FlightSearchClient();
       params = client.fetchTripsParams();
