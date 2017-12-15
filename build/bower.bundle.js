@@ -189,7 +189,7 @@ var Api = {
     }
   },
 
-  hotelEndpoints: {
+  _hotelEndpoints: {
     searchHotelsUrl: function() {
       return Api.getHost("v2") + "/metasearch/hotels/searches";
     },
@@ -206,7 +206,7 @@ var Api = {
     }
   },
 
-  flightEndpoints: {
+  _flightEndpoints: {
     searchTrips: function() {
       var path = "/metasearch/flights/searches";
       return Api.getHost("v2") + path;
@@ -230,33 +230,33 @@ var Api = {
   },
 
   searchTrips: function(requestBody, query) {
-    var uri = this.flightEndpoints.searchTrips();
+    var uri = this._flightEndpoints.searchTrips();
     return this.post(requestBody, uri, query);
   },
 
   fetchTrips: function(searchId, query = {}) {
-    var uri = this.flightEndpoints.fetchTrips(searchId);
+    var uri = this._flightEndpoints.fetchTrips(searchId);
     return this.get(uri, query);
   },
 
   searchHotels: function(requestBody, query) {
-    var uri = this.hotelEndpoints.searchHotelsUrl();
+    var uri = this._hotelEndpoints.searchHotelsUrl();
     return this.post(requestBody, uri, query);
   },
 
   fetchHotels: function(searchId, query = {}) {
-    var uri = this.hotelEndpoints.fetchHotelsUrl(searchId);
+    var uri = this._hotelEndpoints.fetchHotelsUrl(searchId);
     return this.get(uri, query);
   },
 
   searchHotel: function(requestBody, query) {
     var hotelId = requestBody.search.hotelId,
-      uri = this.hotelEndpoints.searchSingleHotelUrl(hotelId);
+      uri = this._hotelEndpoints.searchSingleHotelUrl(hotelId);
     return this.post(requestBody, uri, query);
   },
 
   fetchHotelDetails: function(hotelId, query) {
-    var uri = this.hotelEndpoints.hotelDetailsUrl(hotelId);
+    var uri = this._hotelEndpoints.hotelDetailsUrl(hotelId);
     return this.get(uri, query);
   },
 
@@ -711,10 +711,12 @@ FlightSearchClient.prototype = {
   },
 
   fetchTripsParams: function() {
+    var self = this;
     return {
-      currencyCode: this.currency.code,
-      locale: this.locale,
-      paymentMethodIds: this.paymentMethodIds || []
+      currencyCode: self.currency.code,
+      locale: self.locale,
+      paymentMethodIds: self.paymentMethodIds || [],
+      offset: self.processedFaresCount
     };
   }
 };

@@ -153,10 +153,12 @@ FlightSearchClient.prototype = {
   },
 
   fetchTripsParams: function() {
+    var self = this;
     return {
-      currencyCode: this.currency.code,
-      locale: this.locale,
-      paymentMethodIds: this.paymentMethodIds || []
+      currencyCode: self.currency.code,
+      locale: self.locale,
+      paymentMethodIds: self.paymentMethodIds || [],
+      offset: self.processedFaresCount
     };
   }
 };
