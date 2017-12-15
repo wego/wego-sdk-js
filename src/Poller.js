@@ -1,5 +1,6 @@
-var Poller = function (options) {
+var Poller = function(options) {
   options = options || {};
+  this.initCallApi = options.initCallApi;
   this.callApi = options.callApi;
   this.delays = options.delays;
   this.onSuccessResponse = options.onSuccessResponse;
@@ -8,7 +9,12 @@ var Poller = function (options) {
 
 Poller.prototype = {
   start: function() {
-    this.preparePoll();
+    var self = this;
+    this.timer = setTimeout(function() {
+      self.pollCount++;
+      self.retryCount = 0;
+      self.fetch(self.initCallApi || self.callApi);
+    }, 0);
   },
 
   reset: function() {
@@ -37,10 +43,6 @@ Poller.prototype = {
     this.preparePoll();
   },
 
-  handleErrorResponse: function() {
-    this.retry();
-  },
-
   preparePoll: function() {
     var self = this;
     if (this.pollCount < this.delays.length) {
@@ -53,31 +55,33 @@ Poller.prototype = {
   poll: function() {
     this.pollCount++;
     this.retryCount = 0;
-    this.fetch();
+    this.fetch(this.callApi);
   },
 
-  retry: function() {
+  retry: function(callApiFn) {
     if (this.retryCount < 3) {
       this.retryCount++;
-      this.fetch();
+      this.fetch(callApiFn);
     }
   },
 
-  fetch: function() {
+  fetch: function(callApiFn) {
     var self = this;
     var aborted = false;
     this.abortLastFetch = function() {
       aborted = true;
     };
 
-    this.callApi().then(function(response) {
-      if (!aborted) {
-        self.handleSuccessResponse(response);
-      }
-    }).catch(function() {
-      self.handleErrorResponse();
-    });
-  },
+    callApiFn()
+      .then(function(response) {
+        if (!aborted) {
+          self.handleSuccessResponse(response);
+        }
+      })
+      .catch(function() {
+        self.retry(callApiFn);
+      });
+  }
 };
 
 module.exports = Poller;
