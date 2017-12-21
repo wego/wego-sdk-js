@@ -191,15 +191,15 @@ var Api = {
 
   _hotelEndpoints: {
     searchHotelsUrl: function() {
-      return Api.getHost("v2") + "/metasearch/hotels/searches";
+      return Api.getHost("v1") + "/metasearch/hotels/searches";
     },
     fetchHotelsUrl: function(searchId) {
       var path = "/metasearch/hotels/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     searchSingleHotelUrl: function(hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     hotelDetailsUrl: function(hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
@@ -209,11 +209,11 @@ var Api = {
   _flightEndpoints: {
     searchTrips: function() {
       var path = "/metasearch/flights/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     fetchTrips: function(searchId) {
       var path = "/metasearch/flights/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     }
   },
 
