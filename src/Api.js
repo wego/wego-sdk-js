@@ -47,7 +47,11 @@ var Api = {
   },
 
   getEnvironment: function() {
-    return this.env || Wego.ENV || "staging";
+    var environment = "staging";
+    if (typeof Wego !== "undefined" && typeof Wego.ENV !== "undefined") {
+      environment = Wego.ENV;
+    }
+    return this.env || environment;
   },
 
   searchTrips: function(requestBody, query) {
