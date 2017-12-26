@@ -2180,6 +2180,34 @@ module.exports = {
       }
     }
 
+    function _getDiscount(hotel) {
+      if (_hasRates(hotel) && _hasUsualPrice(hotel.rates[0]['usualPrice'])) {
+        return Math.round(hotel.rates[0]['usualPrice']['discountToUsualAmount'] * 100);
+      } else {
+        return null;
+      }
+    }
+
+    function _getSavings(hotel) {
+      var usualPrice;
+
+      if (_hasRates(hotel) && _hasUsualPrice(hotel.rates[0]['usualPrice'])) {
+        usualPrice = hotel.rates[0]['usualPrice'];
+
+        return Math.round(usualPrice['usualAmount'] * usualPrice['discountToUsualAmount']);
+      } else {
+        return null;
+      }
+    }
+
+    function _hasRates(hotel) {
+      return hotel.rates && hotel.rates.length > 0;
+    }
+
+    function _hasUsualPrice(usualPrice) {
+      return usualPrice !== undefined;
+    }
+
     function getReviewScore(type) {
       return function(hotel) {
         var review = hotel.reviewMap[type];
@@ -2206,6 +2234,8 @@ module.exports = {
 
     var getterMap = {
       PRICE: getPrice,
+      DISCOUNT: _getDiscount,
+      SAVINGS: _getSavings,
       ALL_REVIEW_SCORE: getReviewScore('ALL'),
       FAMILY_REVIEW_SCORE: getReviewScore('FAMILY'),
       BUSINESS_REVIEW_SCORE: getReviewScore('BUSINESS'),
@@ -2232,6 +2262,7 @@ module.exports = {
     return cloneHotels;
   },
 };
+
 
 /***/ }),
 /* 15 */
