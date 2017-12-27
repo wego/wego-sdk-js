@@ -28,7 +28,19 @@ function filterByRateAmenities(hotel, rateAmenityIds) {
       if (rates[i].rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) return true;
     }
   }
-  
+
+  return false;
+}
+
+function filterByDeals(hotel, deals) {
+  if (!deals || deals.length === 0) return true;
+  var rates = hotel.rates;
+  if (!rates) return false;
+
+  for (var i = 0; i < rates.length; i++) {
+    if (rates[i]['usualPrice'] !== undefined) return true;
+  }
+
   return false;
 }
 
@@ -68,7 +80,8 @@ module.exports = {
         && filterByName(hotel, filter.name)
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
-        && filterByRateAmenities(hotel, filter.rateAmenityIds);
+        && filterByRateAmenities(hotel, filter.rateAmenityIds)
+        && filterByDeals(hotel, filter.deals);
     });
   }
 };
