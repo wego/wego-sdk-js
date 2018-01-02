@@ -14,7 +14,7 @@ describe('wego-hotel-search-sorting', function() {
       expect(hotels).to.deep.equal([hotel1, hotel3, hotel2]);
     });
 
-    it('sorting by price', function() {
+    it('sorts price order by DESC', function() {
       var hotel1 = createHotelWithBestRateAmountUsd(1);
       var hotel2 = createHotelWithBestRateAmountUsd(3);
       var hotel3 = createHotelWithBestRateAmountUsd(2);
@@ -26,7 +26,7 @@ describe('wego-hotel-search-sorting', function() {
       expect(hotels).to.deep.equal([hotel2, hotel3, hotel1]);
     });
 
-    it('sorting by best discount', function() {
+    it('sorts by best discount', function() {
       var hotel1 = createHotelWithDeals(100, 0.15);
       var hotel2 = createHotelWithDeals(300, 0.25);
       var hotel3 = createHotelWithDeals(200, 0.20);
@@ -38,7 +38,7 @@ describe('wego-hotel-search-sorting', function() {
       expect(hotels).to.deep.equal([hotel2, hotel3, hotel1]);
     });
 
-    it('sorting by biggest savings', function() {
+    it('sorts by biggest savings', function() {
       var hotel1 = createHotelWithDeals(100, 0.15);
       var hotel2 = createHotelWithDeals(200, 0.25);
       var hotel3 = createHotelWithDeals(300, 0.20);
