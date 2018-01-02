@@ -26,7 +26,7 @@ module.exports = {
       if (_hasRates(hotel) && _hasUsualPrice(hotel.rates[0]['usualPrice'])) {
         usualPrice = hotel.rates[0]['usualPrice'];
 
-        return Math.round(usualPrice['usualAmount'] * usualPrice['discountToUsualAmount']);
+        return Math.round(usualPrice['usualAmountUsd'] * usualPrice['discountToUsualAmount']);
       } else {
         return null;
       }
