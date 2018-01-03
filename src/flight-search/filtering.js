@@ -59,6 +59,14 @@ function filterByAirlines(trip, airlineCodeMap) {
   return utils.filterByKey(trip.marketingAirline.code, airlineCodeMap);
 }
 
+function filterByProviders(trip, providerCodeMap) {
+  if (!providerCodeMap) return true;
+  for (var i = 0; i < trip.fares.length; i++) {
+    if (utils.filterByKey(trip.fares[i].provider.code, providerCodeMap)) return true;
+  }
+  return false;
+}
+
 function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
@@ -69,6 +77,7 @@ module.exports = {
 
     var stopCodeMap = utils.arrayToMap(filter.stopCodes);
     var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
+    var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
     var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
     var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
@@ -79,6 +88,7 @@ module.exports = {
         && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
         && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
         && filterByAirlines(trip, airlineCodeMap)
+        && filterByProviders(trip, providerCodeMap)
         && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
         && filterByTripOptions(trip, filter.tripOptions)
         && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)

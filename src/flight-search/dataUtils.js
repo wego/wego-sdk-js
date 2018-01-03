@@ -292,5 +292,6 @@ module.exports = {
     originAirports: 'airports',
     destinationAirports: 'airports',
     stopoverAirports: 'airports',
+    providers: 'providers'
   }
 };
