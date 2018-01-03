@@ -277,6 +277,7 @@ FlightSearchMerger.prototype = {
 
   __filterOptionTypes: [
     'airlines',
+    'providers',
     'stops',
     'alliances',
     'originAirports',
