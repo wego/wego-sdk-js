@@ -20,6 +20,17 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
+    it('filters by deals', function() {
+      var hotel1 = createHotelWithDeals(100, 0.15);
+      var hotel2 = createHotel();
+      var hotel3 = createHotelWithDeals(200, 0.20);
+      var hotel4 = createHotel();
+
+      expect(filtering.filterHotels([hotel1, hotel2, hotel3, hotel4], {
+        deals: 'today'
+      })).to.deep.equal([hotel1, hotel3]);
+    });
+
     it('filtering by review score', function() {
       var hotel1 = createHotelWithReviewScore(7);
       var hotel2 = createHotelWithReviewScore(5);
@@ -223,6 +234,23 @@ describe('wego-hotel-filtering-behavior_test', function() {
           score: score,
         }
       }
+    });
+  }
+
+  function createHotelWithDeals(usualAmountUsd, discountToUsualAmount) {
+    var amountUsd = usualAmountUsd - (usualAmountUsd * discountToUsualAmount);
+    return createHotel({
+      rates: [
+        {
+          price: {
+            amountUsd: amountUsd,
+          },
+          usualPrice: {
+            discountToUsualAmount: discountToUsualAmount,
+            usualAmountUsd: usualAmountUsd
+          }
+        }
+      ]
     });
   }
 

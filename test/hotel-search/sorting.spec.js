@@ -14,6 +14,42 @@ describe('wego-hotel-search-sorting', function() {
       expect(hotels).to.deep.equal([hotel1, hotel3, hotel2]);
     });
 
+    it('sorts price order by DESC', function() {
+      var hotel1 = createHotelWithBestRateAmountUsd(1);
+      var hotel2 = createHotelWithBestRateAmountUsd(3);
+      var hotel3 = createHotelWithBestRateAmountUsd(2);
+      var hotels = sorting.sortHotels([hotel1, hotel2, hotel3], {
+        by: 'PRICE',
+        order: 'DESC',
+      });
+
+      expect(hotels).to.deep.equal([hotel2, hotel3, hotel1]);
+    });
+
+    it('sorts by best discount', function() {
+      var hotel1 = createHotelWithDeals(100, 0.15);
+      var hotel2 = createHotelWithDeals(300, 0.25);
+      var hotel3 = createHotelWithDeals(200, 0.20);
+      var hotels = sorting.sortHotels([hotel1, hotel2, hotel3], {
+        by: 'DISCOUNT',
+        order: 'DESC',
+      });
+
+      expect(hotels).to.deep.equal([hotel2, hotel3, hotel1]);
+    });
+
+    it('sorts by biggest savings', function() {
+      var hotel1 = createHotelWithDeals(100, 0.15);
+      var hotel2 = createHotelWithDeals(200, 0.25);
+      var hotel3 = createHotelWithDeals(300, 0.20);
+      var hotels = sorting.sortHotels([hotel1, hotel2, hotel3], {
+        by: 'SAVINGS',
+        order: 'DESC',
+      });
+
+      expect(hotels).to.deep.equal([hotel3, hotel2, hotel1]);
+    });
+
     it('sorting by all review score', function() {
       var hotel1 = createHotelWithReviewScore(1, 'ALL');
       var hotel2 = createHotelWithReviewScore(3, 'ALL');
@@ -180,6 +216,23 @@ describe('wego-hotel-search-sorting', function() {
         {
           price: {
             amountUsd: amountUsd,
+          }
+        }
+      ]
+    });
+  }
+
+  function createHotelWithDeals(usualAmountUsd, discountToUsualAmount) {
+    var amountUsd = usualAmountUsd - (usualAmountUsd * discountToUsualAmount);
+    return createHotel({
+      rates: [
+        {
+          price: {
+            amountUsd: amountUsd,
+          },
+          usualPrice: {
+            discountToUsualAmount: discountToUsualAmount,
+            usualAmountUsd: usualAmountUsd
           }
         }
       ]
