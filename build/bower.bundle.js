@@ -1628,17 +1628,39 @@ function filterByPrice(trip, priceRange) {
   return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
-function filterByProviderTypes(trip, providerTypes) {
-  if (!providerTypes) return true;
-  var fares = trip.fares;
+/*
+  e.g providerFilter: {
+    providerCodeMap: {citybookers.com: true, rehlat.ae: true},
+    providerTypes: ['instant', 'airline'],
+  }
+*/
+function filterByProviders(trip, providerFilter) {
+  if (!providerFilter) return true;
 
+  var providerCodeMap = providerFilter.providerCodeMap;
+  var providerTypes = providerFilter.providerTypes;
+
+  if (!providerCodeMap && !providerTypes) return true;
+
+  var fares = trip.fares;
   if (!fares) return false;
   for (var i = 0; i < fares.length; i++) {
-    if (fares[i].provider.instant && providerTypes.includes('instant')) return true;
-    if (providerTypes.includes(fares[i].provider.type)) return true;
+    var isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
+    var isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+    if (isMatchCode && isMatchType) return true;
   }
-
   return false;
+}
+
+function isFareMatchProviderType (fare, providerTypes) {
+  if (!providerTypes) return true;
+  var isMatchTypeInstant = (fare.provider.instant && providerTypes.includes('instant'));
+  return isMatchTypeInstant || (providerTypes.includes(fare.provider.type));
+}
+
+function isFareMatchProviderCode (fare, providerCodeMap) {
+  if(!providerCodeMap) return true;
+  return utils.filterByKey(fare.provider.code, providerCodeMap);
 }
 
 function filterByTripOptions(trip, tripOptions) {
@@ -1682,14 +1704,6 @@ function filterByAirlines(trip, airlineCodeMap) {
   return utils.filterByKey(trip.marketingAirline.code, airlineCodeMap);
 }
 
-function filterByProviders(trip, providerCodeMap) {
-  if (!providerCodeMap) return true;
-  for (var i = 0; i < trip.fares.length; i++) {
-    if (utils.filterByKey(trip.fares[i].provider.code, providerCodeMap)) return true;
-  }
-  return false;
-}
-
 function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
@@ -1700,10 +1714,13 @@ module.exports = {
 
     var stopCodeMap = utils.arrayToMap(filter.stopCodes);
     var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
-    var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
     var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
     var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
+
+    var providerCodeMap = utils.arrayToMap(filter.providerCodes);
+    var providerTypes = filter.providerTypes;
+    var providerFilter = {providerCodeMap, providerTypes};
 
     var filteredTrips = trips.filter(function(trip) {
       return filterByPrice(trip, filter.priceRange)
@@ -1711,7 +1728,6 @@ module.exports = {
         && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
         && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
         && filterByAirlines(trip, airlineCodeMap)
-        && filterByProviders(trip, providerCodeMap)
         && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
         && filterByTripOptions(trip, filter.tripOptions)
         && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
@@ -1722,7 +1738,7 @@ module.exports = {
         && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
-        && filterByProviderTypes(trip, filter.providerTypes);
+        && filterByProviders(trip, providerFilter);
     });
 
     return filteredTrips;

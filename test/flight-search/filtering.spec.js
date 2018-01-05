@@ -145,6 +145,30 @@ describe('filtering', function() {
       expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip1]);
     });
 
+    it('filtering by providerCodes and providerTypes', function() {
+      var fare1 = createFareWithProvider('ota', 'wego.com-kiwi');
+      var fare2 = createFareWithProvider('ota', 'trip.com');
+      var fare3 = createFareWithProvider('airline', 'vietjetair.com');
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2]
+      };
+
+      var trip3 = {
+        fares: [fare2, fare3]
+      };
+
+      var filter = {
+        providerCodes: ['wego.com-kiwi', 'vietjetair.com'],
+        providerTypes: ['instant', 'airline']
+      };
+      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
+    });
+
     it('filtering by allianceCodes', function() {
       var trip1 = {
         allianceCodes: ['A1', 'A3'],
