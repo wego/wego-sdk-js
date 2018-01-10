@@ -7,7 +7,7 @@ function filterByPrice(trip, priceRange) {
 
 /*
   e.g providerFilter: {
-    providerCodeMap: {citybookers.com: true, rehlat.ae: true},
+    providerCodeMap: {'citybookers.com': true, 'rehlat.ae': true},
     providerTypes: ['instant', 'airline'],
   }
 */
