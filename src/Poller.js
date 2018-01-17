@@ -5,7 +5,6 @@ var Poller = function(options) {
   this.delays = options.delays;
   this.onSuccessResponse = options.onSuccessResponse;
   this.pollLimit = options.pollLimit;
-  this.forceStop = false;
 };
 
 Poller.prototype = {
@@ -25,6 +24,7 @@ Poller.prototype = {
     }
     this.pollCount = 0;
     this.resultCount = 0;
+    this.forceStop = false;
   },
 
   stop: function() {
