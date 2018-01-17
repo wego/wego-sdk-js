@@ -343,6 +343,7 @@ var Poller = function(options) {
   this.delays = options.delays;
   this.onSuccessResponse = options.onSuccessResponse;
   this.pollLimit = options.pollLimit;
+  this.forceStop = false;
 };
 
 Poller.prototype = {
@@ -364,6 +365,14 @@ Poller.prototype = {
     this.resultCount = 0;
   },
 
+  stop: function() {
+    this.forceStop = true;
+  },
+
+  isStopping: function() {
+    return this.forceStop;
+  },
+
   getProgress: function() {
     if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
       return 100;
@@ -383,7 +392,7 @@ Poller.prototype = {
 
   preparePoll: function() {
     var self = this;
-    if (this.pollCount < this.delays.length) {
+    if (this.pollCount < this.delays.length && !this.forceStop) {
       this.timer = setTimeout(function() {
         self.poll();
       }, this.delays[this.pollCount]);
@@ -866,10 +875,20 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
+  var originDelays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
+  var approximateTime = originDelays.reduce((a,b) => a+b);
+  var timeout = 45000;
+  var stepTime = 6000;
+  var extendedDelays = originDelays.slice();
+  while (approximateTime < timeout) {
+    approximateTime += stepTime;
+    extendedDelays.push(stepTime);
+  }
+
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
-    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
-    pollLimit: 7,
+    delays: extendedDelays,
+    pollLimit: extendedDelays.length - 1,
     initCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -895,13 +914,20 @@ HotelSearchClient.prototype = {
   },
 
   handleSearchResponse: function(response) {
-    this.mergeResponse(response);
+    if (response.done) {
+      this.poller.stop();
+    }
+    this.mergeResponse(response); 
     this.updateResult();
     if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
+    if (response.done) {
+      this.merger.lastMergeResponse(response); 
+    } else {
+      this.merger.mergeResponse(response);  
+    }
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
@@ -1875,6 +1901,19 @@ HotelSearchClient.prototype = {
     this._cloneHotels(hotelIds);
   },
 
+  lastMergeResponse: function(response) {
+    var hotelIds = this._getUpdatedHotelIds(response);
+
+    this._mergeStaticData(response);
+    this._mergeHotels(response.hotels);
+    this._mergeFilter(response.filter);
+    this._lastMergeRates(response.rates);
+    this._mergeScores(response.scores);
+    this._mergeRatesCounts(response.providerRatesCounts);
+
+    this._cloneHotels(hotelIds);
+  },
+
   getFilter: function() {
     return this.__filter;
   },
@@ -1953,6 +1992,52 @@ HotelSearchClient.prototype = {
         }
       }
     });
+  },
+
+  _lastMergeRates: function(newRates) {
+    if (!newRates) return;
+    var self = this;
+
+    self._mergeRates(newRates);
+
+    var updatingHotel = [];
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId].rates.length === 1) {
+        updatingHotel.push(hotelId);
+      }
+    }
+
+    for (var i in newRates) {
+      var newRate = newRates[i];
+      dataUtils.prepareRate(newRate, self.currency, self.__staticData);
+      var hotelId = newRate.hotelId;
+      if (updatingHotel.includes(hotelId)) {
+        continue;
+      }
+      var hotel = self.__hotelMap[hotelId];
+      if (!hotel) {
+        continue;
+      }
+
+      var rates = hotel.rates;
+      var isIncluded = false;
+      for (var i = 0; i < rates.length; i++) {
+        if (newRate.id === rates[i].id) {
+          isIncluded = true;
+          break;
+        }
+      }
+      if (isIncluded) {
+        continue;
+      }
+      for (var i = 0; i < rates.length; i++) {
+        if (dataUtils.isBetterRate(newRate, rates[i])) {
+          rates.splice(i, 0, newRate);
+          continue;
+        }
+      }
+      rates.push(newRate);
+    }
   },
 
   _mergeScores: function(scores) {
@@ -2236,7 +2321,7 @@ module.exports = {
       if (_hasRates(hotel) && _hasUsualPrice(hotel.rates[0]['usualPrice'])) {
         usualPrice = hotel.rates[0]['usualPrice'];
 
-        return Math.round(usualPrice['usualAmount'] * usualPrice['discountToUsualAmount']);
+        return Math.round(usualPrice['usualAmountUsd'] * usualPrice['discountToUsualAmount']);
       } else {
         return null;
       }
