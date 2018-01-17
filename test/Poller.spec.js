@@ -119,6 +119,15 @@ describe("Poller", () => {
       poller.preparePoll();
       expect(poller.timer).to.equal(null);
     });
+
+    it("stop the polling process when client request", () =>{
+      poller.delays = [1, 2, 3, 4, 5];
+      poller.pollCount = 3;
+      poller.timer = null;
+      poller.forceStop = true;
+      poller.preparePoll();
+      expect(poller.timer).to.equal(null);
+    });
   });
 
   describe("#retry", () => {

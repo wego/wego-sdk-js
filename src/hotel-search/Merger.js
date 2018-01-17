@@ -28,6 +28,19 @@ HotelSearchClient.prototype = {
     this._cloneHotels(hotelIds);
   },
 
+  lastMergeResponse: function(response) {
+    var hotelIds = this._getUpdatedHotelIds(response);
+
+    this._mergeStaticData(response);
+    this._mergeHotels(response.hotels);
+    this._mergeFilter(response.filter);
+    this._lastMergeRates(response.rates);
+    this._mergeScores(response.scores);
+    this._mergeRatesCounts(response.providerRatesCounts);
+
+    this._cloneHotels(hotelIds);
+  },
+
   getFilter: function() {
     return this.__filter;
   },
@@ -106,6 +119,52 @@ HotelSearchClient.prototype = {
         }
       }
     });
+  },
+
+  _lastMergeRates: function(newRates) {
+    if (!newRates) return;
+    var self = this;
+
+    self._mergeRates(newRates);
+
+    var updatingHotel = [];
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId].rates.length === 1) {
+        updatingHotel.push(hotelId);
+      }
+    }
+
+    for (var i in newRates) {
+      var newRate = newRates[i];
+      dataUtils.prepareRate(newRate, self.currency, self.__staticData);
+      var hotelId = newRate.hotelId;
+      if (updatingHotel.includes(hotelId)) {
+        continue;
+      }
+      var hotel = self.__hotelMap[hotelId];
+      if (!hotel) {
+        continue;
+      }
+
+      var rates = hotel.rates;
+      var isIncluded = false;
+      for (var i = 0; i < rates.length; i++) {
+        if (newRate.id === rates[i].id) {
+          isIncluded = true;
+          break;
+        }
+      }
+      if (isIncluded) {
+        continue;
+      }
+      for (var i = 0; i < rates.length; i++) {
+        if (dataUtils.isBetterRate(newRate, rates[i])) {
+          rates.splice(i, 0, newRate);
+          continue;
+        }
+      }
+      rates.push(newRate);
+    }
   },
 
   _mergeScores: function(scores) {

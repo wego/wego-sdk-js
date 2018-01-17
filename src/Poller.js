@@ -5,6 +5,7 @@ var Poller = function(options) {
   this.delays = options.delays;
   this.onSuccessResponse = options.onSuccessResponse;
   this.pollLimit = options.pollLimit;
+  this.forceStop = false;
 };
 
 Poller.prototype = {
@@ -26,6 +27,14 @@ Poller.prototype = {
     this.resultCount = 0;
   },
 
+  stop: function() {
+    this.forceStop = true;
+  },
+
+  isStopping: function() {
+    return this.forceStop;
+  },
+
   getProgress: function() {
     if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
       return 100;
@@ -45,7 +54,7 @@ Poller.prototype = {
 
   preparePoll: function() {
     var self = this;
-    if (this.pollCount < this.delays.length) {
+    if (this.pollCount < this.delays.length && !this.forceStop) {
       this.timer = setTimeout(function() {
         self.poll();
       }, this.delays[this.pollCount]);

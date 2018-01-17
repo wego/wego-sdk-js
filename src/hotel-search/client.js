@@ -23,10 +23,20 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
+  var originDelays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
+  var approximateTime = originDelays.reduce((a,b) => a+b);
+  var timeout = 45000;
+  var stepTime = 6000;
+  var extendedDelays = originDelays.slice();
+  while (approximateTime < timeout) {
+    approximateTime += stepTime;
+    extendedDelays.push(stepTime);
+  }
+
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
-    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
-    pollLimit: 7,
+    delays: extendedDelays,
+    pollLimit: extendedDelays.length - 1,
     initCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -52,13 +62,20 @@ HotelSearchClient.prototype = {
   },
 
   handleSearchResponse: function(response) {
-    this.mergeResponse(response);
+    if (response.done) {
+      this.poller.stop();
+    }
+    this.mergeResponse(response); 
     this.updateResult();
     if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
+    if (response.done) {
+      this.merger.lastMergeResponse(response); 
+    } else {
+      this.merger.mergeResponse(response);  
+    }
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
