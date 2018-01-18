@@ -62,11 +62,7 @@ HotelSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
-    if (response.done) {
-      this.merger.lastMergeResponse(response); 
-    } else {
-      this.merger.mergeResponse(response);  
-    }
+    this.merger.mergeResponse(response);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
