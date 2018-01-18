@@ -23,7 +23,7 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
-  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000, 6000, 6000, 6000, 6000, 6000];
+  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000, 6000, 6000];
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
     delays: delays,
