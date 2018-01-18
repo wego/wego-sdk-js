@@ -373,7 +373,7 @@ describe('Merger', function() {
       expect(getRateIds(merger.__hotelMap[1].rates)).to.deep.equal([2, 1]);
     });
 
-    it("some hotel may have more than 1 from a provider rate when search's status is 'done'", () =>{
+    it ("some hotel may have more than 1 from a provider rate when search's status is 'done'", () => {
       var response = {
         done: true,
         hotels: [{ id: 1},{ id: 2}],

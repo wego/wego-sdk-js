@@ -331,7 +331,7 @@ describe("HotelSearchClient", function() {
       expect(client.merger.__staticData.brands[1]).to.equal(brand);
     });
 
-    it("no hotel can have more than 1 rate from a provider when search's status is not'done'", () =>{
+    it ("no hotel can have more than 1 rate from a provider when search's status is not'done'", () => {
       var response = {
         done: false,
         hotels: [{ id: 1},{ id: 2}],
@@ -350,7 +350,7 @@ describe("HotelSearchClient", function() {
         client.merger.__hotelMap[2].rates[1].providerCode);
     });
 
-    it("some hotels may have more than 1 from a provider rate when search's status is 'done'", () =>{
+    it ("some hotels may have more than 1 from a provider rate when search's status is 'done'", () => {
       var response = {
         done: true,
         hotels: [{ id: 1},{ id: 2}],
@@ -363,7 +363,6 @@ describe("HotelSearchClient", function() {
         ]
       }
       client.handleSearchResponse(response);
-      console.log(client.merger.__hotelMap[1]);
       expect(client.merger.__hotelMap[1].rates.length).to.equal(3);
       expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
     });
