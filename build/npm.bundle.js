@@ -2002,6 +2002,9 @@ HotelSearchClient.prototype = {
       var hotelId = singlePartnerHotels[i];
       var currentBestRate = self.__hotelMap[hotelId].rates[0];
       var rates = hotelIdToNewRatesMap[hotelId];
+      if (!rates) {
+        continue;
+      }
       rates = rates.filter(rate => rate.id !== currentBestRate.id)
       rates.push(currentBestRate);
       self.__hotelMap[hotelId].rates = rates.sort(compareRates);
