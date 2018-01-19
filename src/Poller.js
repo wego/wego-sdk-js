@@ -35,6 +35,10 @@ Poller.prototype = {
     return this.forceStop;
   },
 
+  isLastPolling: function() {
+    return this.pollCount > this.pollLimit;
+  },
+
   getProgress: function() {
     if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
       return 100;

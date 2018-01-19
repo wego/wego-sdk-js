@@ -21,7 +21,7 @@ HotelSearchClient.prototype = {
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    if (response.done) {
+    if (response.done || response.isLastPolling) {
       this._lastMergeRates(response.rates);
     } else {
       this._mergeRates(response.rates);  

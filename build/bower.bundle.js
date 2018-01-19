@@ -373,6 +373,10 @@ Poller.prototype = {
     return this.forceStop;
   },
 
+  isLastPolling: function() {
+    return this.pollCount > this.pollLimit;
+  },
+
   getProgress: function() {
     if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
       return 100;
@@ -914,6 +918,7 @@ HotelSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
+    response["isLastPolling"] = this.poller.isLastPolling();
     this.merger.mergeResponse(response);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
@@ -1010,7 +1015,7 @@ HotelSearchClient.prototype = {
       params.selectedHotelIds = selectedHotelIds;
     }
 
-    if (this.poller.pollCount > this.poller.pollLimit) {
+    if (this.poller.isLastPolling()) {
       params["isLastPolling"] = true;
     }
     return params;
@@ -1885,7 +1890,7 @@ HotelSearchClient.prototype = {
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    if (response.done) {
+    if (response.done || response.isLastPolling) {
       this._lastMergeRates(response.rates);
     } else {
       this._mergeRates(response.rates);  
