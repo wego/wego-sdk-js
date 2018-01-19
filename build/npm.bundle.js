@@ -918,7 +918,7 @@ HotelSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
-    response["isLastPolling"] = this.poller.isLastPolling();
+    response.isLastPolling = this.poller.isLastPolling();
     this.merger.mergeResponse(response);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
