@@ -875,7 +875,7 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
-  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000, 6000, 6000];
+  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
     delays: delays,
@@ -887,7 +887,11 @@ var HotelSearchClient = function(options) {
       });
     },
     callApi: function() {
-      return Api.fetchHotels(self.responseSearch.id, self.fetchHotelsParams());
+      var query = self.fetchHotelsParams();
+      if (self.poller.pollCount > self.poller.pollLimit) {
+        query["isLastPolling"] = true;
+      }
+      return Api.fetchHotels(self.responseSearch.id, query);
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
