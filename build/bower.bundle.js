@@ -887,11 +887,7 @@ var HotelSearchClient = function(options) {
       });
     },
     callApi: function() {
-      var query = self.fetchHotelsParams();
-      if (self.poller.pollCount > self.poller.pollLimit) {
-        query["isLastPolling"] = true;
-      }
-      return Api.fetchHotels(self.responseSearch.id, query);
+      return Api.fetchHotels(self.responseSearch.id, self.fetchHotelsParams());
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
@@ -1012,6 +1008,10 @@ HotelSearchClient.prototype = {
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (this.poller.pollCount > this.poller.pollLimit) {
+      params["isLastPolling"] = true;
     }
     return params;
   }

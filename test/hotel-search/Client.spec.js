@@ -518,5 +518,12 @@ describe("HotelSearchClient", function() {
       var params = client.fetchHotelsParams();
       expect(params.selectedHotelIds).to.deep.equal(["957766"]);
     });
+    it("return isLastPolling flag at the last polling request", function() {
+      client.poller.pollCount = 2;
+      client.poller.pollLimit = 1;
+      var params = client.fetchHotelsParams();
+      console.log(params);
+      expect(params.isLastPolling).to.equal(true);
+    });
   });
 });
