@@ -1016,7 +1016,7 @@ HotelSearchClient.prototype = {
     }
 
     if (this.poller.isLastPolling()) {
-      params["isLastPolling"] = true;
+      params.isLastPolling = true;
     }
     return params;
   }
@@ -1997,7 +1997,10 @@ HotelSearchClient.prototype = {
     for (var i in newRates) {
       var rate = newRates[i];
       if (singlePartnerHotels[rate.hotelId]) {
-        var hotelOrderedRates = hotelIdToNewRatesMap[rate.hotelId] || [];
+        if (!hotelIdToNewRatesMap[rate.hotelId]) {
+          hotelIdToNewRatesMap[rate.hotelId] = [];
+        }
+        var hotelOrderedRates = hotelIdToNewRatesMap[rate.hotelId];
         var index;
         for (index = 0; index < hotelOrderedRates.length; index++) {
           if (dataUtils.isBetterRate(rate, hotelOrderedRates[index])) {
@@ -2005,7 +2008,6 @@ HotelSearchClient.prototype = {
           }
         }
         hotelOrderedRates.splice(index, 0, rate);
-        hotelIdToNewRatesMap[rate.hotelId] = hotelOrderedRates;
       }
     }
 

@@ -160,7 +160,7 @@ HotelSearchClient.prototype = {
     }
 
     if (this.poller.isLastPolling()) {
-      params["isLastPolling"] = true;
+      params.isLastPolling = true;
     }
     return params;
   }
