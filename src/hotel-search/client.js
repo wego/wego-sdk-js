@@ -23,10 +23,11 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
+  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
-    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
-    pollLimit: 7,
+    delays: delays,
+    pollLimit: delays.length - 1,
     initCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -52,13 +53,17 @@ HotelSearchClient.prototype = {
   },
 
   handleSearchResponse: function(response) {
-    this.mergeResponse(response);
+    if (response.done) {
+      this.poller.stop();
+    }
+    this.mergeResponse(response); 
     this.updateResult();
     if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
+    var isSearchEnd = response.done || this.poller.isLastPolling()
+    this.merger.mergeResponse(response, isSearchEnd);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
@@ -152,6 +157,10 @@ HotelSearchClient.prototype = {
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (this.poller.isLastPolling()) {
+      params.isLastPolling = true;
     }
     return params;
   }
