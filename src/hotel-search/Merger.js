@@ -15,13 +15,13 @@ HotelSearchClient.prototype = {
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
 
-  mergeResponse: function(response) {
+  mergeResponse: function(response, isSearchEnd = false) {
     var hotelIds = this._getUpdatedHotelIds(response);
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    this._mergeRates(response);  
+    this._mergeRates(response.rates, isSearchEnd);  
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -80,8 +80,7 @@ HotelSearchClient.prototype = {
     });
   },
 
-  _mergeRates: function(response) {
-    newRates = response.rates;
+  _mergeRates: function(newRates, isSearchEnd) {
     if (!newRates) return;
     var self = this;
 
@@ -108,7 +107,7 @@ HotelSearchClient.prototype = {
       }
     });
 
-    if (response.done || response.isLastPolling) {
+    if (isSearchEnd) {
       this._lastMergeRates(newRates);
     }
   },

@@ -62,8 +62,8 @@ HotelSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
-    response.isLastPolling = this.poller.isLastPolling();
-    this.merger.mergeResponse(response);  
+    var isSearchEnd = response.done || this.poller.isLastPolling()
+    this.merger.mergeResponse(response, isSearchEnd);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },

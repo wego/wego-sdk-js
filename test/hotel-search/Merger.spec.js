@@ -373,9 +373,8 @@ describe('Merger', function() {
       expect(getRateIds(merger.__hotelMap[1].rates)).to.deep.equal([2, 1]);
     });
 
-    it("some hotel may have more than 1 from a provider rate when search's status is 'done'", () => {
+    it("some hotel may have more than 1 from a provider rate when search's is end", () => {
       var response = {
-        done: true,
         hotels: [{ id: 1},{ id: 2}],
         rates: [
           { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
@@ -386,26 +385,7 @@ describe('Merger', function() {
         ]
       }
       merger.updateCurrency(null);
-      merger.mergeResponse(response);
-      expect(merger.__hotelMap[1].rates.length).to.equal(3);
-      expect(merger.__hotelMap[2].rates.length).to.equal(2);
-    });
-
-    it("some hotel may have more than 1 from a provider rate at the last polling even the search's status is not 'done'", () => {
-      var response = {
-        done: false,
-        hotels: [{ id: 1},{ id: 2}],
-        rates: [
-          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
-          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
-          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
-          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
-          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}}
-        ],
-        isLastPolling: true
-      }
-      merger.updateCurrency(null);
-      merger.mergeResponse(response);
+      merger.mergeResponse(response, true);
       expect(merger.__hotelMap[1].rates.length).to.equal(3);
       expect(merger.__hotelMap[2].rates.length).to.equal(2);
     });
