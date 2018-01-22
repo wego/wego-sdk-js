@@ -24,6 +24,19 @@ Poller.prototype = {
     }
     this.pollCount = 0;
     this.resultCount = 0;
+    this.forceStop = false;
+  },
+
+  stop: function() {
+    this.forceStop = true;
+  },
+
+  isStopping: function() {
+    return this.forceStop;
+  },
+
+  isLastPolling: function() {
+    return this.pollCount > this.pollLimit;
   },
 
   getProgress: function() {
@@ -45,7 +58,7 @@ Poller.prototype = {
 
   preparePoll: function() {
     var self = this;
-    if (this.pollCount < this.delays.length) {
+    if (this.pollCount < this.delays.length && !this.forceStop) {
       this.timer = setTimeout(function() {
         self.poll();
       }, this.delays[this.pollCount]);

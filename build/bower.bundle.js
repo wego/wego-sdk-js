@@ -362,6 +362,19 @@ Poller.prototype = {
     }
     this.pollCount = 0;
     this.resultCount = 0;
+    this.forceStop = false;
+  },
+
+  stop: function() {
+    this.forceStop = true;
+  },
+
+  isStopping: function() {
+    return this.forceStop;
+  },
+
+  isLastPolling: function() {
+    return this.pollCount > this.pollLimit;
   },
 
   getProgress: function() {
@@ -383,7 +396,7 @@ Poller.prototype = {
 
   preparePoll: function() {
     var self = this;
-    if (this.pollCount < this.delays.length) {
+    if (this.pollCount < this.delays.length && !this.forceStop) {
       this.timer = setTimeout(function() {
         self.poll();
       }, this.delays[this.pollCount]);
@@ -866,10 +879,11 @@ var HotelSearchClient = function(options) {
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
 
+  var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
   this.merger = new HotelSearchMerger();
   this.poller = new Poller({
-    delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
-    pollLimit: 7,
+    delays: delays,
+    pollLimit: delays.length - 1,
     initCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -895,13 +909,17 @@ HotelSearchClient.prototype = {
   },
 
   handleSearchResponse: function(response) {
-    this.mergeResponse(response);
+    if (response.done) {
+      this.poller.stop();
+    }
+    this.mergeResponse(response); 
     this.updateResult();
     if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
+    var isSearchEnd = response.done || this.poller.isLastPolling()
+    this.merger.mergeResponse(response, isSearchEnd);  
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
@@ -995,6 +1013,10 @@ HotelSearchClient.prototype = {
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (this.poller.isLastPolling()) {
+      params.isLastPolling = true;
     }
     return params;
   }
@@ -1878,13 +1900,13 @@ HotelSearchClient.prototype = {
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
 
-  mergeResponse: function(response) {
+  mergeResponse: function(response, isSearchEnd = false) {
     var hotelIds = this._getUpdatedHotelIds(response);
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    this._mergeRates(response.rates);
+    this._mergeRates(response.rates, isSearchEnd);  
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -1943,7 +1965,7 @@ HotelSearchClient.prototype = {
     });
   },
 
-  _mergeRates: function(newRates) {
+  _mergeRates: function(newRates, isSearchEnd) {
     if (!newRates) return;
     var self = this;
 
@@ -1969,6 +1991,52 @@ HotelSearchClient.prototype = {
         }
       }
     });
+
+    if (isSearchEnd) {
+      this._lastMergeRates(newRates);
+    }
+  },
+
+  _lastMergeRates: function(newRates) {
+    if (!newRates) return;
+    var self = this;
+
+    var singlePartnerHotels = {};
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId].rates && self.__hotelMap[hotelId].rates.length === 1) {
+        singlePartnerHotels[hotelId] = true;
+      }
+    }
+
+    var hotelIdToNewRatesMap = {};
+    for (var i in newRates) {
+      var rate = newRates[i];
+      if (singlePartnerHotels[rate.hotelId]) {
+        if (!hotelIdToNewRatesMap[rate.hotelId]) {
+          hotelIdToNewRatesMap[rate.hotelId] = [];
+        }
+        var hotelOrderedRates = hotelIdToNewRatesMap[rate.hotelId];
+        var index;
+        for (index = 0; index < hotelOrderedRates.length; index++) {
+          if (dataUtils.isBetterRate(rate, hotelOrderedRates[index])) {
+            break;
+          }
+        }
+        hotelOrderedRates.splice(index, 0, rate);
+      }
+    }
+
+    for (var hotelId in singlePartnerHotels) {
+      var currentBestRate = self.__hotelMap[hotelId].rates[0];
+      var hotelOrderedRates = hotelIdToNewRatesMap[hotelId];
+      if (!hotelOrderedRates) {
+        continue;
+      }
+      if (hotelOrderedRates[0].id !== currentBestRate.id) {
+        hotelOrderedRates.splice(0, 0, currentBestRate);
+      }
+      self.__hotelMap[hotelId].rates = hotelOrderedRates;
+    }
   },
 
   _mergeScores: function(scores) {

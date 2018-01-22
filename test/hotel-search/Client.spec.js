@@ -299,6 +299,13 @@ describe("HotelSearchClient", function() {
 
       expect(requestBody.selectedHotelIds).to.equal(undefined);
     });
+
+    it("return isLastPolling flag at the last polling request", function() {
+      client.poller.pollCount = 2;
+      client.poller.pollLimit = 1;
+      var params = client.fetchHotelsParams();
+      expect(params.isLastPolling).to.equal(true);
+    });
   });
 
   describe("#mergeResponse", function() {
@@ -329,6 +336,61 @@ describe("HotelSearchClient", function() {
       });
 
       expect(client.merger.__staticData.brands[1]).to.equal(brand);
+    });
+
+    it("no hotel can have more than 1 rate from a provider when search's status is not'done'", () => {
+      var response = {
+        done: false,
+        hotels: [{ id: 1},{ id: 2}],
+        rates: [
+          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
+          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
+          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
+          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
+          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+        ]
+      }
+      client.poller.pollCount = 1;
+      client.poller.pollLimit = 3;
+      client.handleSearchResponse(response);
+      expect(client.merger.__hotelMap[1].rates.length).to.equal(1);
+      expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
+      expect(client.merger.__hotelMap[2].rates[0].providerCode).to.not.equal(
+        client.merger.__hotelMap[2].rates[1].providerCode);
+    });
+    it("some hotels may have more than 1 from a provider rate when search's status is not 'done' but reaching limit polling time", () => {
+      var response = {
+        done: true,
+        hotels: [{ id: 1},{ id: 2}],
+        rates: [
+          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
+          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
+          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
+          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
+          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+        ]
+      }
+      client.poller.pollCount = 2;
+      client.poller.pollLimit = 1;
+      client.handleSearchResponse(response);
+      expect(client.merger.__hotelMap[1].rates.length).to.equal(3);
+      expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
+    });
+    it("some hotels may have more than 1 from a provider rate when search's status is 'done'", () => {
+      var response = {
+        done: true,
+        hotels: [{ id: 1},{ id: 2}],
+        rates: [
+          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
+          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
+          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
+          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
+          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+        ]
+      }
+      client.handleSearchResponse(response);
+      expect(client.merger.__hotelMap[1].rates.length).to.equal(3);
+      expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
     });
   });
 

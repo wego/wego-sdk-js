@@ -15,13 +15,13 @@ HotelSearchClient.prototype = {
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
 
-  mergeResponse: function(response) {
+  mergeResponse: function(response, isSearchEnd = false) {
     var hotelIds = this._getUpdatedHotelIds(response);
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    this._mergeRates(response.rates);
+    this._mergeRates(response.rates, isSearchEnd);  
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -80,7 +80,7 @@ HotelSearchClient.prototype = {
     });
   },
 
-  _mergeRates: function(newRates) {
+  _mergeRates: function(newRates, isSearchEnd) {
     if (!newRates) return;
     var self = this;
 
@@ -106,6 +106,52 @@ HotelSearchClient.prototype = {
         }
       }
     });
+
+    if (isSearchEnd) {
+      this._lastMergeRates(newRates);
+    }
+  },
+
+  _lastMergeRates: function(newRates) {
+    if (!newRates) return;
+    var self = this;
+
+    var singlePartnerHotels = {};
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId].rates && self.__hotelMap[hotelId].rates.length === 1) {
+        singlePartnerHotels[hotelId] = true;
+      }
+    }
+
+    var hotelIdToNewRatesMap = {};
+    for (var i in newRates) {
+      var rate = newRates[i];
+      if (singlePartnerHotels[rate.hotelId]) {
+        if (!hotelIdToNewRatesMap[rate.hotelId]) {
+          hotelIdToNewRatesMap[rate.hotelId] = [];
+        }
+        var hotelOrderedRates = hotelIdToNewRatesMap[rate.hotelId];
+        var index;
+        for (index = 0; index < hotelOrderedRates.length; index++) {
+          if (dataUtils.isBetterRate(rate, hotelOrderedRates[index])) {
+            break;
+          }
+        }
+        hotelOrderedRates.splice(index, 0, rate);
+      }
+    }
+
+    for (var hotelId in singlePartnerHotels) {
+      var currentBestRate = self.__hotelMap[hotelId].rates[0];
+      var hotelOrderedRates = hotelIdToNewRatesMap[hotelId];
+      if (!hotelOrderedRates) {
+        continue;
+      }
+      if (hotelOrderedRates[0].id !== currentBestRate.id) {
+        hotelOrderedRates.splice(0, 0, currentBestRate);
+      }
+      self.__hotelMap[hotelId].rates = hotelOrderedRates;
+    }
   },
 
   _mergeScores: function(scores) {
