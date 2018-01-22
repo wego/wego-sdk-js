@@ -1708,6 +1708,20 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
+function filterByFareConditions(trip, fareConditions) {
+  var fares = trip.fares,
+    refundableFares;
+
+  if (fareConditions && fareConditions.indexOf("refundable") !== -1) {
+    refundableFares = fares.filter(function(fare) {
+      return fare["conditionIds"].indexOf(1) !== -1;
+    });
+
+    return refundableFares.length >= 1;
+  }
+  return true;
+}
+
 module.exports = {
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
@@ -1738,12 +1752,14 @@ module.exports = {
         && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
-        && filterByProviders(trip, providerFilter);
+        && filterByProviders(trip, providerFilter)
+        && filterByFareConditions(trip, filter.conditions);
     });
 
     return filteredTrips;
   }
 };
+
 
 /***/ }),
 /* 11 */
@@ -2236,7 +2252,7 @@ module.exports = {
       if (_hasRates(hotel) && _hasUsualPrice(hotel.rates[0]['usualPrice'])) {
         usualPrice = hotel.rates[0]['usualPrice'];
 
-        return Math.round(usualPrice['usualAmount'] * usualPrice['discountToUsualAmount']);
+        return Math.round(usualPrice['usualAmountUsd'] * usualPrice['discountToUsualAmount']);
       } else {
         return null;
       }
