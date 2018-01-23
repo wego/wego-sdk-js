@@ -2,6 +2,35 @@ var filtering = require('../../src/flight-search/filtering');
 
 describe('filtering', function() {
   describe('#filterTrips', function() {
+    it('filters by conditions', function() {
+      var fare1 = createFareWithConditions(1),
+        fare2 = createFareWithConditions(),
+        fare3 = createFareWithConditions(2),
+        fare4 = createFareWithConditions();
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2, fare3]
+      };
+
+      var trip3 = {
+        fares: [fare2, fare4]
+      };
+
+      var trip4 = {
+        fares: [fare1]
+      };
+
+      var filter = {
+        conditions: ["refundable"]
+      };
+
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip4]);
+    });
+
     it('filtering by stopCodes', function() {
       var trip1 = {
         stopCode: 'DIRECT'
@@ -549,6 +578,16 @@ describe('filtering', function() {
         amountUsd: amountUsd,
       }
     };
+  }
+
+  function createFareWithConditions(conditionIds) {
+    var conditionValue = conditionIds ? [conditionIds]: [];
+    return {
+      conditionIds: conditionValue,
+      price: {
+        amountUsd: 250,
+      }
+    }
   }
 
   function createFareWithProvider(providerType, providerCode) {
