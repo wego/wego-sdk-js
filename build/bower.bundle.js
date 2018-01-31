@@ -1770,20 +1770,6 @@ function _hasCharteredCondition(fareConditions, conditionIds) {
     conditionIds.indexOf(4) !== -1;
 }
 
-function filterByFareConditions(trip, fareConditions) {
-  var fares = trip.fares,
-    refundableFares;
-
-  if (fareConditions && fareConditions.indexOf("refundable") !== -1) {
-    refundableFares = fares.filter(function(fare) {
-      return fare["conditionIds"].indexOf(1) !== -1;
-    });
-
-    return refundableFares.length >= 1;
-  }
-  return true;
-}
-
 module.exports = {
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
