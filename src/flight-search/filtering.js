@@ -85,18 +85,44 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
-function filterByFareConditions(trip, fareConditions) {
+function filterByConditions(trip, fareConditions) {
   var fares = trip.fares,
-    refundableFares;
+    filteredFares = [],
+    conditionIds;
 
-  if (fareConditions && fareConditions.indexOf("refundable") !== -1) {
-    refundableFares = fares.filter(function(fare) {
-      return fare["conditionIds"].indexOf(1) !== -1;
+  if (!!fareConditions && fareConditions.length !== 0) {
+    filteredFares = fares.filter(function(fare) {
+      conditionIds = fare["conditionIds"];
+
+      return _hasRefundableCondition(fareConditions, conditionIds) ||
+        _hasNonRefundableCondition(fareConditions, conditionIds) ||
+        _hasScheduledCondition(fareConditions, conditionIds) ||
+        _hasCharteredCondition(fareConditions, conditionIds);
     });
 
-    return refundableFares.length >= 1;
+    return filteredFares.length >= 1;
   }
   return true;
+}
+
+function _hasRefundableCondition(fareConditions, conditionIds) {
+  return fareConditions.indexOf("refundable") !== -1 &&
+    conditionIds.indexOf(1) !== -1;
+}
+
+function _hasNonRefundableCondition(fareConditions, conditionIds) {
+  return fareConditions.indexOf("non_refundable") !== -1 &&
+    conditionIds.indexOf(2) !== -1;
+}
+
+function _hasScheduledCondition(fareConditions, conditionIds) {
+  return fareConditions.indexOf("scheduled") !== -1 &&
+    conditionIds.indexOf(3) !== -1;
+}
+
+function _hasCharteredCondition(fareConditions, conditionIds) {
+  return fareConditions.indexOf("chartered") !== -1 &&
+    conditionIds.indexOf(4) !== -1;
 }
 
 module.exports = {
@@ -130,7 +156,7 @@ module.exports = {
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
-        && filterByFareConditions(trip, filter.conditions);
+        && filterByConditions(trip, filter.conditions);
     });
 
     return filteredTrips;
