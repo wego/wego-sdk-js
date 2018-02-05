@@ -2,11 +2,11 @@ var filtering = require('../../src/flight-search/filtering');
 
 describe('filtering', function() {
   describe('#filterTrips', function() {
-    it('filters by conditions', function() {
-      var fare1 = createFareWithConditions(1),
-        fare2 = createFareWithConditions(),
-        fare3 = createFareWithConditions(2),
-        fare4 = createFareWithConditions();
+    it('filters by refundable and scheduled conditions', function() {
+      var fare1 = createFareWithConditions([1]),
+        fare2 = createFareWithConditions([]),
+        fare3 = createFareWithConditions([2, 4]),
+        fare4 = createFareWithConditions([3]);
 
       var trip1 = {
         fares: [fare1, fare2]
@@ -25,10 +25,66 @@ describe('filtering', function() {
       };
 
       var filter = {
-        conditions: ["refundable"]
+        conditions: ["refundable", "scheduled"]
       };
 
-      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip4]);
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip3, trip4]);
+    });
+
+    it('filters by chartered conditions', function() {
+      var fare1 = createFareWithConditions([1]),
+        fare2 = createFareWithConditions([]),
+        fare3 = createFareWithConditions([2, 4]),
+        fare4 = createFareWithConditions([3]);
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2, fare3]
+      };
+
+      var trip3 = {
+        fares: [fare2, fare4]
+      };
+
+      var trip4 = {
+        fares: [fare1]
+      };
+
+      var filter = {
+        conditions: ["chartered"]
+      };
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip2]);
+    });
+
+    it('filters an empty conditions', function() {
+      var fare1 = createFareWithConditions([1]),
+        fare2 = createFareWithConditions([]),
+        fare3 = createFareWithConditions([2, 4]),
+        fare4 = createFareWithConditions([3]);
+
+      var trip1 = {
+        fares: [fare1, fare2]
+      };
+
+      var trip2 = {
+        fares: [fare2, fare3]
+      };
+
+      var trip3 = {
+        fares: [fare2, fare4]
+      };
+
+      var trip4 = {
+        fares: [fare1]
+      };
+
+      var filter = {
+        conditions: []
+      };
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip2, trip3, trip4]);
     });
 
     it('filtering by stopCodes', function() {
@@ -580,8 +636,7 @@ describe('filtering', function() {
     };
   }
 
-  function createFareWithConditions(conditionIds) {
-    var conditionValue = conditionIds ? [conditionIds]: [];
+  function createFareWithConditions(conditionValue) {
     return {
       conditionIds: conditionValue,
       price: {

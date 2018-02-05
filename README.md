@@ -46,6 +46,135 @@ Make a new search
 ```
 client.searchTrips(search);
 ```
+
+### List of Flight Filters
+Stops
+```
+stopCodes: [
+  "DIRECT",
+  "ONE_STOP",
+  "MORE_THAN_ONE_STOP"
+]
+```
+
+Price
+```
+priceRange: {
+  "legIndex": undefined
+  "min": 1397
+  "max": 10924
+}
+```
+
+Fare Types
+```
+conditions: [
+  "refundable",
+  "non_refundable",
+  "scheduled",
+  "chartered"
+]
+```
+
+Flight Times
+```
+departureTimeMinutesRanges: [
+  {
+    "min": 171,
+    "max": 1241,
+    "legIndex": 0
+  },
+  {
+    "min": 360,
+    "max": 1296,
+    "legIndex": 1
+  }
+]
+
+arrivalTimeMinutesRanges: [
+  {
+    "min": 171,
+    "max": 1241,
+    "legIndex": 0
+  },
+  {
+    "min": 360,
+    "max": 1296,
+    "legIndex": 1
+  }
+]
+```
+
+Airlines/Alliances
+```
+airlineCodes: [
+  "AF",
+  "NH"
+],
+allianceCodes: [
+  "sky_team",
+  "star_alliance",
+  "oneworld",
+  "lcc"
+]
+
+Complete trip on the same airline
+tripOptions: ["SAME_AIRLINE"]
+```
+
+Booking Options
+```
+providerTypes: [
+  "instant",
+  "airline"
+]
+```
+
+Origin/Destination
+```
+originAirportCodes: ["SIN"],
+destinationAirportCodes: ["IAD"]
+```
+
+Stopover Airports
+```
+stopoverAirportCodes: [
+  "BRU",
+  "PEK"
+]
+```
+
+Duration
+```
+durationMinutesRanges: [
+  {
+    "min": 1553,
+    "max": 3113,
+    "legIndex": 0
+  },
+  {
+    "min": 1564,
+    "max": 3379,
+    "legIndex": 1
+  }
+],
+stopoverDurationMinutesRange: [
+  {
+    "min": 190,
+    "max": 2275,
+    "legIndex": undefined
+  }
+]
+```
+
+Flight Experience
+```
+itineraryOptions: [
+  "NOT_OVERNIGHT",
+  "SHORT_STOPOVER"
+]
+```
+
 ### Hotel SDK Client
 Create client
 ```
