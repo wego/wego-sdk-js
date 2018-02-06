@@ -233,6 +233,31 @@ describe('FlightSearchMerger', function() {
       expect(merger.__legMap[legId]).to.equal(leg);
     });
 
+    it('add legConditionIds', function() {
+      var legs = [
+        {
+          id: "id1",
+          conditionIds: [1]
+        },
+        {
+          id: "id2"
+        }
+      ];
+
+      var newLegConditions = {
+        id1: [2],
+        id2: [3]
+      };
+
+      merger.mergeResponse({
+       legs: legs,
+       legConditionIds: newLegConditions 
+      });
+
+      expect(merger.__legMap["id1"]["conditionIds"]).to.deep.equal([2])
+      expect(merger.__legMap["id2"]["conditionIds"]).to.deep.equal([3])
+    });
+
     it('add trip', function() {
       var legId = 2;
       var leg = {
