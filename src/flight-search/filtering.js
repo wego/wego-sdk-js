@@ -31,8 +31,17 @@ function filterByProviders(trip, providerFilter) {
 
 function isFareMatchProviderType (fare, providerTypes) {
   if (!providerTypes) return true;
-  var isMatchTypeInstant = (fare.provider.instant && providerTypes.includes('instant'));
-  return isMatchTypeInstant || (providerTypes.includes(fare.provider.type));
+  return _isFacilitatedBooking(fare, providerTypes) || _isDirectBooking(fare, providerTypes);
+}
+
+function _isFacilitatedBooking(fare, providerTypes) {
+  return providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
+}
+
+function _isDirectBooking(fare, providerTypes) {
+  return providerTypes.indexOf("airline") !== -1 &&
+    fare.provider.type === "airline" &&
+    !fare.provider.instant;
 }
 
 function isFareMatchProviderCode (fare, providerCodeMap) {
