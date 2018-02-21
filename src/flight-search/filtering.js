@@ -117,12 +117,12 @@ function _hasNonRefundableCondition(fareConditions, conditionIds) {
 
 function _hasScheduledCondition(fareConditions, conditionIds) {
   return fareConditions.indexOf("scheduled") !== -1 &&
-    conditionIds.indexOf(3) !== -1;
+    conditionIds.indexOf(4) !== -1;
 }
 
 function _hasCharteredCondition(fareConditions, conditionIds) {
   return fareConditions.indexOf("chartered") !== -1 &&
-    conditionIds.indexOf(4) !== -1;
+    conditionIds.indexOf(3) !== -1;
 }
 
 module.exports = {
