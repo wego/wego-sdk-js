@@ -1059,6 +1059,7 @@ FlightSearchMerger.prototype = {
 
     this._mergeStaticData(response);
     this._mergeLegs(response.legs);
+    this._mergeLegConditions(response.legConditionIds);
     this._mergeTrips(response.trips);
     this._mergeFilter(response.filters);
     this._mergeScores(response.scores);
@@ -1142,6 +1143,17 @@ FlightSearchMerger.prototype = {
       if (!legMap[legId]) {
         dataUtils.prepareLeg(newLeg, self.__staticData);
         legMap[legId] = newLeg;
+      }
+    });
+  },
+
+  _mergeLegConditions: function(newLegConditions) {
+    if (!newLegConditions) return;
+    var self = this;
+    var legMap = this.__legMap;
+    Object.keys(newLegConditions).forEach(function(legId) {
+      if (legMap[legId]) {
+        legMap[legId]["conditionIds"] = newLegConditions[legId]; 
       }
     });
   },
