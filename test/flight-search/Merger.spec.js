@@ -217,6 +217,19 @@ describe('FlightSearchMerger', function() {
 
       expect(merger.__staticData.providers[1]).to.equal(provider);
     });
+
+    it('merging legConditions', function() {
+      var legCondition = {
+        id: 1,
+        name: 1,
+      };
+
+      merger.mergeResponse({
+        legConditions: [legCondition]
+      });
+
+      expect(merger.__staticData.legConditions[1]).to.equal(legCondition);
+    });
   });
 
   describe('merge trips', function() {
