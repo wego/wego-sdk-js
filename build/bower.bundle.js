@@ -1332,6 +1332,7 @@ FlightSearchMerger.prototype = {
     'providers',
     'stops',
     'alliances',
+    'legConditions'
   ],
 
   __filterOptionTypes: [
