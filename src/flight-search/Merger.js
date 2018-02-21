@@ -106,7 +106,7 @@ FlightSearchMerger.prototype = {
     var legMap = this.__legMap;
     Object.keys(newLegConditions).forEach(function(legId) {
       if (legMap[legId]) {
-        legMap[legId]["conditionIds"] = newLegConditions[legId] 
+        legMap[legId]["conditionIds"] = newLegConditions[legId]; 
       }
     });
   },
