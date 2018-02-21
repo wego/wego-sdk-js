@@ -12,7 +12,7 @@ FlightSearchMerger.prototype = {
 
     this._mergeStaticData(response);
     this._mergeLegs(response.legs);
-    this._mergeLegConditions(response.legConditionIds)
+    this._mergeLegConditions(response.legConditionIds);
     this._mergeTrips(response.trips);
     this._mergeFilter(response.filters);
     this._mergeScores(response.scores);
