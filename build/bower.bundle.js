@@ -1743,44 +1743,39 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
-function filterByConditions(trip, fareConditions) {
-  var fares = trip.fares,
-    filteredFares = [],
+function filterByConditions(items, conditions) {
+  var filteredItems = [],
     conditionIds;
 
-  if (!!fareConditions && fareConditions.length !== 0) {
-    filteredFares = fares.filter(function(fare) {
-      conditionIds = fare["conditionIds"];
-
-      return _hasRefundableCondition(fareConditions, conditionIds) ||
-        _hasNonRefundableCondition(fareConditions, conditionIds) ||
-        _hasScheduledCondition(fareConditions, conditionIds) ||
-        _hasCharteredCondition(fareConditions, conditionIds);
-    });
-
-    return filteredFares.length >= 1;
+  if (!_hasConditions(conditions)) {
+    return true;
   }
-  return true;
+
+  filteredItems = items.filter(function(item) {
+    conditionIds = item["conditionIds"];
+
+    for (var i = 0; i < conditions.length; i++) {
+      if (conditionIds && conditionIds.indexOf(_conditionMap(conditions[i])) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  return filteredItems.length >= 1;
 }
 
-function _hasRefundableCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("refundable") !== -1 &&
-    conditionIds.indexOf(1) !== -1;
+function _hasConditions(conditions) {
+  return !!conditions && conditions.length !== 0;
 }
 
-function _hasNonRefundableCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("non_refundable") !== -1 &&
-    conditionIds.indexOf(2) !== -1;
-}
-
-function _hasScheduledCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("scheduled") !== -1 &&
-    conditionIds.indexOf(4) !== -1;
-}
-
-function _hasCharteredCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("chartered") !== -1 &&
-    conditionIds.indexOf(3) !== -1;
+function _conditionMap(condition) {
+  return ({
+    "refundable": 1,
+    "non_refundable": 2,
+    "chartered": 3,
+    "scheduled": 4
+  })[condition];
 }
 
 module.exports = {
@@ -1814,7 +1809,8 @@ module.exports = {
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
-        && filterByConditions(trip, filter.conditions);
+        && filterByConditions(trip.fares, filter.fareTypes)
+        && filterByConditions(trip.legs, filter.flightTypes);
     });
 
     return filteredTrips;
