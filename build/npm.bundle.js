@@ -1689,8 +1689,16 @@ function filterByProviders(trip, providerFilter) {
 
 function isFareMatchProviderType (fare, providerTypes) {
   if (!providerTypes) return true;
-  var isMatchTypeInstant = (fare.provider.instant && providerTypes.includes('instant'));
-  return isMatchTypeInstant || (providerTypes.includes(fare.provider.type));
+  return _isFacilitatedBooking(fare, providerTypes) || _hasProviderType(fare, providerTypes);
+}
+
+function _isFacilitatedBooking(fare, providerTypes) {
+  return providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
+}
+
+function _hasProviderType(fare, providerTypes) {
+  return providerTypes.indexOf(fare.provider.type) !== -1 &&
+    !fare.provider.instant;
 }
 
 function isFareMatchProviderCode (fare, providerCodeMap) {
