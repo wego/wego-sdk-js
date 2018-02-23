@@ -285,6 +285,7 @@ FlightSearchMerger.prototype = {
     'providers',
     'stops',
     'alliances',
+    'fareConditions',
     'legConditions'
   ],
 
@@ -296,6 +297,8 @@ FlightSearchMerger.prototype = {
     'originAirports',
     'destinationAirports',
     'stopoverAirports',
+    'fareConditions',
+    'legConditions'
   ],
 };
 

@@ -218,6 +218,19 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.providers[1]).to.equal(provider);
     });
 
+    it('merging fareConditions', function() {
+      var fareCondition = {
+        id: 1,
+        name: 1,
+      };
+
+      merger.mergeResponse({
+        fareConditions: [fareCondition]
+      });
+
+      expect(merger.__staticData.fareConditions[1]).to.equal(fareCondition);
+    });
+
     it('merging legConditions', function() {
       var legCondition = {
         id: 1,
@@ -678,6 +691,50 @@ describe('FlightSearchMerger', function() {
 
       var filter = merger.getFilter();
       expect(filter.stopoverAirports[0].name).to.equal('name');
+    });
+
+    it('fareConditions', function() {
+      var option = {
+        code: 1,
+      };
+
+      merger.__staticData.fareConditions = {
+        1: {
+          code: 1,
+          name: 'name',
+        }
+      };
+
+      merger.mergeResponse({
+        filters: {
+          fareConditions: [option]
+        }
+      });
+
+      var filter = merger.getFilter();
+      expect(filter.fareConditions[0].name).to.equal('name');
+    });
+
+    it('legConditions', function() {
+      var option = {
+        code: 1,
+      };
+
+      merger.__staticData.legConditions = {
+        1: {
+          code: 1,
+          name: 'name',
+        }
+      };
+
+      merger.mergeResponse({
+        filters: {
+          legConditions: [option]
+        }
+      });
+
+      var filter = merger.getFilter();
+      expect(filter.legConditions[0].name).to.equal('name');
     });
 
     it('minPrice', function() {
