@@ -826,8 +826,7 @@ HotelDetailsClient.prototype = {
     searchRequestBody = {
       search: {
         cityCode: hotelSearch.cityCode,
-        roomsCount: hotelSearch.roomsCount,
-        guestsCount: hotelSearch.guestsCount,
+        rooms: hotelSearch.rooms,
         hotelId: hotelSearch.hotelId,
         checkIn: hotelSearch.checkIn,
         checkOut: hotelSearch.checkOut,
@@ -849,6 +848,7 @@ HotelDetailsClient.prototype = {
 };
 
 module.exports = HotelDetailsClient;
+
 
 /***/ }),
 /* 6 */
@@ -912,14 +912,14 @@ HotelSearchClient.prototype = {
     if (response.done) {
       this.poller.stop();
     }
-    this.mergeResponse(response); 
+    this.mergeResponse(response);
     this.updateResult();
     if (this.poller.pollCount === 1) this.onSearchCreated(response.search);
   },
 
   mergeResponse: function(response) {
     var isSearchEnd = response.done || this.poller.isLastPolling()
-    this.merger.mergeResponse(response, isSearchEnd);  
+    this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
   },
@@ -984,8 +984,7 @@ HotelSearchClient.prototype = {
         hotelId: search.hotelId,
         districtId: search.districtId,
         countryCode: search.countryCode,
-        roomsCount: search.roomsCount,
-        guestsCount: search.guestsCount,
+        rooms: search.rooms,
         checkIn: search.checkIn,
         checkOut: search.checkOut,
         deviceType: self.deviceType,
