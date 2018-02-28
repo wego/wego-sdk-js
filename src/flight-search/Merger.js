@@ -110,6 +110,7 @@ FlightSearchMerger.prototype = {
         legMap[legId].conditions = newLegConditions[legId].map(function (legConditionId) {
           return legConditions[legConditionId];
         });
+        legMap[legId].conditionIds = newLegConditions[legId]; 
       }
     });
   },

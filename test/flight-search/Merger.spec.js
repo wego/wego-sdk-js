@@ -295,6 +295,8 @@ describe('FlightSearchMerger', function() {
 
       expect(merger.__legMap["id1"].conditions).to.deep.equal([legConditions[2]]);
       expect(merger.__legMap["id2"].conditions).to.deep.equal([legConditions[3]]);
+      expect(merger.__legMap["id1"].conditionIds).to.deep.equal([2]);
+      expect(merger.__legMap["id2"].conditionIds).to.deep.equal([3]);
     });
 
     it('add trip', function() {
