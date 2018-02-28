@@ -176,6 +176,18 @@ describe('Merger', function() {
       expect(merger.__staticData.districts[1]).to.equal(district);
     });
 
+    it('merging cities', function() {
+      var city = {
+        id: 1,
+      };
+
+      merger.mergeResponse({
+        cities: [city]
+      });
+
+      expect(merger.__staticData.cities[1]).to.equal(city);
+    });
+
     it('merging amenities', function() {
       var amenity = {
         id: 1,
@@ -571,6 +583,28 @@ describe('Merger', function() {
       expect(filter.chains[0].name).to.equal('chain');
     });
 
+    it('cities', function() {
+      var option = {
+        code: 1,
+      };
+
+      merger.__staticData.cities = {
+        1: {
+          code: 1,
+          name: 'city',
+        }
+      };
+
+      merger.mergeResponse({
+        filter: {
+          cities: [option],
+        }
+      });
+
+      var filter = merger.getFilter();
+      expect(filter.cities[0].name).to.equal('city');
+    });
+    
     it('minPrice', function() {
       var price  = {
         currencyCode: 'sgd',

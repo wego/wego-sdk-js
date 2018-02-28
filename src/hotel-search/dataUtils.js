@@ -113,6 +113,7 @@ module.exports = {
     brands: 'brands',
     propertyTypes: 'propertyTypes',
     districts: 'districts',
+    cities: 'cities',
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',
