@@ -259,11 +259,11 @@ describe('FlightSearchMerger', function() {
       expect(merger.__legMap[legId]).to.equal(leg);
     });
 
-    it('add legConditionIds', function() {
+    it('add legConditionIds', function () {
       var legs = [
         {
           id: "id1",
-          conditionIds: [1]
+          conditions: [1]
         },
         {
           id: "id2"
@@ -275,13 +275,26 @@ describe('FlightSearchMerger', function() {
         id2: [3]
       };
 
+      var legConditions = {
+        2: {
+          id: 2,
+          name: "name2"
+        },
+        3: {
+          id: 3,
+          name: "name3"
+        }
+      };
+
+      merger.__staticData.legConditions = legConditions;
+
       merger.mergeResponse({
-       legs: legs,
-       legConditionIds: newLegConditions 
+        legs: legs,
+        legConditionIds: newLegConditions
       });
 
-      expect(merger.__legMap["id1"]["conditionIds"]).to.deep.equal([2]);
-      expect(merger.__legMap["id2"]["conditionIds"]).to.deep.equal([3]);
+      expect(merger.__legMap["id1"].conditions).to.deep.equal([legConditions[2]]);
+      expect(merger.__legMap["id2"].conditions).to.deep.equal([legConditions[3]]);
     });
 
     it('add trip', function() {
