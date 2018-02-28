@@ -106,6 +106,15 @@ FlightSearchClient.prototype = {
 
   updateResult: function() {
     var trips = this.merger.getTrips();
+
+    if (Object.keys(this.merger.getLegConditions()).length !== 0) {
+      filtering.passLegConditions(this.merger.getLegConditions());
+    }
+
+    if (Object.keys(this.merger.getFareConditions()).length !== 0) {
+      filtering.passFareConditions(this.merger.getFareConditions());
+    }
+
     var filteredTrips = filtering.filterTrips(trips, this.filter);
     var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
 

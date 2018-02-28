@@ -34,6 +34,14 @@ FlightSearchMerger.prototype = {
     return this.__trips;
   },
 
+  getLegConditions: function() {
+    return this.__staticData["legConditions"];
+  },
+
+  getFareConditions: function() {
+    return this.__staticData["fareConditions"];
+  },
+
   getFilter: function() {
     return this.__filter;
   },

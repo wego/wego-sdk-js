@@ -677,6 +677,15 @@ FlightSearchClient.prototype = {
 
   updateResult: function() {
     var trips = this.merger.getTrips();
+
+    if (Object.keys(this.merger.getLegConditions()).length !== 0) {
+      filtering.passLegConditions(this.merger.getLegConditions());
+    }
+
+    if (Object.keys(this.merger.getFareConditions()).length !== 0) {
+      filtering.passFareConditions(this.merger.getFareConditions());
+    }
+
     var filteredTrips = filtering.filterTrips(trips, this.filter);
     var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
 
@@ -1079,6 +1088,14 @@ FlightSearchMerger.prototype = {
 
   getTrips: function() {
     return this.__trips;
+  },
+
+  getLegConditions: function() {
+    return this.__staticData["legConditions"];
+  },
+
+  getFareConditions: function() {
+    return this.__staticData["fareConditions"];
   },
 
   getFilter: function() {
@@ -1760,9 +1777,10 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
-function filterByConditions(items, conditions) {
+function filterByConditions(items, conditions, conditionsObj) {
   var filteredItems = [],
-    conditionIds;
+    conditionIds,
+    conditionMapper;
 
   if (!_hasConditions(conditions)) {
     return true;
@@ -1770,9 +1788,9 @@ function filterByConditions(items, conditions) {
 
   filteredItems = items.filter(function(item) {
     conditionIds = item["conditionIds"];
-
     for (var i = 0; i < conditions.length; i++) {
-      if (conditionIds && conditionIds.indexOf(_conditionMap(conditions[i])) !== -1) {
+      conditionMapper = _conditionMap(conditions[i], conditionsObj);
+      if (conditionIds && conditionIds.indexOf(conditionMapper) !== -1) {
         return true;
       }
     }
@@ -1786,19 +1804,26 @@ function _hasConditions(conditions) {
   return !!conditions && conditions.length !== 0;
 }
 
-function _conditionMap(condition) {
-  return ({
-    "refundable": 1,
-    "non_refundable": 2,
-    "chartered": 3,
-    "scheduled": 4
-  })[condition];
+function _conditionMap(condition, conditionsObj) {
+  var conditionKeys = Object.keys(conditionsObj);
+
+  for (var i = 0; i < conditionKeys.length; i++) {
+    if (conditionsObj[conditionKeys[i]]["code"].toLowerCase() === condition) {
+      return conditionsObj[conditionKeys[i]]["id"];
+    }
+  }
 }
 
 module.exports = {
+  passLegConditions: function(value) {
+    this.legConditions = value;
+  },
+  passFareConditions: function(value) {
+    this.fareConditions = value;
+  },
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
-
+    var self = this;
     var stopCodeMap = utils.arrayToMap(filter.stopCodes);
     var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
     var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
@@ -1808,7 +1833,6 @@ module.exports = {
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
     var providerFilter = {providerCodeMap, providerTypes};
-
     var filteredTrips = trips.filter(function(trip) {
       return filterByPrice(trip, filter.priceRange)
         && utils.filterByKey(trip.stopCode, stopCodeMap)
@@ -1826,8 +1850,8 @@ module.exports = {
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
-        && filterByConditions(trip.fares, filter.fareTypes)
-        && filterByConditions(trip.legs, filter.flightTypes);
+        && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
+        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions);
     });
 
     return filteredTrips;
