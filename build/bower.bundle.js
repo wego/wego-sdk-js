@@ -1147,13 +1147,16 @@ FlightSearchMerger.prototype = {
     });
   },
 
-  _mergeLegConditions: function(newLegConditions) {
+  _mergeLegConditions: function (newLegConditions) {
     if (!newLegConditions) return;
     var self = this;
     var legMap = this.__legMap;
-    Object.keys(newLegConditions).forEach(function(legId) {
+    var legConditions = this.__staticData.legConditions;
+    Object.keys(newLegConditions).forEach(function (legId) {
       if (legMap[legId]) {
-        legMap[legId]["conditionIds"] = newLegConditions[legId]; 
+        legMap[legId].conditions = newLegConditions[legId].map(function (legConditionId) {
+          return legConditions[legConditionId];
+        });
       }
     });
   },
