@@ -121,6 +121,7 @@ function _hasConditions(conditions) {
 }
 
 function _conditionMap(condition, conditionsObj) {
+  if (!conditionsObj) return;
   var conditionKeys = Object.keys(conditionsObj);
 
   for (var i = 0; i < conditionKeys.length; i++) {
