@@ -178,14 +178,14 @@ describe('Merger', function() {
 
     it('merging cities', function() {
       var city = {
-        id: 1,
+        code: "SIN",
       };
 
       merger.mergeResponse({
         cities: [city]
       });
 
-      expect(merger.__staticData.cities[1]).to.equal(city);
+      expect(merger.__staticData.cities["SIN"]).to.equal(city);
     });
 
     it('merging amenities', function() {
@@ -230,17 +230,24 @@ describe('Merger', function() {
         id: 1,
       };
 
+      var city = {
+        code: "SIN",
+      };
+
       var hotel = {
         id: 3,
         districtId: 1,
+        cityCode: "SIN",
       };
       merger.mergeResponse({
         districts: [district],
+        cities: [city],
         hotels: [hotel]
       });
 
       expect(merger.__hotelMap[3].id).to.equal(3);
       expect(merger.__hotelMap[3].district).to.equal(district);
+      expect(merger.__hotelMap[3].city).to.equal(city);
     });
   });
 
