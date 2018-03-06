@@ -456,6 +456,7 @@ module.exports = {
     }
 
     hotel.district = staticData.districts[hotel.districtId];
+    hotel.city = staticData.cities[hotel.cityCode];
     hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
       return review.reviewerGroup;
     });
@@ -557,6 +558,7 @@ module.exports = {
     brands: 'brands',
     propertyTypes: 'propertyTypes',
     districts: 'districts',
+    cities: 'cities',
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',
@@ -1976,7 +1978,7 @@ HotelSearchClient.prototype = {
     function merge(itemMap, items, type) {
       if (!items) return;
       items.forEach(function(item) {
-        var key = (type === 'providers') ? item.code : item.id;
+        var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
         itemMap[key] = item;
       });
     }
@@ -2209,6 +2211,7 @@ HotelSearchClient.prototype = {
     'brands',
     'propertyTypes',
     'districts',
+    'cities',
     'amenities',
     'rateAmenities',
     'chains',
@@ -2220,6 +2223,7 @@ HotelSearchClient.prototype = {
     'brands',
     'propertyTypes',
     'districts',
+    'cities',
     'amenities',
     'rateAmenities',
     'chains',
