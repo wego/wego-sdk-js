@@ -327,6 +327,7 @@ describe('dataUtils', function() {
   function createStaticData(data) {
     return Object.assign({
       districts: {},
+      cities: {},
       providers: {},
     }, data);
   }

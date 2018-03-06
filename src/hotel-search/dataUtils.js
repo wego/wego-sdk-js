@@ -12,6 +12,7 @@ module.exports = {
     }
 
     hotel.district = staticData.districts[hotel.districtId];
+    hotel.city = staticData.cities[hotel.cityCode];
     hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
       return review.reviewerGroup;
     });
