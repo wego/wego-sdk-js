@@ -232,9 +232,9 @@ describe("HotelSearchClient", function() {
       siteCode = "SGD",
       cityCode = "cd",
       rooms = [{
-        "adultsCount": 1,
-        "childrenCount": 0,
-        "childrenAges": []
+        adultsCount: 1,
+        childrenCount: 0,
+        childrenAges: []
       }],
       checkIn = "2017-02-07",
       checkOut = "2017-02-07",
