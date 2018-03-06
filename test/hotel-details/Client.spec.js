@@ -52,9 +52,9 @@ describe('HotelDetailsClient', function() {
     var siteCode = 'SGD';
     var cityCode = 'cd';
     var rooms = [{
-      "adultsCount": 1,
-      "childrenCount": 0,
-      "childrenAges": []
+      adultsCount: 1,
+      childrenCount: 0,
+      childrenAges: []
     }];
     var checkIn = '2017-02-07';
     var checkOut = '2017-02-07';
