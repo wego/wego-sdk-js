@@ -127,6 +127,7 @@ HotelSearchClient.prototype = {
         cityCode: search.cityCode,
         hotelId: search.hotelId,
         districtId: search.districtId,
+        regionId: search.regionId,
         countryCode: search.countryCode,
         rooms: search.rooms,
         checkIn: search.checkIn,
