@@ -28,6 +28,14 @@ describe('filtering', function() {
         fareTypes: ["refundable"]
       };
 
+      filtering.fareConditions = [
+        {
+          id: 1,
+          code: "REFUNDABLE",
+          name: "Refundable"
+        }
+      ];
+
       expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip4]);
     });
 
@@ -56,6 +64,15 @@ describe('filtering', function() {
       var filter = {
         flightTypes: ["chartered"]
       };
+
+      filtering.legConditions = [
+        {
+          id: 3,
+          code: "CHARTERED",
+          name: "chartered"
+        }
+      ];
+
       expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip3]);
     });
 
