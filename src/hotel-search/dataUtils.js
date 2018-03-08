@@ -12,6 +12,7 @@ module.exports = {
     }
 
     hotel.district = staticData.districts[hotel.districtId];
+    hotel.city = staticData.cities[hotel.cityCode];
     hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
       return review.reviewerGroup;
     });
@@ -113,6 +114,7 @@ module.exports = {
     brands: 'brands',
     propertyTypes: 'propertyTypes',
     districts: 'districts',
+    cities: 'cities',
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',
