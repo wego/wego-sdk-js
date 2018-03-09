@@ -65,7 +65,21 @@ HotelSearchClient.prototype = {
     var isSearchEnd = response.done || this.poller.isLastPolling()
     this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
-    this.responseSearch = response.search;
+    this.responseSearch = this.prepareResponseSearch(response);
+  },
+
+  prepareResponseSearch: function(response) {
+    var responseSearch = response.search;
+    var region = responseSearch.region;
+    if (region) {
+      var cities = [];
+      var staticCities = this.merger.__staticData.cities;
+      region.cityCodes.forEach(function(cityCode) {
+        cities.push(staticCities[cityCode]);
+      });
+      region.cities = cities;
+    }
+    return responseSearch;
   },
 
   reset: function() {
