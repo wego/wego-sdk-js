@@ -12,6 +12,7 @@ FlightSearchMerger.prototype = {
 
     this._mergeStaticData(response);
     this._mergeLegs(response.legs);
+    this._mergeLegConditions(response.legConditionIds);
     this._mergeTrips(response.trips);
     this._mergeFilter(response.filters);
     this._mergeScores(response.scores);
@@ -31,6 +32,14 @@ FlightSearchMerger.prototype = {
 
   getTrips: function() {
     return this.__trips;
+  },
+
+  getLegConditions: function() {
+    return this.__staticData["legConditions"];
+  },
+
+  getFareConditions: function() {
+    return this.__staticData["fareConditions"];
   },
 
   getFilter: function() {
@@ -95,6 +104,21 @@ FlightSearchMerger.prototype = {
       if (!legMap[legId]) {
         dataUtils.prepareLeg(newLeg, self.__staticData);
         legMap[legId] = newLeg;
+      }
+    });
+  },
+
+  _mergeLegConditions: function (newLegConditions) {
+    if (!newLegConditions) return;
+    var self = this;
+    var legMap = this.__legMap;
+    var legConditions = this.__staticData.legConditions;
+    Object.keys(newLegConditions).forEach(function (legId) {
+      if (legMap[legId]) {
+        legMap[legId].conditions = newLegConditions[legId].map(function (legConditionId) {
+          return legConditions[legConditionId];
+        });
+        legMap[legId].conditionIds = newLegConditions[legId]; 
       }
     });
   },
@@ -273,6 +297,8 @@ FlightSearchMerger.prototype = {
     'providers',
     'stops',
     'alliances',
+    'fareConditions',
+    'legConditions'
   ],
 
   __filterOptionTypes: [
@@ -283,6 +309,8 @@ FlightSearchMerger.prototype = {
     'originAirports',
     'destinationAirports',
     'stopoverAirports',
+    'fareConditions',
+    'legConditions'
   ],
 };
 

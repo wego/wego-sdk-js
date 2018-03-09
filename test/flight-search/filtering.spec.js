@@ -2,7 +2,7 @@ var filtering = require('../../src/flight-search/filtering');
 
 describe('filtering', function() {
   describe('#filterTrips', function() {
-    it('filters by refundable and scheduled conditions', function() {
+    it('filters by refundable fareTypes', function() {
       var fare1 = createFareWithConditions([1]),
         fare2 = createFareWithConditions([]),
         fare3 = createFareWithConditions([2, 4]),
@@ -13,7 +13,7 @@ describe('filtering', function() {
       };
 
       var trip2 = {
-        fares: [fare2, fare3]
+        fares: [fare3]
       };
 
       var trip3 = {
@@ -25,38 +25,55 @@ describe('filtering', function() {
       };
 
       var filter = {
-        conditions: ["refundable", "scheduled"]
+        fareTypes: ["refundable"]
       };
 
-      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip3, trip4]);
+      filtering.fareConditions = [
+        {
+          id: 1,
+          code: "REFUNDABLE",
+          name: "Refundable"
+        }
+      ];
+
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip1, trip4]);
     });
 
-    it('filters by chartered conditions', function() {
-      var fare1 = createFareWithConditions([1]),
-        fare2 = createFareWithConditions([]),
-        fare3 = createFareWithConditions([2, 4]),
-        fare4 = createFareWithConditions([3]);
+    it('filters by chartered flightTypes', function() {
+      var leg1 = createLegWithConditions([1]),
+        leg2 = createLegWithConditions([]),
+        leg3 = createLegWithConditions([2, 4]),
+        leg4 = createLegWithConditions([3]);
 
       var trip1 = {
-        fares: [fare1, fare2]
+        legs: [leg1, leg2]
       };
 
       var trip2 = {
-        fares: [fare2, fare3]
+        legs: [leg2, leg3]
       };
 
       var trip3 = {
-        fares: [fare2, fare4]
+        legs: [leg2, leg4]
       };
 
       var trip4 = {
-        fares: [fare1]
+        legs: [leg1]
       };
 
       var filter = {
-        conditions: ["chartered"]
+        flightTypes: ["chartered"]
       };
-      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip2]);
+
+      filtering.legConditions = [
+        {
+          id: 3,
+          code: "CHARTERED",
+          name: "chartered"
+        }
+      ];
+
+      expect(filtering.filterTrips([trip1, trip2, trip3, trip4], filter)).to.deep.equal([trip3]);
     });
 
     it('filters an empty conditions', function() {
@@ -642,6 +659,12 @@ describe('filtering', function() {
       price: {
         amountUsd: 250,
       }
+    }
+  }
+
+  function createLegWithConditions(conditionValue) {
+    return {
+      conditionIds: conditionValue
     }
   }
 

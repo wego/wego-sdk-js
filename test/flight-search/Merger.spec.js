@@ -217,6 +217,32 @@ describe('FlightSearchMerger', function() {
 
       expect(merger.__staticData.providers[1]).to.equal(provider);
     });
+
+    it('merging fareConditions', function() {
+      var fareCondition = {
+        id: 1,
+        name: 1,
+      };
+
+      merger.mergeResponse({
+        fareConditions: [fareCondition]
+      });
+
+      expect(merger.__staticData.fareConditions[1]).to.equal(fareCondition);
+    });
+
+    it('merging legConditions', function() {
+      var legCondition = {
+        id: 1,
+        name: 1,
+      };
+
+      merger.mergeResponse({
+        legConditions: [legCondition]
+      });
+
+      expect(merger.__staticData.legConditions[1]).to.equal(legCondition);
+    });
   });
 
   describe('merge trips', function() {
@@ -231,6 +257,46 @@ describe('FlightSearchMerger', function() {
       });
 
       expect(merger.__legMap[legId]).to.equal(leg);
+    });
+
+    it('add legConditionIds', function () {
+      var legs = [
+        {
+          id: "id1",
+          conditions: [1]
+        },
+        {
+          id: "id2"
+        }
+      ];
+
+      var newLegConditions = {
+        id1: [2],
+        id2: [3]
+      };
+
+      var legConditions = {
+        2: {
+          id: 2,
+          name: "name2"
+        },
+        3: {
+          id: 3,
+          name: "name3"
+        }
+      };
+
+      merger.__staticData.legConditions = legConditions;
+
+      merger.mergeResponse({
+        legs: legs,
+        legConditionIds: newLegConditions
+      });
+
+      expect(merger.__legMap["id1"].conditions).to.deep.equal([legConditions[2]]);
+      expect(merger.__legMap["id2"].conditions).to.deep.equal([legConditions[3]]);
+      expect(merger.__legMap["id1"].conditionIds).to.deep.equal([2]);
+      expect(merger.__legMap["id2"].conditionIds).to.deep.equal([3]);
     });
 
     it('add trip', function() {
@@ -640,6 +706,50 @@ describe('FlightSearchMerger', function() {
 
       var filter = merger.getFilter();
       expect(filter.stopoverAirports[0].name).to.equal('name');
+    });
+
+    it('fareConditions', function() {
+      var option = {
+        code: 1,
+      };
+
+      merger.__staticData.fareConditions = {
+        1: {
+          code: 1,
+          name: 'name',
+        }
+      };
+
+      merger.mergeResponse({
+        filters: {
+          fareConditions: [option]
+        }
+      });
+
+      var filter = merger.getFilter();
+      expect(filter.fareConditions[0].name).to.equal('name');
+    });
+
+    it('legConditions', function() {
+      var option = {
+        code: 1,
+      };
+
+      merger.__staticData.legConditions = {
+        1: {
+          code: 1,
+          name: 'name',
+        }
+      };
+
+      merger.mergeResponse({
+        filters: {
+          legConditions: [option]
+        }
+      });
+
+      var filter = merger.getFilter();
+      expect(filter.legConditions[0].name).to.equal('name');
     });
 
     it('minPrice', function() {

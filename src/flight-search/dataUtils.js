@@ -292,6 +292,8 @@ module.exports = {
     originAirports: 'airports',
     destinationAirports: 'airports',
     stopoverAirports: 'airports',
-    providers: 'providers'
+    providers: 'providers',
+    fareConditions: 'fareConditions',
+    legConditions: 'legConditions'
   }
 };

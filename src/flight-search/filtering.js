@@ -93,50 +93,54 @@ function isBothAirlineAndInstant(value) {
   return value.provider.type === 'airline' || value.provider.instant;
 }
 
-function filterByConditions(trip, fareConditions) {
-  var fares = trip.fares,
-    filteredFares = [],
-    conditionIds;
+function filterByConditions(items, conditions, conditionsObj) {
+  var filteredItems = [],
+    conditionIds,
+    conditionMapper;
 
-  if (!!fareConditions && fareConditions.length !== 0) {
-    filteredFares = fares.filter(function(fare) {
-      conditionIds = fare["conditionIds"];
-
-      return _hasRefundableCondition(fareConditions, conditionIds) ||
-        _hasNonRefundableCondition(fareConditions, conditionIds) ||
-        _hasScheduledCondition(fareConditions, conditionIds) ||
-        _hasCharteredCondition(fareConditions, conditionIds);
-    });
-
-    return filteredFares.length >= 1;
+  if (!_hasConditions(conditions)) {
+    return true;
   }
-  return true;
+
+  filteredItems = items.filter(function(item) {
+    conditionIds = item["conditionIds"];
+    for (var i = 0; i < conditions.length; i++) {
+      conditionMapper = _conditionMap(conditions[i], conditionsObj);
+      if (conditionIds && conditionIds.indexOf(conditionMapper) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  return filteredItems.length >= 1;
 }
 
-function _hasRefundableCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("refundable") !== -1 &&
-    conditionIds.indexOf(1) !== -1;
+function _hasConditions(conditions) {
+  return !!conditions && conditions.length !== 0;
 }
 
-function _hasNonRefundableCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("non_refundable") !== -1 &&
-    conditionIds.indexOf(2) !== -1;
-}
+function _conditionMap(condition, conditionsObj) {
+  if (!conditionsObj) return;
+  var conditionKeys = Object.keys(conditionsObj);
 
-function _hasScheduledCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("scheduled") !== -1 &&
-    conditionIds.indexOf(3) !== -1;
-}
-
-function _hasCharteredCondition(fareConditions, conditionIds) {
-  return fareConditions.indexOf("chartered") !== -1 &&
-    conditionIds.indexOf(4) !== -1;
+  for (var i = 0; i < conditionKeys.length; i++) {
+    if (conditionsObj[conditionKeys[i]]["code"].toLowerCase() === condition) {
+      return conditionsObj[conditionKeys[i]]["id"];
+    }
+  }
 }
 
 module.exports = {
+  passLegConditions: function(value) {
+    this.legConditions = value;
+  },
+  passFareConditions: function(value) {
+    this.fareConditions = value;
+  },
   filterTrips: function(trips, filter) {
     if (!filter) return trips;
-
+    var self = this;
     var stopCodeMap = utils.arrayToMap(filter.stopCodes);
     var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
     var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
@@ -146,7 +150,6 @@ module.exports = {
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
     var providerFilter = {providerCodeMap, providerTypes};
-
     var filteredTrips = trips.filter(function(trip) {
       return filterByPrice(trip, filter.priceRange)
         && utils.filterByKey(trip.stopCode, stopCodeMap)
@@ -164,7 +167,8 @@ module.exports = {
         && filterByItineraryOptions(trip, filter.itineraryOptions)
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
-        && filterByConditions(trip, filter.conditions);
+        && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
+        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions);
     });
 
     return filteredTrips;
