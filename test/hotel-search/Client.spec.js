@@ -231,8 +231,11 @@ describe("HotelSearchClient", function() {
       currencyCode = "currencyCode",
       siteCode = "SGD",
       cityCode = "cd",
-      roomsCount = 1,
-      guestsCount = 2,
+      rooms = [{
+        adultsCount: 1,
+        childrenCount: 0,
+        childrenAges: []
+      }],
       checkIn = "2017-02-07",
       checkOut = "2017-02-07",
       countryCode = "SG",
@@ -255,8 +258,7 @@ describe("HotelSearchClient", function() {
 
     client.search = {
       cityCode: cityCode,
-      roomsCount: roomsCount,
-      guestsCount: guestsCount,
+      rooms: rooms,
       checkIn: checkIn,
       checkOut: checkOut,
       countryCode: countryCode
@@ -275,8 +277,7 @@ describe("HotelSearchClient", function() {
       expect(requestSearch.locale).to.equal(locale);
       expect(requestSearch.currencyCode).to.equal(currencyCode);
       expect(requestSearch.siteCode).to.equal(siteCode);
-      expect(requestSearch.roomsCount).to.equal(roomsCount);
-      expect(requestSearch.guestsCount).to.equal(guestsCount);
+      expect(requestSearch.rooms).to.equal(rooms);
       expect(requestSearch.checkIn).to.equal(checkIn);
       expect(requestSearch.checkOut).to.equal(checkOut);
       expect(requestSearch.countryCode).to.equal(countryCode);
@@ -494,8 +495,11 @@ describe("HotelSearchClient", function() {
     var currencyCode = "currencyCode";
     var siteCode = "SGD";
     var cityCode = "cd";
-    var roomsCount = 1;
-    var guestsCount = 2;
+    var rooms = [{
+      adultsCount: 1,
+      childrenCount: 0,
+      childrenAges: []
+    }];
     var checkIn = "2017-02-07";
     var checkOut = "2017-02-07";
     var countryCode = "SG";

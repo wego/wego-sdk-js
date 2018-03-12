@@ -51,8 +51,11 @@ describe('HotelDetailsClient', function() {
     var hotelId = '258101';
     var siteCode = 'SGD';
     var cityCode = 'cd';
-    var roomsCount = 1;
-    var guestsCount = 2;
+    var rooms = [{
+      adultsCount: 1,
+      childrenCount: 0,
+      childrenAges: []
+    }];
     var checkIn = '2017-02-07';
     var checkOut = '2017-02-07';
     var deviceType = 'desktop';
@@ -69,8 +72,7 @@ describe('HotelDetailsClient', function() {
     client.search = {
       hotelId: hotelId,
       cityCode: cityCode,
-      roomsCount: roomsCount,
-      guestsCount: guestsCount,
+      rooms: rooms,
       checkIn: checkIn,
       checkOut: checkOut,
     };
@@ -83,8 +85,7 @@ describe('HotelDetailsClient', function() {
     expect(requestSearch.currencyCode).to.equal(currencyCode);
     expect(requestSearch.hotelId).to.equal(hotelId);
     expect(requestSearch.siteCode).to.equal(siteCode);
-    expect(requestSearch.roomsCount).to.equal(roomsCount);
-    expect(requestSearch.guestsCount).to.equal(guestsCount);
+    expect(requestSearch.rooms).to.equal(rooms);
     expect(requestSearch.checkIn).to.equal(checkIn);
     expect(requestSearch.checkOut).to.equal(checkOut);
     expect(requestSearch.deviceType).to.equal(deviceType);

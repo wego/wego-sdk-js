@@ -83,8 +83,7 @@ HotelDetailsClient.prototype = {
     searchRequestBody = {
       search: {
         cityCode: hotelSearch.cityCode,
-        roomsCount: hotelSearch.roomsCount,
-        guestsCount: hotelSearch.guestsCount,
+        rooms: hotelSearch.rooms,
         hotelId: hotelSearch.hotelId,
         checkIn: hotelSearch.checkIn,
         checkOut: hotelSearch.checkOut,
