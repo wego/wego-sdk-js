@@ -70,7 +70,7 @@ HotelSearchClient.prototype = {
 
   prepareResponseSearch: function(response) {
     var responseSearch = response.search;
-    var region = responseSearch.region;
+    var region = responseSearch && responseSearch.region;
     if (region) {
       var cities = [];
       var staticCities = this.merger.getStaticData().cities;
