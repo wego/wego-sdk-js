@@ -73,7 +73,7 @@ HotelSearchClient.prototype = {
     var region = responseSearch.region;
     if (region) {
       var cities = [];
-      var staticCities = this.merger.__staticData.cities;
+      var staticCities = this.merger.getStaticData().cities;
       region.cityCodes.forEach(function(cityCode) {
         cities.push(staticCities[cityCode]);
       });

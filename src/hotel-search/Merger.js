@@ -36,6 +36,10 @@ HotelSearchClient.prototype = {
     return this.__hotels;
   },
 
+  getStaticData: function() {
+    return this.__staticData;
+  },
+
   updateCurrency: function(currency) {
     this.currency = currency;
 
