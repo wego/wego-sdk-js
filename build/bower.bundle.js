@@ -445,6 +445,18 @@ module.exports = Poller;
 var utils = __webpack_require__(0);
 
 module.exports = {
+  prepareResponseSearch: function(search, staticData) {
+    var region = search && search.region;
+    if (region) {
+      var cities = [];
+      var staticCities = staticData.cities;
+      region.cityCodes.forEach(function(cityCode) {
+        cities.push(staticCities[cityCode]);
+      });
+      region.cities = cities;
+    }
+  },
+
   prepareHotel: function(hotel, staticData) {
     function arrayToMap (items, getKeyFunc) {
       if (!items) return {};
@@ -932,22 +944,10 @@ HotelSearchClient.prototype = {
     var isSearchEnd = response.done || this.poller.isLastPolling()
     this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
-    this.responseSearch = this.prepareResponseSearch(response);
+    this.responseSearch = response.search;
+    dataUtils.prepareResponseSearch(this.responseSearch, this.merger.getStaticData());
   },
 
-  prepareResponseSearch: function(response) {
-    var responseSearch = response.search;
-    var region = responseSearch.region;
-    if (region) {
-      var cities = [];
-      var staticCities = this.merger.__staticData.cities;
-      region.cityCodes.forEach(function(cityCode) {
-        cities.push(staticCities[cityCode]);
-      });
-      region.cities = cities;
-    }
-    return responseSearch;
-  },
 
   reset: function() {
     this.poller.reset();
@@ -2012,6 +2012,10 @@ HotelSearchClient.prototype = {
 
   getHotels: function () {
     return this.__hotels;
+  },
+
+  getStaticData: function() {
+    return this.__staticData;
   },
 
   updateCurrency: function(currency) {
