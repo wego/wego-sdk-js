@@ -1,6 +1,18 @@
 var utils = require('../utils');
 
 module.exports = {
+  prepareResponseSearch: function(search, staticData) {
+    var region = search && search.region;
+    if (region) {
+      var cities = [];
+      var staticCities = staticData.cities;
+      region.cityCodes.forEach(function(cityCode) {
+        cities.push(staticCities[cityCode]);
+      });
+      region.cities = cities;
+    }
+  },
+
   prepareHotel: function(hotel, staticData) {
     function arrayToMap (items, getKeyFunc) {
       if (!items) return {};

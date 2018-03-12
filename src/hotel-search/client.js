@@ -65,22 +65,10 @@ HotelSearchClient.prototype = {
     var isSearchEnd = response.done || this.poller.isLastPolling()
     this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
-    this.responseSearch = this.prepareResponseSearch(response);
+    this.responseSearch = response.search;
+    dataUtils.prepareResponseSearch(this.responseSearch, this.merger.getStaticData());
   },
 
-  prepareResponseSearch: function(response) {
-    var responseSearch = response.search;
-    var region = responseSearch && responseSearch.region;
-    if (region) {
-      var cities = [];
-      var staticCities = this.merger.getStaticData().cities;
-      region.cityCodes.forEach(function(cityCode) {
-        cities.push(staticCities[cityCode]);
-      });
-      region.cities = cities;
-    }
-    return responseSearch;
-  },
 
   reset: function() {
     this.poller.reset();
