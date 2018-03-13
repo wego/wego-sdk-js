@@ -1,6 +1,18 @@
 var utils = require('../utils');
 
 module.exports = {
+  prepareResponseSearch: function(search, staticData) {
+    var region = search && search.region;
+    if (region) {
+      var cities = [];
+      var staticCities = staticData.cities;
+      region.cityCodes.forEach(function(cityCode) {
+        cities.push(staticCities[cityCode]);
+      });
+      region.cities = cities;
+    }
+  },
+
   prepareHotel: function(hotel, staticData) {
     function arrayToMap (items, getKeyFunc) {
       if (!items) return {};
@@ -12,6 +24,7 @@ module.exports = {
     }
 
     hotel.district = staticData.districts[hotel.districtId];
+    hotel.city = staticData.cities[hotel.cityCode];
     hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
       return review.reviewerGroup;
     });
@@ -113,6 +126,7 @@ module.exports = {
     brands: 'brands',
     propertyTypes: 'propertyTypes',
     districts: 'districts',
+    cities: 'cities',
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',

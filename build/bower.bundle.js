@@ -445,6 +445,18 @@ module.exports = Poller;
 var utils = __webpack_require__(0);
 
 module.exports = {
+  prepareResponseSearch: function(search, staticData) {
+    var region = search && search.region;
+    if (region) {
+      var cities = [];
+      var staticCities = staticData.cities;
+      region.cityCodes.forEach(function(cityCode) {
+        cities.push(staticCities[cityCode]);
+      });
+      region.cities = cities;
+    }
+  },
+
   prepareHotel: function(hotel, staticData) {
     function arrayToMap (items, getKeyFunc) {
       if (!items) return {};
@@ -456,6 +468,7 @@ module.exports = {
     }
 
     hotel.district = staticData.districts[hotel.districtId];
+    hotel.city = staticData.cities[hotel.cityCode];
     hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
       return review.reviewerGroup;
     });
@@ -557,6 +570,7 @@ module.exports = {
     brands: 'brands',
     propertyTypes: 'propertyTypes',
     districts: 'districts',
+    cities: 'cities',
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',
@@ -931,7 +945,9 @@ HotelSearchClient.prototype = {
     this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
+    dataUtils.prepareResponseSearch(this.responseSearch, this.merger.getStaticData());
   },
+
 
   reset: function() {
     this.poller.reset();
@@ -992,6 +1008,7 @@ HotelSearchClient.prototype = {
         cityCode: search.cityCode,
         hotelId: search.hotelId,
         districtId: search.districtId,
+        regionId: search.regionId,
         countryCode: search.countryCode,
         rooms: search.rooms,
         checkIn: search.checkIn,
@@ -1997,6 +2014,10 @@ HotelSearchClient.prototype = {
     return this.__hotels;
   },
 
+  getStaticData: function() {
+    return this.__staticData;
+  },
+
   updateCurrency: function(currency) {
     this.currency = currency;
 
@@ -2018,7 +2039,7 @@ HotelSearchClient.prototype = {
     function merge(itemMap, items, type) {
       if (!items) return;
       items.forEach(function(item) {
-        var key = (type === 'providers') ? item.code : item.id;
+        var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
         itemMap[key] = item;
       });
     }
@@ -2251,6 +2272,7 @@ HotelSearchClient.prototype = {
     'brands',
     'propertyTypes',
     'districts',
+    'cities',
     'amenities',
     'rateAmenities',
     'chains',
@@ -2262,6 +2284,7 @@ HotelSearchClient.prototype = {
     'brands',
     'propertyTypes',
     'districts',
+    'cities',
     'amenities',
     'rateAmenities',
     'chains',
@@ -2342,6 +2365,7 @@ module.exports = {
 
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
+    var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
@@ -2352,6 +2376,7 @@ module.exports = {
         && filterByReviewScore(hotel, filter)
         && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
         && utils.filterByKey(hotel.districtId, districtIdMap)
+        && utils.filterByKey(hotel.cityCode, cityCodeMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
         && filterByName(hotel, filter.name)

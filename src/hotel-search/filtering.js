@@ -65,6 +65,7 @@ module.exports = {
 
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
+    var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
@@ -75,6 +76,7 @@ module.exports = {
         && filterByReviewScore(hotel, filter)
         && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
         && utils.filterByKey(hotel.districtId, districtIdMap)
+        && utils.filterByKey(hotel.cityCode, cityCodeMap)
         && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
         && utils.filterByKey(hotel.brandId, brandIdMap)
         && filterByName(hotel, filter.name)

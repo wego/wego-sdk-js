@@ -311,12 +311,34 @@ describe("HotelSearchClient", function() {
 
   describe("#mergeResponse", function() {
     it("responseSearch", function() {
-      var search = {};
+      var regionId = 101;
+      var cityCode = "DXB";
+
+      var region = {
+        id: regionId,
+        cityCodes: [cityCode]
+      };
+
+      var city = {
+        code: cityCode,
+      };
+
+      var search = {
+        region: region
+      };
+      
+      client.merger.__staticData = {
+        cities: {
+          "DXB": city
+        }
+      }
+
       client.handleSearchResponse({
         search: search
       });
 
       expect(client.responseSearch).to.equal(search);
+      expect(client.responseSearch.region.cities[0]).to.equal(city);
     });
 
     it("lastRatesCount", function() {

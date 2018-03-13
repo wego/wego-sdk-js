@@ -1,6 +1,35 @@
 var dataUtils = require('../../src/hotel-search/dataUtils');
 
 describe('dataUtils', function() {
+  describe('#prepareResponseSearch', function() {
+    it('region', function() {
+      var regionId = 101;
+      var cityCode = "DXB";
+
+      var region = {
+        id: regionId,
+        cityCodes: [cityCode]
+      };
+
+      var search = {
+        region: region,
+      };
+
+      var city = {
+        code: cityCode,
+        name: "city name"
+      };
+
+      dataUtils.prepareResponseSearch(search, createStaticData({
+        cities: {
+          "DXB": city,
+        }
+      }));
+
+      expect(search.region.cities[0]).to.equal(city);
+    });
+  });
+
   describe('#prepareHotel', function() {
     it('district', function() {
       var districtId = 3;
@@ -327,6 +356,7 @@ describe('dataUtils', function() {
   function createStaticData(data) {
     return Object.assign({
       districts: {},
+      cities: {},
       providers: {},
     }, data);
   }

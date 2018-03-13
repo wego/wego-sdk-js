@@ -66,7 +66,9 @@ HotelSearchClient.prototype = {
     this.merger.mergeResponse(response, isSearchEnd);
     this.lastRatesCount = response.count;
     this.responseSearch = response.search;
+    dataUtils.prepareResponseSearch(this.responseSearch, this.merger.getStaticData());
   },
+
 
   reset: function() {
     this.poller.reset();
@@ -127,6 +129,7 @@ HotelSearchClient.prototype = {
         cityCode: search.cityCode,
         hotelId: search.hotelId,
         districtId: search.districtId,
+        regionId: search.regionId,
         countryCode: search.countryCode,
         rooms: search.rooms,
         checkIn: search.checkIn,
