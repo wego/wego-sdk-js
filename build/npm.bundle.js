@@ -496,24 +496,24 @@ module.exports = {
     if (!currency) return price;
     if (!price) return null;
     var amount = price.amount,
-      totalAmount = price.totalAmount;
-      // taxAmount = price.taxAmount,
-      // totalTaxAmount = price.totalTaxAmount;
+      totalAmount = price.totalAmount,
+      taxAmount = price.taxAmount,
+      totalTaxAmount = price.totalTaxAmount;
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
       amount = Math.round(price.amountUsd * exchangeRate);
       totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
-      // taxAmount = Math.round(price.taxAmountUsd * exchangeRate);
-      // totalTaxAmount = taxAmount * Math.round(price.totalTaxAmountUsd / price.taxAmountUsd);
+      taxAmount = Math.round(price.taxAmountUsd * exchangeRate);
+      totalTaxAmount = taxAmount * Math.round(price.totalTaxAmountUsd / price.taxAmountUsd);
     }
 
     var convertedPrice = utils.cloneObject(price);
     convertedPrice.currency = currency;
     convertedPrice.amount = amount;
     convertedPrice.totalAmount = totalAmount;
-    // convertedPrice.taxAmount = taxAmount;
-    // convertedPrice.totalTaxAmount = totalTaxAmount;
+    convertedPrice.taxAmount = taxAmount;
+    convertedPrice.totalTaxAmount = totalTaxAmount;
 
     return convertedPrice;
   },
