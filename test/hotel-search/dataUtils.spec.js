@@ -125,16 +125,20 @@ describe('dataUtils', function() {
   });
 
   describe('#convertPrice', function() {
-    it('#remaining amount and total amount when having same currency', function() {
+    it('#remaining amount, tax amount, total amount and total tax amount when having same currency', function() {
       var currencyCode = 'CC';
       var amount = 10;
       var amountUsd = 1;
       var totalAmount = 40;
       var totalAmountUsd = 2;
+      var taxAmount = 2;
+      var totalTaxAmount = 8;
       var price = {
         currencyCode: currencyCode,
         amount: amount,
         totalAmount: totalAmount,
+        taxAmount: taxAmount,
+        totalTaxAmount: totalTaxAmount,
         amountUsd: amountUsd,
         totalAmountUsd: totalAmountUsd,
       };
@@ -148,6 +152,8 @@ describe('dataUtils', function() {
       expect(convertedPrice.currency).to.equal(currency);
       expect(convertedPrice.amount).to.equal(amount);
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
+      expect(convertedPrice.taxAmount).to.equal(taxAmount);
+      expect(convertedPrice.totalTaxAmount).to.equal(totalTaxAmount);
       expect(convertedPrice.amountUsd).to.equal(amountUsd);
       expect(convertedPrice.totalAmountUsd).to.equal(totalAmountUsd);
     });
@@ -180,7 +186,10 @@ describe('dataUtils', function() {
       var amountUsd = 1;
       var totalAmount = 40;
       var totalAmountUsd = 2;
+      var taxAmount = 2;
       var taxAmountUsd = 1;
+      var totalTaxAmount = 8;
+      var totalTaxAmountUsd = 4;
       var ecpc = 0.5;
       var localTaxAmount = 1;
       var price = {
@@ -189,9 +198,12 @@ describe('dataUtils', function() {
         totalAmount: totalAmount,
         amountUsd: amountUsd,
         totalAmountUsd: totalAmountUsd,
+        taxAmount: taxAmount,
         taxAmountUsd: taxAmountUsd,
+        totalTaxAmount: totalTaxAmount,
+        totalTaxAmountUsd: totalTaxAmountUsd,
         ecpc: ecpc,
-        localTaxAmount: localTaxAmount,
+        localTaxAmount: localTaxAmount
       };
 
       var currency = {
@@ -205,7 +217,10 @@ describe('dataUtils', function() {
       expect(convertedPrice.totalAmount).to.equal(totalAmount);
       expect(convertedPrice.amountUsd).to.equal(amountUsd);
       expect(convertedPrice.totalAmountUsd).to.equal(totalAmountUsd);
+      expect(convertedPrice.taxAmount).to.equal(taxAmount);
       expect(convertedPrice.taxAmountUsd).to.equal(taxAmountUsd);
+      expect(convertedPrice.totalTaxAmount).to.equal(totalTaxAmount);
+      expect(convertedPrice.totalTaxAmountUsd).to.equal(totalTaxAmountUsd);
       expect(convertedPrice.ecpc).to.equal(ecpc);
       expect(convertedPrice.localTaxAmount).to.equal(localTaxAmount);
     });
