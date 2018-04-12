@@ -294,6 +294,7 @@ var Api = {
   get: function(uri, query) {
     return fetch(this.buildUrl(uri, query), {
       method: "GET",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json"
       }
