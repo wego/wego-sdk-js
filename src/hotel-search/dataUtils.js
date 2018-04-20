@@ -43,10 +43,10 @@ module.exports = {
     hotel.images = hotel.images || [];
 
     // Check for airbnb
-    if (hotel.badges.length === 0 && hotel.propertyTypeId === 39) {
+    if (hotel.badges && hotel.propertyTypeId === 39) {
       var roomTypeCategory = staticData.roomTypeCategories[hotel.roomTypeCategoryId];
 
-      // Re-use badges array.
+      // Re-use badges array for room type category
       hotel.badges.push({ text: roomTypeCategory.name });
     }
   },
