@@ -446,23 +446,23 @@ module.exports = Poller;
 var utils = __webpack_require__(0);
 
 module.exports = {
-  prepareResponseSearch: function(search, staticData) {
+  prepareResponseSearch: function (search, staticData) {
     var region = search && search.region;
     if (region) {
       var cities = [];
       var staticCities = staticData.cities;
-      region.cityCodes.forEach(function(cityCode) {
+      region.cityCodes.forEach(function (cityCode) {
         cities.push(staticCities[cityCode]);
       });
       region.cities = cities;
     }
   },
 
-  prepareHotel: function(hotel, staticData) {
-    function arrayToMap (items, getKeyFunc) {
+  prepareHotel: function (hotel, staticData) {
+    function arrayToMap(items, getKeyFunc) {
       if (!items) return {};
       var map = {};
-      items.forEach(function(item) {
+      items.forEach(function (item) {
         map[getKeyFunc(item)] = item;
       });
       return map;
@@ -470,7 +470,7 @@ module.exports = {
 
     hotel.district = staticData.districts[hotel.districtId];
     hotel.city = staticData.cities[hotel.cityCode];
-    hotel.reviewMap = arrayToMap(hotel.reviews, function(review) {
+    hotel.reviewMap = arrayToMap(hotel.reviews, function (review) {
       return review.reviewerGroup;
     });
 
@@ -480,20 +480,28 @@ module.exports = {
 
     var amenityIdMap = {};
     var amenityIds = hotel.amenityIds || [];
-    amenityIds.forEach(function(id) {
+    amenityIds.forEach(function (id) {
       amenityIdMap[id] = true;
     });
     hotel.amenityIdMap = amenityIdMap;
     hotel.rates = [];
     hotel.images = hotel.images || [];
+
+    // Check for airbnb
+    if (hotel.badges && hotel.propertyTypeId === 39) {
+      var roomTypeCategory = staticData.roomTypeCategories[hotel.roomTypeCategoryId];
+
+      // Re-use badges array for room type category
+      hotel.badges.push({ text: roomTypeCategory.name });
+    }
   },
 
-  prepareRate: function(rate, currency, staticData) {
+  prepareRate: function (rate, currency, staticData) {
     rate.provider = staticData.providers[rate.providerCode];
     rate.price = this.convertPrice(rate.price, currency);
   },
 
-  convertPrice: function(price, currency) {
+  convertPrice: function (price, currency) {
     if (!currency) return price;
     if (!price) return null;
     var amount = price.amount;
@@ -513,19 +521,19 @@ module.exports = {
     return convertedPrice;
   },
 
-  prepareFilterOption: function(option, type, staticData) {
+  prepareFilterOption: function (option, type, staticData) {
     var staticDataType = this.__filterOptionTypeToStaticDataType[type];
     var itemMap = staticData[staticDataType] || {};
     var item = itemMap[option.code] || {};
     option.name = item.name;
   },
 
-  trimArray: function(value) {
+  trimArray: function (value) {
     if (!value) return;
 
     if (Array.isArray(value)) {
       value = value.filter(
-        function(entry) {
+        function (entry) {
           if (!entry) return false;
           return entry.trim() != '';
         }
@@ -535,7 +543,7 @@ module.exports = {
     return value;
   },
 
-  isBetterRate: function(firstRate, secondRate) {
+  isBetterRate: function (firstRate, secondRate) {
     function processRateAmount(rate) {
       var amount = Math.round(rate.price.amount);
       if (amount > 99999) {
@@ -1980,13 +1988,13 @@ module.exports = {
 var utils = __webpack_require__(0);
 var dataUtils = __webpack_require__(3);
 
-var HotelSearchClient = function(options) {
+var HotelSearchClient = function (options) {
   options = options || {};
-  this.currency  = options.currency;
+  this.currency = options.currency;
 };
 
 HotelSearchClient.prototype = {
-  reset: function() {
+  reset: function () {
     this.__staticData = this._getEmptyStaticData();
     this.__hotelMap = {};
     this.__hotels = [];
@@ -1994,20 +2002,20 @@ HotelSearchClient.prototype = {
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
 
-  mergeResponse: function(response, isSearchEnd = false) {
+  mergeResponse: function (response, isSearchEnd = false) {
     var hotelIds = this._getUpdatedHotelIds(response);
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
     this._mergeFilter(response.filter);
-    this._mergeRates(response.rates, isSearchEnd);  
+    this._mergeRates(response.rates, isSearchEnd);
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
     this._cloneHotels(hotelIds);
   },
 
-  getFilter: function() {
+  getFilter: function () {
     return this.__filter;
   },
 
@@ -2015,16 +2023,16 @@ HotelSearchClient.prototype = {
     return this.__hotels;
   },
 
-  getStaticData: function() {
+  getStaticData: function () {
     return this.__staticData;
   },
 
-  updateCurrency: function(currency) {
+  updateCurrency: function (currency) {
     this.currency = currency;
 
     var hotelMap = this.__hotelMap;
     for (var hotelId in hotelMap) {
-      hotelMap[hotelId].rates.forEach(function(rate) {
+      hotelMap[hotelId].rates.forEach(function (rate) {
         rate.price = dataUtils.convertPrice(rate.price, currency);
       });
     }
@@ -2036,17 +2044,17 @@ HotelSearchClient.prototype = {
     this.__filter = utils.cloneObject(this.__filter);
   },
 
-  _mergeStaticData: function(response) {
+  _mergeStaticData: function (response) {
     function merge(itemMap, items, type) {
       if (!items) return;
-      items.forEach(function(item) {
+      items.forEach(function (item) {
         var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
         itemMap[key] = item;
       });
     }
 
     var staticData = this.__staticData;
-    this.__staticDataTypes.forEach(function(type) {
+    this.__staticDataTypes.forEach(function (type) {
       merge(staticData[type], response[type], type);
     });
   },
@@ -2057,17 +2065,17 @@ HotelSearchClient.prototype = {
     var self = this;
     var hotelMap = this.__hotelMap;
 
-    hotels.forEach(function(hotel) {
+    hotels.forEach(function (hotel) {
       dataUtils.prepareHotel(hotel, self.__staticData);
       hotelMap[hotel.id] = hotelMap[hotel.id] || hotel;
     });
   },
 
-  _mergeRates: function(newRates, isSearchEnd) {
+  _mergeRates: function (newRates, isSearchEnd) {
     if (!newRates) return;
     var self = this;
 
-    newRates.forEach(function(newRate) {
+    newRates.forEach(function (newRate) {
       dataUtils.prepareRate(newRate, self.currency, self.__staticData);
       var hotelId = newRate.hotelId;
       var hotel = self.__hotelMap[hotelId];
@@ -2095,7 +2103,7 @@ HotelSearchClient.prototype = {
     }
   },
 
-  _lastMergeRates: function(newRates) {
+  _lastMergeRates: function (newRates) {
     if (!newRates) return;
     var self = this;
 
@@ -2137,7 +2145,7 @@ HotelSearchClient.prototype = {
     }
   },
 
-  _mergeScores: function(scores) {
+  _mergeScores: function (scores) {
     if (!scores) return;
     var hotelMap = this.__hotelMap;
     for (var hotelId in scores) {
@@ -2148,10 +2156,10 @@ HotelSearchClient.prototype = {
     }
   },
 
-  _mergeRatesCounts: function(providerRatesCounts) {
+  _mergeRatesCounts: function (providerRatesCounts) {
     if (!providerRatesCounts) return;
     var self = this;
-    providerRatesCounts.forEach(function(providerRatesCount) {
+    providerRatesCounts.forEach(function (providerRatesCount) {
       var hotel = self.__hotelMap[providerRatesCount.hotelId];
       if (!hotel) return;
 
@@ -2164,7 +2172,7 @@ HotelSearchClient.prototype = {
     });
   },
 
-  _mergeFilter: function(newFilter) {
+  _mergeFilter: function (newFilter) {
     if (!newFilter) return;
 
     var filter = this.__filter;
@@ -2178,9 +2186,9 @@ HotelSearchClient.prototype = {
       filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, this.currency);
     }
 
-    this.__filterOptionTypes.forEach(function(type) {
+    this.__filterOptionTypes.forEach(function (type) {
       var options = newFilter[type] || [];
-      options.forEach(function(option) {
+      options.forEach(function (option) {
         dataUtils.prepareFilterOption(option, type, self.__staticData);
         self.__filterOptionsMap[type][option.code] = option;
       });
@@ -2190,47 +2198,47 @@ HotelSearchClient.prototype = {
     this.__filter = utils.cloneObject(this.__filter);
   },
 
-  _getEmptyStaticData: function() {
+  _getEmptyStaticData: function () {
     var staticData = {};
-    this.__staticDataTypes.forEach(function(type) {
+    this.__staticDataTypes.forEach(function (type) {
       staticData[type] = {};
     });
     return staticData;
   },
 
-  _getEmptyFilterOptionsMap: function() {
+  _getEmptyFilterOptionsMap: function () {
     var map = {};
-    this.__filterOptionTypes.forEach(function(type) {
+    this.__filterOptionTypes.forEach(function (type) {
       map[type] = {};
     });
     return map;
   },
 
-  _buildFilterOptions: function(type) {
+  _buildFilterOptions: function (type) {
     this.__filter[type] = utils
       .mapValues(this.__filterOptionsMap[type])
-      .sort(function(option1, option2) {
+      .sort(function (option1, option2) {
         if (option1.name < option2.name) return -1;
         else if (option1.name === option2.name) return 0;
         else return 1;
       });
   },
 
-  _getEmptyFilter: function() {
+  _getEmptyFilter: function () {
     var filter = {};
 
-    this.__filterOptionTypes.forEach(function(type) {
+    this.__filterOptionTypes.forEach(function (type) {
       filter[type] = [];
     });
 
     return filter;
   },
 
-  _getUpdatedHotelIds: function(response) {
+  _getUpdatedHotelIds: function (response) {
     var hotelIds = {};
     var self = this;
     if (response.rates) {
-      response.rates.forEach(function(rate) {
+      response.rates.forEach(function (rate) {
         hotelIds[rate.hotelId] = true;
       });
     }
@@ -2242,19 +2250,19 @@ HotelSearchClient.prototype = {
     }
 
     if (response.providerRatesCounts) {
-      response.providerRatesCounts.forEach(function(providerRatesCount) {
+      response.providerRatesCounts.forEach(function (providerRatesCount) {
         hotelIds[providerRatesCount.hotelId] = true;
       });
     }
 
-    return Object.keys(hotelIds).filter(function(hotelId) {
+    return Object.keys(hotelIds).filter(function (hotelId) {
       return self.__hotelMap[hotelId];
     });
   },
 
-  _cloneHotels: function(hotelIds) {
+  _cloneHotels: function (hotelIds) {
     var hotelMap = this.__hotelMap;
-    hotelIds.forEach(function(hotelId) {
+    hotelIds.forEach(function (hotelId) {
       var hotel = hotelMap[hotelId];
       if (!hotel) {
         console.error("Hotel with " + hotelId + " is missing");
@@ -2278,6 +2286,7 @@ HotelSearchClient.prototype = {
     'rateAmenities',
     'chains',
     'providers',
+    'roomTypeCategories'
   ],
 
   __filterOptionTypes: [
