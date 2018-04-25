@@ -9,11 +9,7 @@
     "build": "./node_modules/.bin/webpack --config webpack.config.js",
     "start": "./node_modules/.bin/webpack --watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wego/wego-sdk-js.git"
-  },
-  "author": "",
+  "repository": "git+https://github.com/wego/wego-sdk-js.git",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/wego/wego-sdk-js/issues"
