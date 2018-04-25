@@ -1,13 +1,2 @@
 language: node_js
-sudo: required
-dist: trusty
-node_js: stable
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
 script: npm run test
-env:
-  - CXX=g++-4.8
