@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -191,15 +191,15 @@ var Api = {
 
   _hotelEndpoints: {
     searchHotelsUrl: function() {
-      return Api.getHost("v2") + "/metasearch/hotels/searches";
+      return Api.getHost("v1") + "/metasearch/hotels/searches";
     },
     fetchHotelsUrl: function(searchId) {
       var path = "/metasearch/hotels/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     searchSingleHotelUrl: function(hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     hotelDetailsUrl: function(hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
@@ -209,11 +209,11 @@ var Api = {
   _flightEndpoints: {
     searchTrips: function() {
       var path = "/metasearch/flights/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     },
     fetchTrips: function(searchId) {
       var path = "/metasearch/flights/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v1") + path;
     }
   },
 
@@ -226,7 +226,11 @@ var Api = {
   },
 
   getEnvironment: function() {
-    return this.env || Wego.ENV || "staging";
+    var environment = "staging";
+    if (typeof Wego !== "undefined" && typeof Wego.ENV !== "undefined") {
+      environment = Wego.ENV;
+    }
+    return this.env || environment;
   },
 
   searchTrips: function(requestBody, query) {
@@ -584,9 +588,9 @@ module.exports = {
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var FlightSearchMerger = __webpack_require__(8);
-var sorting = __webpack_require__(11);
-var filtering = __webpack_require__(10);
+var FlightSearchMerger = __webpack_require__(9);
+var sorting = __webpack_require__(12);
+var filtering = __webpack_require__(11);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
 
@@ -878,9 +882,9 @@ module.exports = HotelDetailsClient;
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var HotelSearchMerger = __webpack_require__(12);
-var sorting = __webpack_require__(14);
-var filtering = __webpack_require__(13);
+var HotelSearchMerger = __webpack_require__(13);
+var sorting = __webpack_require__(15);
+var filtering = __webpack_require__(14);
 var dataUtils = __webpack_require__(3);
 var Api = __webpack_require__(1);
 var Poller = __webpack_require__(2);
@@ -1059,19 +1063,76 @@ var Api = __webpack_require__(1);
 var FlightSearchClient = __webpack_require__(4);
 var HotelSearchClient = __webpack_require__(6);
 var HotelDetailsClient = __webpack_require__(5);
+var UsersServiceClient = __webpack_require__(8);
 
 module.exports = {
   Api: Api,
   FlightSearchClient: FlightSearchClient,
   HotelSearchClient: HotelSearchClient,
   HotelDetailsClient: HotelDetailsClient,
+  UsersServiceClient: UsersServiceClient
 };
+
 
 /***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dataUtils = __webpack_require__(9);
+var Api = __webpack_require__(1);
+
+const endpoints = {
+  signIn: "/users/oauth/token",
+  signUp: "/sign_up",
+  confirmation: "/resend_confirmation"
+};
+
+var UsersServiceClient = function(options = {}) {
+  var self = this;
+  this.accessToken = options.accessToken;
+  this.locale = options.locale || "en";
+};
+
+UsersServiceClient.prototype = {
+  authenticate: function(credentials) {
+    var uri = Api.getHost("v1") + endpoints.signIn;
+    return Api.post(credentials, uri).then(response => {
+      this.auth = response;
+      this.accessToken = response.accessToken;
+      return response;
+    });
+  },
+  signUp: function(credentials) {
+    var uri = Api.getHost("v1") + endpoints.signUp;
+    return Api.post(credentials, uri);
+  },
+  // TODO implementation
+  changePassword: function() {
+    if (!this.accessToken) {
+      throw "User must be logged in to change password";
+    }
+  },
+  // TODO implementation
+  resetPassword: function() {
+    if (!this.accessToken) {
+      throw "User must be logged in to reset password";
+    }
+  },
+  // TODO implementation
+  resendConfirmationEmail: function() {
+    if (!this.accessToken) {
+      throw "User must be logged in to resend confirmation email";
+    }
+  }
+};
+
+module.exports = UsersServiceClient;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dataUtils = __webpack_require__(10);
 var utils = __webpack_require__(0);
 
 var FlightSearchMerger = function(options) {
@@ -1391,7 +1452,7 @@ module.exports = FlightSearchMerger;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -1696,7 +1757,7 @@ module.exports = {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1878,7 +1939,7 @@ module.exports = {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -1974,7 +2035,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2296,7 +2357,7 @@ HotelSearchClient.prototype = {
 module.exports = HotelSearchClient;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2391,7 +2452,7 @@ module.exports = {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var utils = __webpack_require__(0);
@@ -2493,7 +2554,7 @@ module.exports = {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var WegoSdk = __webpack_require__(7);
