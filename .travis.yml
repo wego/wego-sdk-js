@@ -16,7 +16,6 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   - sleep 3
   - npm i
-  - npm run build
 script: npm run test
 env:
   - CXX=g++-4.8
