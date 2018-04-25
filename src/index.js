@@ -1,4 +1,4 @@
-var Api = require('./Api');
+var Api = require("./Api");
 var FlightSearchClient = require('./flight-search/Client');
 var HotelSearchClient = require('./hotel-search/Client');
 var HotelDetailsClient = require('./hotel-details/Client');
