@@ -1,2 +1,16 @@
 language: node_js
-script: npm run test
+sudo: required
+dist: trusty
+node_js: stable
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+cache:
+  yarn: true
+script:
+- yarn test
+env:
+  - CXX=g++-4.8
