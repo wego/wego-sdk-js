@@ -1067,6 +1067,7 @@ module.exports = {
   HotelDetailsClient: HotelDetailsClient,
 };
 
+
 /***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -1442,12 +1443,8 @@ module.exports = {
     }
 
     function hasAirportChangeAtStopover(legs) {
-      for (var i = legs.length; i--;) {
-        var segments = legs[i].segments;
-        for(var j=segments.length-1; j > 0; j--) {
-          if(segments[j].departureAirportCode !== segments[j-1].arrivalAirportCode)
-            return true;
-        }
+      for (var i = 0; i < legs.length - 1; i++) {
+        if (legs[i].arrivalAirportCode !== legs[i + 1].departureAirportCode) return true;
       }
       return false;
     }
