@@ -312,6 +312,7 @@ HotelSearchClient.prototype = {
     'rateAmenities',
     'chains',
     'reviewerGroups',
+    'roomTypeCategories'
   ],
 };
 

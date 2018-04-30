@@ -139,5 +139,6 @@ module.exports = {
     rateAmenities: 'rateAmenities',
     chains: 'chains',
     reviewerGroups: 'reviewerGroups',
+    roomTypeCategories: 'roomTypeCategories'
   }
 };
