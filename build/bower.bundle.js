@@ -2411,7 +2411,7 @@ module.exports = {
         && filterByDeals(hotel, filter.deals);
 
       if (hotel.propertyTypeId === 39) {
-        return filterResult && filterByBedroomCount(hotel, filter.airbnb.bedroomCount) && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
+        return conditionResult && filterByBedroomCount(hotel, filter.airbnb.bedroomCount) && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
       }
       return conditionResult;
     });
