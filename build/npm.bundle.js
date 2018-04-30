@@ -584,6 +584,7 @@ module.exports = {
     rateAmenities: 'rateAmenities',
     chains: 'chains',
     reviewerGroups: 'reviewerGroups',
+    roomTypeCategories: 'roomTypeCategories'
   }
 };
 
@@ -2011,7 +2012,7 @@ HotelSearchClient.prototype = {
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
-    this._mergeFilter(response.filter);
+    this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter)); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
@@ -2190,6 +2191,10 @@ HotelSearchClient.prototype = {
       filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, this.currency);
     }
 
+    if (newFilter.maxBedroomsCount) {
+      filter.airbnbMaxBedroomCount = newFilter.maxBedroomsCount;
+    }
+
     this.__filterOptionTypes.forEach(function (type) {
       var options = newFilter[type] || [];
       options.forEach(function (option) {
@@ -2303,6 +2308,7 @@ HotelSearchClient.prototype = {
     'rateAmenities',
     'chains',
     'reviewerGroups',
+    'roomTypeCategories'
   ],
 };
 
@@ -2316,7 +2322,7 @@ var utils = __webpack_require__(0);
 
 function filterByReviewScore(hotel, filter) {
   if (!filter.reviewScoreRange) return true;
-  var review  = hotel.reviewMap['ALL'] || {};
+  var review = hotel.reviewMap['ALL'] || {};
   return utils.filterByRange(review.score, filter.reviewScoreRange)
 }
 
@@ -2373,19 +2379,24 @@ function filterByName(hotel, name) {
   return false;
 }
 
+function filterByBedroomCount(hotel, count) {
+  return hotel.bedroomsCount >= count;
+}
+
 module.exports = {
-  filterHotels: function(hotels, filter) {
+  filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
 
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
     var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
+    var roomTypeCategoryMap = utils.arrayToMap(filter.airbnb.types);
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
 
-    return hotels.filter(function(hotel) {
-      return filterByPrice(hotel, filter.priceRange)
+    return hotels.filter(function (hotel) {
+      var conditionResult = filterByPrice(hotel, filter.priceRange)
         && utils.filterByKey(hotel.star, starMap)
         && filterByReviewScore(hotel, filter)
         && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
@@ -2398,6 +2409,11 @@ module.exports = {
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds)
         && filterByDeals(hotel, filter.deals);
+
+      if (hotel.propertyTypeId === 39) {
+        return filterResult && filterByBedroomCount(hotel, filter.airbnb.bedroomCount) && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
+      }
+      return conditionResult;
     });
   }
 };
