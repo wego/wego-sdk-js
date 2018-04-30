@@ -2391,7 +2391,7 @@ module.exports = {
     var districtIdMap = utils.arrayToMap(filter.districtIds);
     var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
-    var roomTypeCategoryMap = utils.arrayToMap(filter.airbnb.types);
+    var roomTypeCategoryMap = filter.airbnb ? utils.arrayToMap(filter.airbnb.types) : null;
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
 
