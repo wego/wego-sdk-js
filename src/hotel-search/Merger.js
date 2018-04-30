@@ -20,7 +20,7 @@ HotelSearchClient.prototype = {
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
-    this._mergeFilter(response.filter);
+    this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter)); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
@@ -197,6 +197,10 @@ HotelSearchClient.prototype = {
 
     if (newFilter.maxPrice) {
       filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, this.currency);
+    }
+
+    if (newFilter.maxBedroomsCount) {
+      filter.airbnbMaxBedroomCount = newFilter.maxBedroomsCount;
     }
 
     this.__filterOptionTypes.forEach(function (type) {
