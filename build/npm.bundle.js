@@ -2321,10 +2321,15 @@ module.exports = HotelSearchClient;
 
 var utils = __webpack_require__(0);
 
-function filterByReviewScore(hotel, filter) {
-  if (!filter.reviewScoreRange) return true;
+function filterByReviewScore(hotel, reviewScoreRange) {
+  if (!reviewScoreRange) return true;
   var review = hotel.reviewMap['ALL'] || {};
-  return utils.filterByRange(review.score, filter.reviewScoreRange)
+  return utils.filterByRange(review.score, reviewScoreRange);
+}
+
+function airbnbFilterByReviewScore(hotel, reviewScoreRange) {
+  if (!reviewScoreRange) return true;
+  return utils.filterByRange(hotel.reviewsScore, reviewScoreRange);
 }
 
 function filterByReviewerGroups(hotel, reviewerGroups) {
@@ -2399,7 +2404,6 @@ module.exports = {
     return hotels.filter(function (hotel) {
       var conditionResult = filterByPrice(hotel, filter.priceRange)
         && utils.filterByKey(hotel.star, starMap)
-        && filterByReviewScore(hotel, filter)
         && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.cityCode, cityCodeMap)
@@ -2412,9 +2416,12 @@ module.exports = {
         && filterByDeals(hotel, filter.deals);
 
       if (hotel.propertyTypeId === 39) {
-        return conditionResult && filterByBedroomCount(hotel, filter.airbnb.bedroomCount) && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
+        return conditionResult
+          && airbnbFilterByReviewScore(hotel, filter.reviewScoreRange)
+          && filterByBedroomCount(hotel, filter.airbnb.bedroomCount)
+          && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
       }
-      return conditionResult;
+      return conditionResult && filterByReviewScore(hotel, filter.reviewScoreRange);
     });
   }
 };
