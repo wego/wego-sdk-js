@@ -486,6 +486,7 @@ module.exports = {
     hotel.amenityIdMap = amenityIdMap;
     hotel.rates = [];
     hotel.images = hotel.images || [];
+    hotel.propertyType = staticData.propertyTypes[hotel.propertyTypeId];
 
     // Check for airbnb
     if (hotel.badges && hotel.propertyTypeId === 39) {
