@@ -1074,7 +1074,7 @@ module.exports = {
   Api: Api,
   FlightSearchClient: FlightSearchClient,
   HotelSearchClient: HotelSearchClient,
-  HotelDetailsClient: HotelDetailsClient,
+  HotelDetailsClient: HotelDetailsClient
 };
 
 
