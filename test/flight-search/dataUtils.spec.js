@@ -190,12 +190,14 @@ describe('data-utils', function() {
       var trip = {
         legs: [
           createLeg({
-            departureAirportCode: 'x',
-            arrivalAirportCode: 'y'
-          }),
-          createLeg({
-            departureAirportCode: 'y',
-            arrivalAirportCode: 'z'
+            segments: [{
+              departureAirportCode: "x",
+              arrivalAirportCode: "y",
+            },
+            {
+              departureAirportCode: "y",
+              arrivalAirportCode: "x",
+            }]
           })
         ]
       };
@@ -209,12 +211,14 @@ describe('data-utils', function() {
       var trip = {
         legs: [
           createLeg({
-            departureAirportCode: 'x',
-            arrivalAirportCode: 'y'
-          }),
-          createLeg({
-            departureAirportCode: 'z',
-            arrivalAirportCode: 't'
+            segments: [{
+              departureAirportCode: "x",
+              arrivalAirportCode: "y",
+            },
+            {
+              departureAirportCode: "x",
+              arrivalAirportCode: "y",
+            }]
           })
         ]
       };
@@ -783,7 +787,8 @@ describe('data-utils', function() {
     return Object.assign({
       longestSegment: {
         airline: {}
-      }
+      },
+      segments: []
     }, data);
   }
 });
