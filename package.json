@@ -4,8 +4,7 @@
   "description": "Wego SDK",
   "main": "build/npm.bundle.js",
   "scripts": {
-    "test":
-      "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
+    "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
     "build": "./node_modules/.bin/webpack --config webpack.config.js",
     "start": "./node_modules/.bin/webpack --watch"
   },
