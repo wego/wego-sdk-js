@@ -2390,6 +2390,19 @@ function filterByBedroomCount(hotel, count) {
   return hotel.bedroomsCount >= count;
 }
 
+function filterByProviders(hotel, providerCodes) {
+  if (!providerCodes || providerCodes.length === 0) return true;
+  var rates = hotel.rates;
+
+  if (!rates) return false;
+
+  for (var i = 0; i < rates.length; i++) {
+    if (providerCodes.includes(rates[i].providerCode)) return true;
+  }
+
+  return false;
+}
+
 module.exports = {
   filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
@@ -2414,6 +2427,7 @@ module.exports = {
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds)
+        && filterByProviders(hotel, filter.providerCodes)
         && filterByDeals(hotel, filter.deals);
 
       if (hotel.propertyTypeId === 39) {
