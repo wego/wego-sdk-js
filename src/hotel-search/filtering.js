@@ -89,7 +89,7 @@ module.exports = {
     var districtIdMap = utils.arrayToMap(filter.districtIds);
     var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
-    var roomTypeCategoryMap = filter.airbnb ? utils.arrayToMap(filter.airbnb.types) : null;
+    var roomTypeCategoryMap = utils.arrayToMap(filter.airbnbTypes);
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
 
@@ -111,7 +111,7 @@ module.exports = {
       if (hotel.propertyTypeId === 39) {
         return conditionResult
           && airbnbFilterByReviewScore(hotel, filter.reviewScoreRange)
-          && filterByBedroomCount(hotel, filter.airbnb.bedroomCount)
+          && filterByBedroomCount(hotel, filter.airbnbBedroomCount ? filter.airbnbBedroomCount : 0)
           && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
       }
       return conditionResult && filterByReviewScore(hotel, filter.reviewScoreRange);
