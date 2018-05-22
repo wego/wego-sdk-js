@@ -373,6 +373,7 @@ describe('dataUtils', function() {
       districts: {},
       cities: {},
       providers: {},
+      propertyTypes: {}
     }, data);
   }
 });

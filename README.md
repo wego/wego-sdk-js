@@ -1,4 +1,4 @@
-# Wego SDK for javascript
+# Wego SDK for javascript [![Build Status](https://travis-ci.org/wego/wego-sdk-js.svg?branch=master)](https://travis-ci.org/wego/wego-sdk-js)
 The official Wego SDK for JavaScript, available for browsers and mobile devices (if you are using javascript), or Node.js backends
 
 ## Installing

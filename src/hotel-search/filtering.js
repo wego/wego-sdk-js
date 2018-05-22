@@ -1,9 +1,14 @@
 var utils = require('../utils');
 
-function filterByReviewScore(hotel, filter) {
-  if (!filter.reviewScoreRange) return true;
-  var review  = hotel.reviewMap['ALL'] || {};
-  return utils.filterByRange(review.score, filter.reviewScoreRange)
+function filterByReviewScore(hotel, reviewScoreRange) {
+  if (!reviewScoreRange) return true;
+  var review = hotel.reviewMap['ALL'] || {};
+  return utils.filterByRange(review.score, reviewScoreRange);
+}
+
+function airbnbFilterByReviewScore(hotel, reviewScoreRange) {
+  if (!reviewScoreRange) return true;
+  return utils.filterByRange(hotel.reviewsScore, reviewScoreRange);
 }
 
 function filterByReviewerGroups(hotel, reviewerGroups) {
@@ -59,21 +64,38 @@ function filterByName(hotel, name) {
   return false;
 }
 
+function filterByBedroomCount(hotel, count) {
+  return hotel.bedroomsCount >= count;
+}
+
+function filterByProviders(hotel, providerCodes) {
+  if (!providerCodes || providerCodes.length === 0) return true;
+  var rates = hotel.rates;
+
+  if (!rates) return false;
+
+  for (var i = 0; i < rates.length; i++) {
+    if (providerCodes.includes(rates[i].providerCode)) return true;
+  }
+
+  return false;
+}
+
 module.exports = {
-  filterHotels: function(hotels, filter) {
+  filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
 
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
     var cityCodeMap = utils.arrayToMap(filter.cityCodes);
     var propertyTypeIdMap = utils.arrayToMap(filter.propertyTypeIds);
+    var roomTypeCategoryMap = utils.arrayToMap(filter.airbnbTypes);
     var brandIdMap = utils.arrayToMap(filter.brandIds);
     var chainIdMap = utils.arrayToMap(filter.chainIds);
 
-    return hotels.filter(function(hotel) {
-      return filterByPrice(hotel, filter.priceRange)
+    return hotels.filter(function (hotel) {
+      var conditionResult = filterByPrice(hotel, filter.priceRange)
         && utils.filterByKey(hotel.star, starMap)
-        && filterByReviewScore(hotel, filter)
         && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
         && utils.filterByKey(hotel.districtId, districtIdMap)
         && utils.filterByKey(hotel.cityCode, cityCodeMap)
@@ -83,7 +105,16 @@ module.exports = {
         && utils.filterByKey(hotel.chainId, chainIdMap)
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds)
+        && filterByProviders(hotel, filter.providerCodes)
         && filterByDeals(hotel, filter.deals);
+
+      if (hotel.propertyTypeId === 39) {
+        return conditionResult
+          && airbnbFilterByReviewScore(hotel, filter.reviewScoreRange)
+          && filterByBedroomCount(hotel, filter.airbnbBedroomCount ? filter.airbnbBedroomCount : 0)
+          && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
+      }
+      return conditionResult && filterByReviewScore(hotel, filter.reviewScoreRange);
     });
   }
 };

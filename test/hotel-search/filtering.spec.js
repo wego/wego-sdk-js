@@ -211,12 +211,50 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel1, hotel2]);
     });
 
+    it('filtering by providers', function() {
+      var filter = {
+        providerCodes: ['a.com', 'b.com']
+      };
+
+      var hotel1 = {
+        rates: createRatesWithProviderCodes(['a.com', 'b.com'])
+      };
+
+      var hotel2 = {
+        rates: createRatesWithProviderCodes(['c.com', 'b.com'])
+      };
+
+      var hotel3 = {
+        rates: createRatesWithProviderCodes(['c.com', 'd.com'])
+      };
+
+      var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
+
+      expect(hotels).to.deep.equal([hotel1, hotel2]);
+    });
+
   });
 
   function createRateWithRateAmenities(amenities) {
     return {
       rateAmenityIds: amenities
     }
+  }
+
+  function createRateWithProviderCode(providerCode) {
+    return {
+      providerCode: providerCode
+    }
+  }
+
+  function createRatesWithProviderCodes(providerCodes) {
+    var rates = [];
+
+    providerCodes.forEach(function(providerCode) {
+      rates.push(createRateWithProviderCode(providerCode));
+    })
+
+    return rates;
   }
 
   function createRateWithAmountUsd(amountUsd) {
