@@ -21,7 +21,7 @@ describe('Merger', function() {
       var hotel = {
         id: 1,
       };
-      
+
       var roomsCount = 1;
       var nightsCount = 2;
       var amountUsd = 10.15;
@@ -434,6 +434,51 @@ describe('Merger', function() {
     expect(newHotels[0]).to.not.equal(oldHotels[0]);
   });
 
+  describe('#_mergeSortedRatesByBasePrice', function() {
+    it('adds sortedRatesByBasePrice property with sorted rates by base price', function() {
+      var rate1 = {
+        id: 1,
+        hotelId: 1,
+        providerCode: "a",
+        price: {
+          totalAmount: 20,
+          totalTaxAmount: 10,
+          ecpc: 0.10
+        }
+      };
+
+      var rate2 = {
+        id: 2,
+        hotelId: 1,
+        providerCode: "b",
+        price: {
+          totalAmount: 15,
+          totalTaxAmount: 5,
+          ecpc: 0.15
+        }
+      };
+
+      var rate3 = {
+        id: 3,
+        hotelId: 1,
+        providerCode: "c",
+        price: {
+          totalAmount: 25,
+          totalTaxAmount: 10,
+          ecpc: 0.20
+        }
+      };
+
+      merger.mergeResponse({
+        hotels: [{ id: 1 }],
+        rates: [rate1, rate2, rate3],
+      });
+
+      expect(getRateIds(merger.__hotelMap[1].sortedRatesByBasePrice)).to.deep.equal([2, 1, 3]);
+
+    });
+  });
+
   describe('merge ratesCount', function() {
     it('update provider rates count', function() {
       var providerCode = 'SG';
@@ -611,7 +656,7 @@ describe('Merger', function() {
       var filter = merger.getFilter();
       expect(filter.cities[0].name).to.equal('city');
     });
-    
+
     it('minPrice', function() {
       var price  = {
         currencyCode: 'sgd',

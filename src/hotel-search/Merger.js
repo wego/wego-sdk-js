@@ -22,7 +22,7 @@ HotelSearchClient.prototype = {
     this._mergeHotels(response.hotels);
     this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter)); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
-    this._mergeOrderedRateIdsByBasePrice();
+    this._mergeSortedRatesByBasePrice();
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -117,7 +117,7 @@ HotelSearchClient.prototype = {
     }
   },
 
-  _mergeOrderedRateIdsByBasePrice: function() {
+  _mergeSortedRatesByBasePrice: function() {
     var self = this,
       cloneRates,
       sortedCloneRates;
@@ -143,7 +143,7 @@ HotelSearchClient.prototype = {
           }
         );
 
-        self.__hotelMap[hotelId].orderedRateIdsByBasePrice = sortedCloneRates;
+        self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneRates;
       }
     }
   },
