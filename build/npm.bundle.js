@@ -505,19 +505,25 @@ module.exports = {
   convertPrice: function (price, currency) {
     if (!currency) return price;
     if (!price) return null;
-    var amount = price.amount;
-    var totalAmount = price.totalAmount;
+    var amount = price.amount,
+      totalAmount = price.totalAmount,
+      taxAmount = price.taxAmount,
+      totalTaxAmount = price.totalTaxAmount;
 
     if (price.currencyCode != currency.code) {
       var exchangeRate = currency.rate;
       amount = Math.round(price.amountUsd * exchangeRate);
       totalAmount = amount * Math.round(price.totalAmountUsd / price.amountUsd);
+      taxAmount = Math.round(price.taxAmountUsd * exchangeRate);
+      totalTaxAmount = taxAmount * Math.round(price.totalTaxAmountUsd / price.taxAmountUsd);
     }
 
     var convertedPrice = utils.cloneObject(price);
     convertedPrice.currency = currency;
     convertedPrice.amount = amount;
     convertedPrice.totalAmount = totalAmount;
+    convertedPrice.taxAmount = taxAmount;
+    convertedPrice.totalTaxAmount = totalTaxAmount;
 
     return convertedPrice;
   },
@@ -2016,6 +2022,7 @@ HotelSearchClient.prototype = {
     this._mergeHotels(response.hotels);
     this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter)); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
+    this._mergeSortedRatesByBasePrice();
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -2107,6 +2114,32 @@ HotelSearchClient.prototype = {
 
     if (isSearchEnd) {
       this._lastMergeRates(newRates);
+    }
+  },
+
+  _mergeSortedRatesByBasePrice: function() {
+    var self = this,
+      sortedCloneRates;
+
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId]) {
+        sortedCloneRates = utils
+          .cloneArray(self.__hotelMap[hotelId].rates)
+          .sort(function(a, b) {
+            var totalAmountA = a.price.totalAmount,
+              totalAmountB = b.price.totalAmount,
+              totalTaxAmountA = a.price.totalTaxAmount,
+              totalTaxAmountB = b.price.totalTaxAmount;
+
+            if (totalAmountA - totalTaxAmountA === totalAmountB - totalTaxAmountB) {
+              return b.price.ecpc - a.price.ecpc;
+            } else {
+              return (totalAmountA - totalTaxAmountA) - (totalAmountB - totalTaxAmountB);
+            }
+          });
+
+        self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneRates;
+      }
     }
   },
 
@@ -2315,6 +2348,7 @@ HotelSearchClient.prototype = {
 };
 
 module.exports = HotelSearchClient;
+
 
 /***/ }),
 /* 13 */
