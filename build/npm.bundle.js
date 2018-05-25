@@ -2119,29 +2119,24 @@ HotelSearchClient.prototype = {
 
   _mergeSortedRatesByBasePrice: function() {
     var self = this,
-      cloneRates,
       sortedCloneRates;
 
     for (var hotelId in self.__hotelMap) {
       if (self.__hotelMap[hotelId]) {
-        cloneRates = JSON.parse(JSON.stringify(self.__hotelMap[hotelId].rates));
-        sortedCloneRates = cloneRates.sort(function(a, b) {
-          var totalAmountA = a.price.totalAmount,
-            totalAmountB = b.price.totalAmount,
-            totalTaxAmountA = a.price.totalTaxAmount,
-            totalTaxAmountB = b.price.totalTaxAmount;
+        sortedCloneRates = utils
+          .cloneArray(self.__hotelMap[hotelId].rates)
+          .sort(function(a, b) {
+            var totalAmountA = a.price.totalAmount,
+              totalAmountB = b.price.totalAmount,
+              totalTaxAmountA = a.price.totalTaxAmount,
+              totalTaxAmountB = b.price.totalTaxAmount;
 
-            if (
-              totalAmountA - totalTaxAmountA ===
-              totalAmountB - totalTaxAmountB
-            ) {
+            if (totalAmountA - totalTaxAmountA === totalAmountB - totalTaxAmountB) {
               return b.price.ecpc - a.price.ecpc;
             } else {
-              return (totalAmountA - totalTaxAmountA) -
-                (totalAmountB - totalTaxAmountB);
+              return (totalAmountA - totalTaxAmountA) - (totalAmountB - totalTaxAmountB);
             }
-          }
-        );
+          });
 
         self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneRates;
       }
