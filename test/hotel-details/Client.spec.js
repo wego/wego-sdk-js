@@ -65,7 +65,6 @@ describe('HotelDetailsClient', function() {
       siteCode: siteCode,
       deviceType: deviceType,
       locale: locale,
-      wgCampaign: wgCampaign,
       currency: {
         code: currencyCode
       }
@@ -78,6 +77,7 @@ describe('HotelDetailsClient', function() {
       checkIn: checkIn,
       checkOut: checkOut,
     };
+    client.wgCampaign = wgCampaign;
 
     var requestBody = client.getSearchRequestBody();
     var requestSearch = requestBody.search;

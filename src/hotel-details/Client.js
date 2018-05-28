@@ -11,7 +11,6 @@ var HotelDetailsClient = function(options) {
   self.siteCode = options.siteCode;
   self.deviceType = options.deviceType || "DESKTOP";
   self.appType = options.appType || "WEB_APP";
-  self.wgCampaign = options.wgCampaign || '';
   self.userLoggedIn = options.userLoggedIn;
   self.onProgressChanged = options.onProgressChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
@@ -21,11 +20,19 @@ var HotelDetailsClient = function(options) {
     delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
     pollLimit: 7,
     callApi: function() {
-      return Api.searchHotel(self.getSearchRequestBody(), {
+      var params = {
         currencyCode: self.currency.code,
-        locale: self.locale,
-        wgCampaign: self.wgCampaign
-      });
+        locale: self.locale
+      };
+      var trackingParams = {
+        wgCampaign: self.wgCampaign || ''
+      };
+      for (var key in trackingParams) {
+        if (trackingParams.hasOwnProperty(key)) {
+          params[key] = trackingParams[key];
+        }
+      }
+      return Api.searchHotel(self.getSearchRequestBody(), params);
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
@@ -48,8 +55,7 @@ HotelDetailsClient.prototype = {
     } else {
       Api.searchHotel(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
-        wgCampaign: self.wgCampaign
+        locale: self.locale
       }).then(function (hotelSearch) {
         self.reset();
         self.onProgressChanged(self.poller.getProgress());

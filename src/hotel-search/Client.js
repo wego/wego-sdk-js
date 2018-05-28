@@ -13,7 +13,6 @@ var HotelSearchClient = function(options) {
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
   this.appType = options.appType || "WEB_APP";
-  this.wgCampaign = options.wgCampaign || '';
   this.userLoggedIn = options.userLoggedIn;
   this.rateAmenityIds = options.rateAmenityIds || [];
   this.selectedHotelIds = options.selectedHotelIds || [];
@@ -29,11 +28,10 @@ var HotelSearchClient = function(options) {
   this.poller = new Poller({
     delays: delays,
     pollLimit: delays.length - 1,
-    initCallApi: function() {
+    initCallApi: function () {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
-        wgCampaign: self.wgCampaign
+        locale: self.locale
       });
     },
     callApi: function() {
@@ -155,9 +153,17 @@ HotelSearchClient.prototype = {
     var params = {
       currencyCode: this.currency.code,
       locale: this.locale,
-      wgCampaign: this.wgCampaign,
       offset: this.lastRatesCount || 0
     };
+
+    var trackingParams = {
+      wgCampaign: this.wgCampaign || ''
+    };
+    for (var key in trackingParams) {
+      if (trackingParams.hasOwnProperty(key)) {
+        params[key] = trackingParams[key];
+      }
+    }
 
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
