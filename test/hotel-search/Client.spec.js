@@ -241,6 +241,7 @@ describe("HotelSearchClient", function() {
       countryCode = "SG",
       deviceType = "desktop",
       appType = "IOS_APP",
+      wgCampaign = 'test_campaign',
       searchId = 111,
       selectedHotelIds = ["957766"],
       responseSearch = {
@@ -250,6 +251,7 @@ describe("HotelSearchClient", function() {
         siteCode: siteCode,
         deviceType: deviceType,
         appType: appType,
+        wgCampaign: wgCampaign,
         locale: locale,
         currency: {
           code: currencyCode

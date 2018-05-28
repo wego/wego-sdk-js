@@ -59,11 +59,13 @@ describe('HotelDetailsClient', function() {
     var checkIn = '2017-02-07';
     var checkOut = '2017-02-07';
     var deviceType = 'desktop';
+    var wgCampaign = 'test_campaign';
 
     var client = new HotelDetailsClient({
       siteCode: siteCode,
       deviceType: deviceType,
       locale: locale,
+      wgCampaign: wgCampaign,
       currency: {
         code: currencyCode
       }

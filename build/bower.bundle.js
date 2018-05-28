@@ -794,6 +794,7 @@ var HotelDetailsClient = function(options) {
   self.siteCode = options.siteCode;
   self.deviceType = options.deviceType || "DESKTOP";
   self.appType = options.appType || "WEB_APP";
+  self.wgCampaign = options.wgCampaign || '';
   self.userLoggedIn = options.userLoggedIn;
   self.onProgressChanged = options.onProgressChanged || function() {};
   self.onHotelRatesChanged = options.onHotelRatesChanged || function() {};
@@ -806,6 +807,7 @@ var HotelDetailsClient = function(options) {
       return Api.searchHotel(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale,
+        wgCampaign: self.wgCampaign
       });
     },
     onSuccessResponse: function(response) {
@@ -830,6 +832,7 @@ HotelDetailsClient.prototype = {
       Api.searchHotel(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale,
+        wgCampaign: self.wgCampaign
       }).then(function (hotelSearch) {
         self.reset();
         self.onProgressChanged(self.poller.getProgress());
@@ -909,6 +912,7 @@ var HotelSearchClient = function(options) {
   this.siteCode = options.siteCode;
   this.deviceType = options.deviceType || "DESKTOP";
   this.appType = options.appType || "WEB_APP";
+  this.wgCampaign = options.wgCampaign || '';
   this.userLoggedIn = options.userLoggedIn;
   this.rateAmenityIds = options.rateAmenityIds || [];
   this.selectedHotelIds = options.selectedHotelIds || [];
@@ -927,7 +931,8 @@ var HotelSearchClient = function(options) {
     initCallApi: function() {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale
+        locale: self.locale,
+        wgCampaign: self.wgCampaign
       });
     },
     callApi: function() {
@@ -1049,6 +1054,7 @@ HotelSearchClient.prototype = {
     var params = {
       currencyCode: this.currency.code,
       locale: this.locale,
+      wgCampaign: this.wgCampaign,
       offset: this.lastRatesCount || 0
     };
 
