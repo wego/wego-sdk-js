@@ -807,9 +807,7 @@ var HotelDetailsClient = function(options) {
         currencyCode: self.currency.code,
         locale: self.locale
       };
-      var trackingParams = {
-        wgCampaign: self.wgCampaign || ''
-      };
+      var trackingParams = self.trackingParams || {};
       for (var key in trackingParams) {
         if (trackingParams.hasOwnProperty(key)) {
           params[key] = trackingParams[key];
@@ -1061,9 +1059,7 @@ HotelSearchClient.prototype = {
       offset: this.lastRatesCount || 0
     };
 
-    var trackingParams = {
-      wgCampaign: this.wgCampaign || ''
-    };
+    var trackingParams = this.trackingParams || {};
     for (var key in trackingParams) {
       if (trackingParams.hasOwnProperty(key)) {
         params[key] = trackingParams[key];

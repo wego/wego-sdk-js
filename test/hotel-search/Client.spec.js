@@ -542,7 +542,7 @@ describe("HotelSearchClient", function() {
     });
 
     client.lastRatesCount = lastRatesCount;
-    client.wgCampaign = wgCampaign;
+    client.trackingParams = { wgCampaign: wgCampaign };
 
     it("returns offset", function() {
       var params = client.fetchHotelsParams();

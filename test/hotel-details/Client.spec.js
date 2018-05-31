@@ -77,7 +77,7 @@ describe('HotelDetailsClient', function() {
       checkIn: checkIn,
       checkOut: checkOut,
     };
-    client.wgCampaign = wgCampaign;
+    client.trackingParams = { wgCampaign: wgCampaign };
 
     var requestBody = client.getSearchRequestBody();
     var requestSearch = requestBody.search;

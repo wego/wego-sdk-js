@@ -156,9 +156,7 @@ HotelSearchClient.prototype = {
       offset: this.lastRatesCount || 0
     };
 
-    var trackingParams = {
-      wgCampaign: this.wgCampaign || ''
-    };
+    var trackingParams = this.trackingParams || {};
     for (var key in trackingParams) {
       if (trackingParams.hasOwnProperty(key)) {
         params[key] = trackingParams[key];
