@@ -59,6 +59,7 @@ describe('HotelDetailsClient', function() {
     var checkIn = '2017-02-07';
     var checkOut = '2017-02-07';
     var deviceType = 'desktop';
+    var wgCampaign = 'test_campaign';
 
     var client = new HotelDetailsClient({
       siteCode: siteCode,
@@ -76,6 +77,7 @@ describe('HotelDetailsClient', function() {
       checkIn: checkIn,
       checkOut: checkOut,
     };
+    client.trackingParams = { wgCampaign: wgCampaign };
 
     var requestBody = client.getSearchRequestBody();
     var requestSearch = requestBody.search;

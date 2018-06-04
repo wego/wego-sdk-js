@@ -28,7 +28,7 @@ var HotelSearchClient = function(options) {
   this.poller = new Poller({
     delays: delays,
     pollLimit: delays.length - 1,
-    initCallApi: function() {
+    initCallApi: function () {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale
@@ -155,6 +155,13 @@ HotelSearchClient.prototype = {
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
+
+    var trackingParams = this.trackingParams || {};
+    for (var key in trackingParams) {
+      if (trackingParams.hasOwnProperty(key)) {
+        params[key] = trackingParams[key];
+      }
+    }
 
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {

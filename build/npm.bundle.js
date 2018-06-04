@@ -803,10 +803,17 @@ var HotelDetailsClient = function(options) {
     delays: [0, 300, 600, 900, 2400, 3800, 5000, 6000],
     pollLimit: 7,
     callApi: function() {
-      return Api.searchHotel(self.getSearchRequestBody(), {
+      var params = {
         currencyCode: self.currency.code,
-        locale: self.locale,
-      });
+        locale: self.locale
+      };
+      var trackingParams = self.trackingParams || {};
+      for (var key in trackingParams) {
+        if (trackingParams.hasOwnProperty(key)) {
+          params[key] = trackingParams[key];
+        }
+      }
+      return Api.searchHotel(self.getSearchRequestBody(), params);
     },
     onSuccessResponse: function(response) {
       return self.handleSearchResponse(response);
@@ -829,7 +836,7 @@ HotelDetailsClient.prototype = {
     } else {
       Api.searchHotel(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
-        locale: self.locale,
+        locale: self.locale
       }).then(function (hotelSearch) {
         self.reset();
         self.onProgressChanged(self.poller.getProgress());
@@ -924,7 +931,7 @@ var HotelSearchClient = function(options) {
   this.poller = new Poller({
     delays: delays,
     pollLimit: delays.length - 1,
-    initCallApi: function() {
+    initCallApi: function () {
       return Api.searchHotels(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
         locale: self.locale
@@ -1051,6 +1058,13 @@ HotelSearchClient.prototype = {
       locale: this.locale,
       offset: this.lastRatesCount || 0
     };
+
+    var trackingParams = this.trackingParams || {};
+    for (var key in trackingParams) {
+      if (trackingParams.hasOwnProperty(key)) {
+        params[key] = trackingParams[key];
+      }
+    }
 
     var selectedHotelIds = dataUtils.trimArray(this.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {

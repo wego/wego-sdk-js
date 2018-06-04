@@ -527,6 +527,7 @@ describe("HotelSearchClient", function() {
     var countryCode = "SG";
     var deviceType = "desktop";
     var appType = "IOS_APP";
+    var wgCampaign = "test_campaign";
     var searchId = 111;
     var client = new HotelSearchClient({
       siteCode: siteCode,
@@ -539,6 +540,7 @@ describe("HotelSearchClient", function() {
     });
 
     client.lastRatesCount = lastRatesCount;
+    client.trackingParams = { wgCampaign: wgCampaign };
 
     it("returns offset", function() {
       var params = client.fetchHotelsParams();
@@ -551,6 +553,10 @@ describe("HotelSearchClient", function() {
     it("returns currencyCode", function() {
       var params = client.fetchHotelsParams();
       expect(params.currencyCode).to.equal(currencyCode);
+    });
+    it("returns wgCampaign", function () {
+      var params = client.fetchHotelsParams();
+      expect(params.wgCampaign).to.equal(wgCampaign);
     });
     it("has not selectedHotelIds", function() {
       var params = client.fetchHotelsParams();
