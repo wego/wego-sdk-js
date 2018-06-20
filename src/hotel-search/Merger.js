@@ -131,11 +131,13 @@ HotelSearchClient.prototype = {
               totalTaxAmountA = a.price.totalTaxAmount,
               totalTaxAmountB = b.price.totalTaxAmount;
 
-            if (totalAmountA - totalTaxAmountA === totalAmountB - totalTaxAmountB) {
-              return b.price.ecpc - a.price.ecpc;
-            } else {
-              return (totalAmountA - totalTaxAmountA) - (totalAmountB - totalTaxAmountB);
-            }
+            var basePriceA = totalAmountA - totalTaxAmountA,
+              basePriceB = totalAmountB - totalTaxAmountB;
+
+            if (basePriceA !== basePriceB) return basePriceA - basePriceB;
+            if (a.provider.type === 'DIRECT_PRIORITY' && b.provider.type !== 'DIRECT_PRIORITY') return -1;
+            if (b.provider.type === 'DIRECT_PRIORITY' && a.provider.type !== 'DIRECT_PRIORITY') return 1;
+            return b.price.ecpc - a.price.ecpc;
           });
 
         self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneRates;
