@@ -447,6 +447,12 @@ describe('Merger', function() {
         }
       };
 
+      var provider1 = {
+        id: 1,
+        code: "a",
+        type: "OTA"
+      };
+
       var rate2 = {
         id: 2,
         hotelId: 1,
@@ -458,10 +464,33 @@ describe('Merger', function() {
         }
       };
 
+      var provider2 = {
+        id: 2,
+        code: "b",
+        type: "DIRECT_PRIORITY"
+      };
+
       var rate3 = {
         id: 3,
         hotelId: 1,
         providerCode: "c",
+        price: {
+          totalAmount: 10,
+          totalTaxAmount: 0,
+          ecpc: 0.05
+        }
+      };
+
+      var provider3 = {
+        id: 3,
+        code: "c",
+        type: "DIRECT_PRIORITY"
+      };
+
+      var rate4 = {
+        id: 4,
+        hotelId: 1,
+        providerCode: "d",
         price: {
           totalAmount: 25,
           totalTaxAmount: 10,
@@ -469,12 +498,19 @@ describe('Merger', function() {
         }
       };
 
+      var provider4 = {
+        id: 4,
+        code: "d",
+        type: "DIRECT"
+      };
+
       merger.mergeResponse({
         hotels: [{ id: 1 }],
-        rates: [rate1, rate2, rate3],
+        rates: [rate1, rate2, rate3, rate4],
+        providers: [provider1, provider2, provider3, provider4]
       });
 
-      expect(getRateIds(merger.__hotelMap[1].sortedRatesByBasePrice)).to.deep.equal([2, 1, 3]);
+      expect(getRateIds(merger.__hotelMap[1].sortedRatesByBasePrice)).to.deep.equal([2, 3, 1, 4]);
 
     });
   });
