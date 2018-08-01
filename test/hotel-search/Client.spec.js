@@ -223,6 +223,26 @@ describe("HotelSearchClient", function() {
       });
       expect(hotelIds).to.deep.equal([1]);
     });
+
+    it("onDestinationInfoChanged", function () {
+      var destinationInfo;
+
+      client = new HotelSearchClient({
+        onDestinationInfoChanged: function (_destinationInfo) {
+          destinationInfo = _destinationInfo;
+        }
+      });
+
+      mockAjaxCall(client);
+
+      client.handleSearchResponse({
+        destinationInfo: {
+          hotelCount: 100
+        }
+      });
+
+      expect(destinationInfo.hotelCount).to.equal(100);
+    });
   });
 
   describe("#getSearchRequestBody", function() {

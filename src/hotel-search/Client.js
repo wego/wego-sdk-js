@@ -22,6 +22,7 @@ var HotelSearchClient = function(options) {
   this.onDisplayedFilterChanged =
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
+  this.onDestinationInfoChanged = options.onDestinationInfoChanged || function() {};
 
   var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
   this.merger = new HotelSearchMerger();
@@ -109,6 +110,7 @@ HotelSearchClient.prototype = {
     this.onTotalHotelsChanged(hotels);
     this.onDisplayedFilterChanged(this.merger.getFilter());
     this.onProgressChanged(this.poller.getProgress());
+    this.onDestinationInfoChanged(this.merger.getStaticData().destinationInfo);
   },
 
   getSearchRequestBody: function() {
