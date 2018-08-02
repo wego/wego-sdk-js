@@ -61,10 +61,18 @@ HotelSearchClient.prototype = {
   _mergeStaticData: function (response) {
     function merge(itemMap, items, type) {
       if (!items) return;
-      items.forEach(function (item) {
-        var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
-        itemMap[key] = item;
-      });
+      if (Array.isArray(items)) {
+        items.forEach(function (item) {
+          var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
+          itemMap[key] = item;
+        });
+      } else {
+        for (var key in items) {
+          if (items.hasOwnProperty(key)) {
+            itemMap[key] = items[key];
+          }
+        }
+      }
     }
 
     var staticData = this.__staticData;
@@ -330,7 +338,8 @@ HotelSearchClient.prototype = {
     'rateAmenities',
     'chains',
     'providers',
-    'roomTypeCategories'
+    'roomTypeCategories',
+    'destinationInfo'
   ],
 
   __filterOptionTypes: [

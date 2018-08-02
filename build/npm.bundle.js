@@ -925,6 +925,7 @@ var HotelSearchClient = function(options) {
   this.onDisplayedFilterChanged =
     options.onDisplayedFilterChanged || function() {};
   this.onSearchCreated = options.onSearchCreated || function() {};
+  this.onDestinationInfoChanged = options.onDestinationInfoChanged || function() {};
 
   var delays = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
   this.merger = new HotelSearchMerger();
@@ -1012,6 +1013,7 @@ HotelSearchClient.prototype = {
     this.onTotalHotelsChanged(hotels);
     this.onDisplayedFilterChanged(this.merger.getFilter());
     this.onProgressChanged(this.poller.getProgress());
+    this.onDestinationInfoChanged(this.merger.getStaticData().destinationInfo);
   },
 
   getSearchRequestBody: function() {
@@ -2075,10 +2077,18 @@ HotelSearchClient.prototype = {
   _mergeStaticData: function (response) {
     function merge(itemMap, items, type) {
       if (!items) return;
-      items.forEach(function (item) {
-        var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
-        itemMap[key] = item;
-      });
+      if (Array.isArray(items)) {
+        items.forEach(function (item) {
+          var key = (type === 'providers' || type === 'cities') ? item.code : item.id;
+          itemMap[key] = item;
+        });
+      } else {
+        for (var key in items) {
+          if (items.hasOwnProperty(key)) {
+            itemMap[key] = items[key];
+          }
+        }
+      }
     }
 
     var staticData = this.__staticData;
@@ -2344,7 +2354,8 @@ HotelSearchClient.prototype = {
     'rateAmenities',
     'chains',
     'providers',
-    'roomTypeCategories'
+    'roomTypeCategories',
+    'destinationInfo'
   ],
 
   __filterOptionTypes: [

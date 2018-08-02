@@ -222,6 +222,18 @@ describe('Merger', function() {
 
     });
 
+    it('merging destinationInfo', function () {
+      var destinationInfo = {
+        hotelCount: 100
+      };
+
+      merger.mergeResponse({
+        destinationInfo: destinationInfo
+      });
+
+      expect(merger.__staticData.destinationInfo.hotelCount).to.equal(destinationInfo.hotelCount);
+    });
+
   });
 
   describe('merge hotels', function() {
