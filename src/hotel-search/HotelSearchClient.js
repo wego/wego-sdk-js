@@ -8,7 +8,7 @@ const Poller = require("../Poller");
 const DELAYS = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
 
 class HotelSearchClient {
-	constructor(searchHotelsEndpointUrl, options, requestHeaders) {
+	constructor(searchHotelsEndpointUrl, requestHeaders, options) {
 		let self = this;
 		options = options || {};
 		self.currency = options.currency || {};
@@ -72,7 +72,6 @@ class HotelSearchClient {
 		self.responseSearch = response.search;
 		dataUtils.prepareResponseSearch(self.responseSearch, self.merger.getStaticData());
 	}
-
 
 	reset() {
 		let self = this;
