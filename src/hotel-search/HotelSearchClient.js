@@ -25,6 +25,7 @@ class HotelSearchClient {
 		self.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function () { };
 		self.onSearchCreated = options.onSearchCreated || function () { };
 		self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
+		self.requestHeaders = options.requestHeaders;
 
 		self.merger = new HotelSearchMerger();
 		self.poller = new Poller({
@@ -34,10 +35,10 @@ class HotelSearchClient {
 				return Api.searchHotels(searchHotelsEndpointUrl, self.getSearchRequestBody(), {
 					currencyCode: self.currency.code,
 					locale: self.locale
-				}, options.requestHeaders);
+				}, self.requestHeaders);
 			},
 			callApi: () => {
-				return Api.fetchHotels(self.responseSearch.id, self.fetchHotelsParams(), options.requestHeaders);
+				return Api.fetchHotels(self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
 			},
 			onSuccessResponse: (response) => {
 				return self.handleSearchResponse(response);
