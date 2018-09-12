@@ -96,6 +96,7 @@ var Api = {
     return fetch(this.buildUrl(url, query), {
       method: "POST",
       credentials: "include",
+      mode: 'cors',
       headers: new Headers(Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' })),
       body: JSON.stringify(requestBody)
     }).then(function (response) {
@@ -113,6 +114,7 @@ var Api = {
     return fetch(this.buildUrl(uri, query), {
       method: "GET",
       credentials: "include",
+      mode: 'cors',
       headers: new Headers(Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' }))
     }).then(function (response) {
       if (response.ok) {
