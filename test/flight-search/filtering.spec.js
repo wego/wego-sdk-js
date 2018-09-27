@@ -483,27 +483,27 @@ describe('filtering', function() {
     it('filtering by legIds', function() {
       var trip1 = {
         legIdMap: {
-          2: true,
-          3: true,
+          '2': true,
+          '3': true,
         }
       };
 
       var trip2 = {
         legIdMap: {
           '1': true,
-          4: true,
+          '4': true,
         }
       };
 
       var trip3 = {
         legIdMap: {
           '1': true,
-          5: true,
+          '5': true,
         }
       };
 
       var filter = {
-        legIds: ['01'],
+        legIds: ['1'],
       };
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip2, trip3]);

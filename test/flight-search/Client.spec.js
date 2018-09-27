@@ -123,7 +123,7 @@ describe("FlightSearchClient", function() {
     });
 
     client.updateSort({
-      by: "OUTBOUND_DEPARTURE_TIME",
+      by: "LEG1_DEPARTURE_TIME",
       order: "DESC"
     });
 
@@ -238,7 +238,7 @@ describe("FlightSearchClient", function() {
   describe("#searchTrips", function() {
     it("start poller", function() {
       client.poller.timer = null;
-      client.searchTrips({});
+      client.searchTrips({legs: [1,2,3]});
       expect(client.poller.timer).not.equal(null);
     });
   });
