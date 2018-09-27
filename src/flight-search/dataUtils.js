@@ -7,8 +7,8 @@ module.exports = {
 
     trip.legIdMap = {};
 
-    legs.forEach(function(leg) {
-      trip.legIdMap[leg.id] = true;
+    legs.forEach(function(leg, index) {
+      trip.legIdMap[index + leg.id] = true;
     });
 
     var firstLeg = legs[0];

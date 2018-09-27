@@ -300,10 +300,10 @@ describe('data-utils', function() {
       var trip = {
         legs: [
           createLeg({
-            id: 1,
+            id: '1',
           }),
           createLeg({
-            id: 2,
+            id: '2',
           }),
         ]
       };
@@ -311,8 +311,8 @@ describe('data-utils', function() {
       dataUtils.prepareTrip(trip, createStaticData());
 
       expect(trip.legIdMap).to.deep.equal({
-        1: true,
-        2: true,
+        '01': true,
+        '12': true,
       });
     });
 
