@@ -158,7 +158,7 @@ durationMinutesRanges: [
     "legIndex": 1
   }
 ],
-stopoverDurationMinutesRange: [
+stopoverDurationMinutesRanges: [
   {
     "min": 190,
     "max": 2275,

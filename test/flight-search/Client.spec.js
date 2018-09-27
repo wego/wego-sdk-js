@@ -146,12 +146,12 @@ describe("FlightSearchClient", function() {
 
     var trip1 = {
       id: 1,
-      stopCode: "DIRECT"
+      stopCode: 0
     };
 
     var trip2 = {
       id: 2,
-      stopCode: "ONE_STOP"
+      stopCode: 1
     };
 
     client.mergeResponse({
@@ -169,7 +169,7 @@ describe("FlightSearchClient", function() {
     });
 
     client.updateFilter({
-      stopCodes: ["ONE_STOP"]
+      stopCodes: [1]
     });
 
     var tripIds = trips.map(function(trip) {
@@ -194,7 +194,7 @@ describe("FlightSearchClient", function() {
 
     var trip = {
       id: 1,
-      stopCode: "DIRECT"
+      stopCode: 0
     };
 
     client.handleSearchResponse({

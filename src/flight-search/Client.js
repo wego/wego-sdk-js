@@ -7,30 +7,28 @@ var Poller = require("../Poller");
 var FlightSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency = options.currency || {};
-  this.locale = options.locale;
-  this.siteCode = options.siteCode;
-  this.deviceType = options.deviceType || "DESKTOP";
-  this.appType = options.appType || "WEB_APP";
-  this.userLoggedIn = options.userLoggedIn;
-  this.paymentMethodIds = options.paymentMethodIds || [];
-  this.providerTypes = options.providerTypes || [];
-  this.onProgressChanged = options.onProgressChanged || function() {};
-  this.onTripsChanged = options.onTripsChanged || function() {};
-  this.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
-  this.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
-  this.onFastestTripChanged = options.onFastestTripChanged || function() {};
-  this.onBestExperienceTripChanged =
+  self.currency = options.currency || {};
+  self.locale = options.locale;
+  self.siteCode = options.siteCode;
+  self.deviceType = options.deviceType || "DESKTOP";
+  self.appType = options.appType || "WEB_APP";
+  self.userLoggedIn = options.userLoggedIn;
+  self.paymentMethodIds = options.paymentMethodIds || [];
+  self.providerTypes = options.providerTypes || [];
+  self.onProgressChanged = options.onProgressChanged || function() {};
+  self.onTripsChanged = options.onTripsChanged || function() {};
+  self.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
+  self.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
+  self.onFastestTripChanged = options.onFastestTripChanged || function() {};
+  self.onBestExperienceTripChanged =
     options.onBestExperienceTripChanged || function() {};
-  this.onDisplayedFilterChanged =
+  self.onDisplayedFilterChanged =
     options.onDisplayedFilterChanged || function() {};
-  this.onSearchCreated = options.onSearchCreated || function() {};
+  self.onSearchCreated = options.onSearchCreated || function() {};
 
-  this.merger = new FlightSearchMerger();
+  self.merger = new FlightSearchMerger();
 
-  this.poller = new Poller({
-    delays: [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000],
-    pollLimit: 7,
+  self.poller = new Poller({
     initCallApi: function() {
       return Api.searchTrips(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -44,15 +42,36 @@ var FlightSearchClient = function(options) {
       return self.handleSearchResponse(response);
     }
   });
-  this.reset();
+  self.reset();
 };
 
 FlightSearchClient.prototype = {
   searchTrips: function(search) {
-    this.search = search;
-    this.reset();
-    this.updateResult();
-    this.poller.start();
+    var self = this;
+    self.search = search;
+    self.reset();
+
+    // determine whether multi city 
+    var legs = search.legs;
+    var multiCity = legs.length > 2;        
+    // 2 legs can still be multi city
+    if( legs.length === 2 ) {
+      var p = ['departureCityCode', 'departureAirportCode', 'arrivalCityCode', 'arrivalAirportCode'];
+      let sameLocations = (a, b) => a === b || (a[p[0]] === b[p[2]] && a[p[1]] === b[p[3]]);
+      if( !sameLocations(legs[0], legs[1]) ) multiCity = true;
+    }
+    self.multiCity = multiCity;
+    self.merger.multiCity = multiCity;
+
+    var poller = self.poller;
+    poller.delays = (multiCity ? 
+                      [0, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6] : 
+                      [0, 1, 3, 4, 5, 6, 6, 6]
+                    ).map(v => v*1000);
+    poller.pollLimit = poller.delays.length - 1;
+
+    self.updateResult();
+    poller.start();
   },
 
   handleSearchResponse: function(response) {
@@ -62,9 +81,10 @@ FlightSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
-    this.processedFaresCount = response.count;
-    this.responseSearch = response.search;
+    var self = this, merger = self.merger;
+    merger.mergeResponse(response);
+    self.processedFaresCount = response.count;
+    self.responseSearch = response.search;
   },
 
   reset: function() {
@@ -105,28 +125,28 @@ FlightSearchClient.prototype = {
   },
 
   updateResult: function() {
-    var trips = this.merger.getTrips();
+    var self = this, trips = self.merger.getTrips();
 
-    if (Object.keys(this.merger.getLegConditions()).length !== 0) {
-      filtering.passLegConditions(this.merger.getLegConditions());
+    if (Object.keys(self.merger.getLegConditions()).length !== 0) {
+      filtering.passLegConditions(self.merger.getLegConditions());
     }
 
-    if (Object.keys(this.merger.getFareConditions()).length !== 0) {
-      filtering.passFareConditions(this.merger.getFareConditions());
+    if (Object.keys(self.merger.getFareConditions()).length !== 0) {
+      filtering.passFareConditions(self.merger.getFareConditions());
     }
 
-    var filteredTrips = filtering.filterTrips(trips, this.filter);
-    var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
+    var filteredTrips = filtering.filterTrips(trips, self.filter, self.multiCity);
+    var sortedTrips = sorting.sortTrips(filteredTrips, self.sort);
 
-    this.onTripsChanged(sortedTrips);
-    this.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
-    this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
-    this.onBestExperienceTripChanged(
+    self.onTripsChanged(sortedTrips);
+    self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
+    self.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
+    self.onBestExperienceTripChanged(
       sorting.getBestExperienceTrip(filteredTrips)
     );
-    this.onTotalTripsChanged(trips);
-    this.onDisplayedFilterChanged(this.merger.getFilter());
-    this.onProgressChanged(this.poller.getProgress());
+    self.onTotalTripsChanged(trips);
+    self.onDisplayedFilterChanged(self.merger.getFilter());
+    self.onProgressChanged(self.poller.getProgress());
   },
 
   getSearchRequestBody: function() {

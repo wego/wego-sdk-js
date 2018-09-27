@@ -17,7 +17,7 @@ describe('data-utils', function() {
 
         dataUtils.prepareTrip(trip, createStaticData());
 
-        expect(trip.stopCode).to.equal('DIRECT');
+        expect(trip.stopCode).to.equal(0);
       });
 
       it('ONE_STOP when leg stopoversCount maximum is 1', function() {
@@ -34,7 +34,7 @@ describe('data-utils', function() {
 
         dataUtils.prepareTrip(trip, createStaticData());
 
-        expect(trip.stopCode).to.equal('ONE_STOP');
+        expect(trip.stopCode).to.equal(1);
       });
 
       it('MORE_THAN_ONE_STOP when leg stopoversCount maximum is 2', function() {
@@ -51,7 +51,7 @@ describe('data-utils', function() {
 
         dataUtils.prepareTrip(trip, createStaticData());
 
-        expect(trip.stopCode).to.equal('MORE_THAN_ONE_STOP');
+        expect(trip.stopCode).to.equal(2);
       });
     });
 

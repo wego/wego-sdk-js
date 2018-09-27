@@ -97,7 +97,7 @@ describe('sorting', function() {
     });
 
     var trips = sorting.sortTrips([trip1, trip2, trip3], {
-      by: 'OUTBOUND_DEPARTURE_TIME',
+      by: 'LEG1_DEPARTURE_TIME',
       order: 'ASC',
     });
 
@@ -133,7 +133,7 @@ describe('sorting', function() {
     });
 
     var trips = sorting.sortTrips([trip1, trip2, trip3], {
-      by: 'INBOUND_DEPARTURE_TIME',
+      by: 'LEG2_DEPARTURE_TIME',
       order: 'ASC',
     });
 
@@ -169,7 +169,7 @@ describe('sorting', function() {
     });
 
     var trips = sorting.sortTrips([trip1, trip2, trip3], {
-      by: 'OUTBOUND_ARRIVAL_TIME',
+      by: 'LEG1_ARRIVAL_TIME',
       order: 'ASC',
     });
 
@@ -196,7 +196,7 @@ describe('sorting', function() {
     });
 
     var trips = sorting.sortTrips([trip1, trip2], {
-      by: 'OUTBOUND_ARRIVAL_TIME',
+      by: 'LEG1_ARRIVAL_TIME',
       order: 'ASC',
     });
 
@@ -235,7 +235,7 @@ describe('sorting', function() {
     });
 
     var trips = sorting.sortTrips([trip1, trip2, trip3], {
-      by: 'INBOUND_ARRIVAL_TIME',
+      by: 'LEG2_ARRIVAL_TIME',
       order: 'ASC',
     });
 

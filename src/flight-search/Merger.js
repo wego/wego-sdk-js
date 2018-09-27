@@ -8,17 +8,19 @@ var FlightSearchMerger = function(options) {
 
 FlightSearchMerger.prototype = {
   mergeResponse: function(response) {
-    var updatedTripIds = this._getUpdatedTripIds(response);
+    var self = this, 
+        updatedTripIds = self._getUpdatedTripIds(response),
+        legs = response.legs;
+    
+    self._mergeStaticData(response);
+    self._mergeLegs(legs);
+    self._mergeLegConditions(response.legConditionIds);
+    self._mergeTrips(response.trips);
+    self._mergeFilter(response.filters);
+    self._mergeScores(response.scores);
+    self._mergeFares(response.fares);
 
-    this._mergeStaticData(response);
-    this._mergeLegs(response.legs);
-    this._mergeLegConditions(response.legConditionIds);
-    this._mergeTrips(response.trips);
-    this._mergeFilter(response.filters);
-    this._mergeScores(response.scores);
-    this._mergeFares(response.fares);
-
-    this._cloneTrips(updatedTripIds);
+    self._cloneTrips(updatedTripIds);
   },
 
   reset: function() {
@@ -47,20 +49,20 @@ FlightSearchMerger.prototype = {
   },
 
   updateCurrency: function(currency) {
-    this.currency = currency;
     var self = this;
+    self.currency = currency;
 
-    var tripMap = this.__tripMap;
+    var tripMap = self.__tripMap;
     for (var tripId in tripMap) {
       tripMap[tripId].fares.forEach(function(fare) {
         fare.price = dataUtils.convertPrice(fare.price, currency);
         fare.paymentFees = dataUtils.convertPaymentFees(fare.paymentFees, currency);
       });
     }
-    this._cloneTrips(Object.keys(tripMap));
+    self._cloneTrips(Object.keys(tripMap));
 
-    var filter = this.__filter;
-    this.__filterOptionTypes.forEach(function(type) {
+    var filter = self.__filter;
+    self.__filterOptionTypes.forEach(function(type) {
       var optionMap = self.__filterOptionsMap[type];
       for (var code in optionMap) {
         var option = optionMap[code];
@@ -71,7 +73,7 @@ FlightSearchMerger.prototype = {
     });
     filter.minPrice = dataUtils.convertPrice(filter.minPrice, currency);
     filter.maxPrice = dataUtils.convertPrice(filter.maxPrice, currency);
-    this._cloneFilter();
+    self._cloneFilter();
   },
 
   _mergeStaticData: function(response) {
@@ -173,39 +175,58 @@ FlightSearchMerger.prototype = {
 
   _mergeFilter: function(newFilter) {
     if (!newFilter) return;
-    var self = this;
+    var self = this, 
+        filter = self.__filter, 
+        multiCity = self.multiCity,
+        newFilterLegs = newFilter.legs;
 
-    var filter = this.__filter;
-
-    if (newFilter.legs) {
-      newFilter.legs.forEach(function(leg) {
+    if (newFilterLegs) {
+      newFilterLegs.forEach(function(leg) {
         dataUtils.prepareLegFilter(leg, self.__staticData);
       });
-      filter.legs = newFilter.legs;
+      filter.legs = newFilterLegs;
     }
 
     if (newFilter.minPrice) {
-      filter.minPrice = dataUtils.convertPrice(newFilter.minPrice, this.currency);
+      filter.minPrice = dataUtils.convertPrice(newFilter.minPrice, self.currency);
     }
 
     if (newFilter.maxPrice) {
-      filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, this.currency);
+      filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, self.currency);
     }
 
     if (newFilter.stopoverDurations) {
       filter.stopoverDurations = newFilter.stopoverDurations;
     }
 
-    this.__filterOptionTypes.forEach(function(type) {
-      var options = newFilter[type] || [];
-      options.forEach(function(option) {
-        dataUtils.prepareFilterOption(option, type, self.currency, self.__staticData);
-        self.__filterOptionsMap[type][option.code] = option;
-      });
+    var stopCodesMap = {'DIRECT': 0, 'ONE_STOP': 1, 'MORE_THAN_ONE_STOP': 2};    
+
+    self.__filterOptionTypes.forEach(type => {
+
+      let buildOptions = (options, legIndex) => {
+        options && options.forEach(option => {
+          var isByLeg = legIndex >= 0;
+          if( type === 'stops' ) option.code = stopCodesMap[option.code];
+          var code = (isByLeg ? (legIndex+1) + '_' : '') + option.code;
+          dataUtils.prepareFilterOption(option, type, self.currency, self.__staticData);
+          self.__filterOptionsMap[type][code] = option;
+          option.code = code;
+          isByLeg && (option.legIndex = legIndex);
+        });
+      }
+
+      if( multiCity && newFilterLegs ) {
+        for(var i=newFilterLegs.length; i--;) {
+          buildOptions(newFilterLegs[i][type], i);
+        }
+      }
+      else {
+        buildOptions(newFilter[type]);
+      }
       self._buildFilterOptions(type);
     });
 
-    this._cloneFilter();
+    self._cloneFilter();
   },
 
   _getUpdatedTripIds: function(response) {
@@ -248,17 +269,24 @@ FlightSearchMerger.prototype = {
   },
 
   _buildFilterOptions: function(type) {
-    this.__filter[type] = utils.mapValues(this.__filterOptionsMap[type]);
-    this.__filter[type].sort(function(option1, option2) {
+    var self = this, values = utils.mapValues(self.__filterOptionsMap[type]);
+    values.sort((option1, option2) => {
       if (type === 'stops') {
-        var codes = ['DIRECT','ONE_STOP', 'MORE_THAN_ONE_STOP'];
-        return codes.indexOf(option1.code) - codes.indexOf(option2.code);
+        var code1 = option1.code, code2 = option2.code;
+
+        // multi city has leg prefix. i.e: '1_0' (leg 0 direct), '3_1' (leg 2 one stop)
+        if( self.multiCity ) {
+          code1 = code1.substr(2);
+          code2 = code2.substr(2);
+        }
+        return code1 - code2;
       } else {
         if (option1.name < option2.name) return -1;
         else if (option1.name === option2.name) return 0;
         else return 1;
       }
     });
+    self.__filter[type] = values;
   },
 
   _getEmptyFilter: function() {
