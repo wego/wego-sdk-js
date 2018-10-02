@@ -1,26 +1,21 @@
 var Api = {
   __host: {
     staging: {
+      v3: "https://srv.wegostaging.com/v3",
       v2: "https://srv.wegostaging.com/v2",
       v1: "https://srv.wegostaging.com"
     },
     production: {
+      v3: "https://srv.wego.com/v3",
       v2: "https://srv.wego.com/v2",
       v1: "https://srv.wego.com"
     }
   },
 
   _hotelEndpoints: {
-    // searchHotelsUrl: function () {
-    //   return Api.getHost("v2") + "/metasearch/hotels/searches";
-    // },
-    // fetchHotelsUrl: function (searchId) {
-    //   var path = "/metasearch/hotels/searches/" + searchId + "/results";
-    //   return Api.getHost("v2") + path;
-    // },
-    searchSingleHotelUrl: function (hotelId) {
+    searchSingleHotelUrl: function(hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v3") + path;
     },
     hotelDetailsUrl: function (hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
@@ -30,11 +25,11 @@ var Api = {
   _flightEndpoints: {
     searchTrips: function () {
       var path = "/metasearch/flights/searches";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v3") + path;
     },
     fetchTrips: function (searchId) {
       var path = "/metasearch/flights/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
+      return Api.getHost("v3") + path;
     }
   },
 
@@ -61,13 +56,11 @@ var Api = {
   },
 
   searchHotels: function (searchHotelsEndpointUrl, requestBody, query, requestHeaders) {
-    // var uri = this._hotelEndpoints.searchHotelsUrl();
     return this.post(requestBody, searchHotelsEndpointUrl, query, requestHeaders);
   },
 
   fetchHotels: function (searchHotelsEndpointUrl, searchId, query, requestHeaders) {
     let self = this;
-    // let url = self._hotelEndpoints.fetchHotelsUrl(searchId);
     let url = `${searchHotelsEndpointUrl}/${searchId}/results`;
     return self.get(url, query || {}, requestHeaders);
   },
