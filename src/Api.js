@@ -14,10 +14,10 @@ var Api = {
     // searchHotelsUrl: function () {
     //   return Api.getHost("v2") + "/metasearch/hotels/searches";
     // },
-    fetchHotelsUrl: function (searchId) {
-      var path = "/metasearch/hotels/searches/" + searchId + "/results";
-      return Api.getHost("v2") + path;
-    },
+    // fetchHotelsUrl: function (searchId) {
+    //   var path = "/metasearch/hotels/searches/" + searchId + "/results";
+    //   return Api.getHost("v2") + path;
+    // },
     searchSingleHotelUrl: function (hotelId) {
       var path = "/metasearch/hotels/" + hotelId + "/searches";
       return Api.getHost("v2") + path;
@@ -65,9 +65,10 @@ var Api = {
     return this.post(requestBody, searchHotelsEndpointUrl, query, requestHeaders);
   },
 
-  fetchHotels: function (searchId, query, requestHeaders) {
+  fetchHotels: function (searchHotelsEndpointUrl, searchId, query, requestHeaders) {
     let self = this;
-    let url = self._hotelEndpoints.fetchHotelsUrl(searchId);
+    // let url = self._hotelEndpoints.fetchHotelsUrl(searchId);
+    let url = `${searchHotelsEndpointUrl}/${searchId}/results`;
     return self.get(url, query || {}, requestHeaders);
   },
 
