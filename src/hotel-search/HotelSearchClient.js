@@ -38,7 +38,7 @@ class HotelSearchClient {
 				}, self.requestHeaders);
 			},
 			callApi: () => {
-				return Api.fetchHotels(self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
+				return Api.fetchHotels(searchHotelsEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
 			},
 			onSuccessResponse: (response) => {
 				return self.handleSearchResponse(response);
