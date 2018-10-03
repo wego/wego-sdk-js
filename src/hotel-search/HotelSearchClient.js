@@ -32,10 +32,7 @@ class HotelSearchClient {
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
-        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), {
-          currencyCode: self.currency.code,
-          locale: self.locale
-        }, self.requestHeaders);
+        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale }, self.requestHeaders);
       },
       callApi: () => {
         return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
