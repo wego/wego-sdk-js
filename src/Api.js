@@ -55,13 +55,13 @@ var Api = {
     return this.get(uri, query);
   },
 
-  searchHotels: function (searchHotelsEndpointUrl, requestBody, query, requestHeaders) {
-    return this.post(requestBody, searchHotelsEndpointUrl, query, requestHeaders);
+  searchHotels: function (hotelSearchEndpointUrl, requestBody, query, requestHeaders) {
+    return this.post(requestBody, hotelSearchEndpointUrl, query, requestHeaders);
   },
 
-  fetchHotels: function (searchHotelsEndpointUrl, searchId, query, requestHeaders) {
+  fetchHotels: function (hotelSearchEndpointUrl, searchId, query, requestHeaders) {
     let self = this;
-    let url = `${searchHotelsEndpointUrl}/${searchId}/results`;
+    let url = `${hotelSearchEndpointUrl}/${searchId}/results`;
     return self.get(url, query || {}, requestHeaders);
   },
 

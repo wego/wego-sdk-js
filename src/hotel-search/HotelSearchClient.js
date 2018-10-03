@@ -8,7 +8,7 @@ const Poller = require("../Poller");
 const DELAYS = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
 
 class HotelSearchClient {
-  constructor(searchHotelsEndpointUrl, options) {
+  constructor(hotelSearchEndpointUrl, options) {
     let self = this;
     options = options || {};
     self.currency = options.currency || {};
@@ -32,13 +32,13 @@ class HotelSearchClient {
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
-        return Api.searchHotels(searchHotelsEndpointUrl, self.getSearchRequestBody(), {
+        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), {
           currencyCode: self.currency.code,
           locale: self.locale
         }, self.requestHeaders);
       },
       callApi: () => {
-        return Api.fetchHotels(searchHotelsEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
+        return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
       },
       onSuccessResponse: (response) => {
         return self.handleSearchResponse(response);
