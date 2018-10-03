@@ -18,17 +18,6 @@ var Api = {
     }
   },
 
-  _flightEndpoints: {
-    searchTrips: function () {
-      var path = "/metasearch/flights/searches";
-      return Api.getHost("v3") + path;
-    },
-    fetchTrips: function (searchId) {
-      var path = "/metasearch/flights/searches/" + searchId + "/results";
-      return Api.getHost("v3") + path;
-    }
-  },
-
   getHost: function (version = "v2") {
     return this.__host[this.getEnvironment()][version];
   },
@@ -41,14 +30,13 @@ var Api = {
     return this.env || Wego.ENV || "staging";
   },
 
-  searchTrips: function (requestBody, query) {
-    var uri = this._flightEndpoints.searchTrips();
-    return this.post(requestBody, uri, query);
+  searchTrips: function (flightSearchEndpointUrl, requestBody, query, requestHeaders) {
+    return this.post(requestBody, flightSearchEndpointUrl, query, requestHeaders);
   },
 
-  fetchTrips: function (searchId, query = {}) {
-    var uri = this._flightEndpoints.fetchTrips(searchId);
-    return this.get(uri, query);
+  fetchTrips: function (flightSearchEndpointUrl, searchId, query, requestHeaders) {
+    let url = `${flightSearchEndpointUrl}/${searchId}/results`;
+    return this.get(url, query || {}, requestHeaders);
   },
 
   searchHotels: function (hotelSearchEndpointUrl, requestBody, query, requestHeaders) {
@@ -56,9 +44,8 @@ var Api = {
   },
 
   fetchHotels: function (hotelSearchEndpointUrl, searchId, query, requestHeaders) {
-    let self = this;
     let url = `${hotelSearchEndpointUrl}/${searchId}/results`;
-    return self.get(url, query || {}, requestHeaders);
+    return this.get(url, query || {}, requestHeaders);
   },
 
   searchHotel: function (hotelDetailsEndpointUrl, requestBody, query, requestHeaders) {
