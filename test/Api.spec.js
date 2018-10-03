@@ -43,28 +43,7 @@ describe("API", () => {
       });
     });
   });
-  describe("_flightEndpoints", function() {
-    describe("production env", function() {
-      beforeEach(function() {
-        Api.setEnvironment("production");
-      });
-      it("returns searchHotelsUrl", function() {
-        expect(Api._flightEndpoints.searchTrips()).to.equal(
-          "https://srv.wego.com/v3/metasearch/flights/searches"
-        );
-      });
-    });
-    describe("non production env", function() {
-      beforeEach(function() {
-        Api.setEnvironment("staging");
-      });
-      it("returns searchHotelsUrl", function() {
-        expect(Api._flightEndpoints.searchTrips()).to.equal(
-          "https://srv.wegostaging.com/v3/metasearch/flights/searches"
-        );
-      });
-    });
-  });
+
   describe("buildUrl", function() {
     it("build url when query value type is primitive", () => {
       var uri = "url";
