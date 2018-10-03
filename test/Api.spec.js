@@ -8,17 +8,17 @@ describe("API", () => {
       });
       it("returns searchHotelsUrl", function() {
         expect(Api._hotelEndpoints.searchHotelsUrl()).to.equal(
-          "https://srv.wego.com/v2/metasearch/hotels/searches"
+          "https://srv.wego.com/v3/metasearch/hotels/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
         expect(Api._hotelEndpoints.fetchHotelsUrl("searchId12312")).to.equal(
-          "https://srv.wego.com/v2/metasearch/hotels/searches/searchId12312/results"
+          "https://srv.wego.com/v3/metasearch/hotels/searches/searchId12312/results"
         );
       });
       it("returns searchSingleHotelUrl", function() {
         expect(Api._hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
-          "https://srv.wego.com/v2/metasearch/hotels/9001/searches"
+          "https://srv.wego.com/v3/metasearch/hotels/9001/searches"
         );
       });
       it("returns hotelDetailsUrl", function() {
@@ -33,17 +33,17 @@ describe("API", () => {
       });
       it("returns searchHotelsUrl", function() {
         expect(Api._hotelEndpoints.searchHotelsUrl()).to.equal(
-          "https://srv.wegostaging.com/v2/metasearch/hotels/searches"
+          "https://srv.wegostaging.com/v3/metasearch/hotels/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
         expect(Api._hotelEndpoints.fetchHotelsUrl("searchId12312")).to.equal(
-          "https://srv.wegostaging.com/v2/metasearch/hotels/searches/searchId12312/results"
+          "https://srv.wegostaging.com/v3/metasearch/hotels/searches/searchId12312/results"
         );
       });
       it("returns searchSingleHotelUrl", function() {
         expect(Api._hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
-          "https://srv.wegostaging.com/v2/metasearch/hotels/9001/searches"
+          "https://srv.wegostaging.com/v3/metasearch/hotels/9001/searches"
         );
       });
       it("returns hotelDetailsUrl", function() {
@@ -60,12 +60,12 @@ describe("API", () => {
       });
       it("returns searchHotelsUrl", function() {
         expect(Api._flightEndpoints.searchTrips()).to.equal(
-          "https://srv.wego.com/v2/metasearch/flights/searches"
+          "https://srv.wego.com/v3/metasearch/flights/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
         expect(Api._flightEndpoints.fetchTrips("searchId12312")).to.equal(
-          "https://srv.wego.com/v2/metasearch/flights/searches/searchId12312/results"
+          "https://srv.wego.com/v3/metasearch/flights/searches/searchId12312/results"
         );
       });
     });
@@ -75,12 +75,12 @@ describe("API", () => {
       });
       it("returns searchHotelsUrl", function() {
         expect(Api._flightEndpoints.searchTrips()).to.equal(
-          "https://srv.wegostaging.com/v2/metasearch/flights/searches"
+          "https://srv.wegostaging.com/v3/metasearch/flights/searches"
         );
       });
       it("returns fetchHotelsUrl", function() {
         expect(Api._flightEndpoints.fetchTrips("searchId12312")).to.equal(
-          "https://srv.wegostaging.com/v2/metasearch/flights/searches/searchId12312/results"
+          "https://srv.wegostaging.com/v3/metasearch/flights/searches/searchId12312/results"
         );
       });
     });
