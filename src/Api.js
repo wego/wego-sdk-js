@@ -13,10 +13,6 @@ var Api = {
   },
 
   _hotelEndpoints: {
-    searchSingleHotelUrl: function(hotelId) {
-      var path = "/metasearch/hotels/" + hotelId + "/searches";
-      return Api.getHost("v3") + path;
-    },
     hotelDetailsUrl: function (hotelId) {
       return Api.getHost("v1") + "/hotels/hotels/" + hotelId;
     }
@@ -65,10 +61,9 @@ var Api = {
     return self.get(url, query || {}, requestHeaders);
   },
 
-  searchHotel: function (requestBody, query) {
-    var hotelId = requestBody.search.hotelId,
-      uri = this._hotelEndpoints.searchSingleHotelUrl(hotelId);
-    return this.post(requestBody, uri, query);
+  searchHotel: function (hotelDetailsEndpointUrl, requestBody, query, requestHeaders) {
+    let url = `${hotelDetailsEndpointUrl}/${requestBody.search.hotelId}/searches`;
+    return this.post(requestBody, url, query, requestHeaders);
   },
 
   fetchHotelDetails: function (hotelId, query) {
