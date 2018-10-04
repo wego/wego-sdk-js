@@ -123,7 +123,7 @@ describe("FlightSearchClient", function() {
     });
 
     client.updateSort({
-      by: "OUTBOUND_DEPARTURE_TIME",
+      by: "LEG1_DEPARTURE_TIME",
       order: "DESC"
     });
 
@@ -146,12 +146,12 @@ describe("FlightSearchClient", function() {
 
     var trip1 = {
       id: 1,
-      stopCode: "DIRECT"
+      stopCode: 0
     };
 
     var trip2 = {
       id: 2,
-      stopCode: "ONE_STOP"
+      stopCode: 1
     };
 
     client.mergeResponse({
@@ -169,7 +169,7 @@ describe("FlightSearchClient", function() {
     });
 
     client.updateFilter({
-      stopCodes: ["ONE_STOP"]
+      stopCodes: [1]
     });
 
     var tripIds = trips.map(function(trip) {
@@ -194,7 +194,7 @@ describe("FlightSearchClient", function() {
 
     var trip = {
       id: 1,
-      stopCode: "DIRECT"
+      stopCode: 0
     };
 
     client.handleSearchResponse({
@@ -238,7 +238,7 @@ describe("FlightSearchClient", function() {
   describe("#searchTrips", function() {
     it("start poller", function() {
       client.poller.timer = null;
-      client.searchTrips({});
+      client.searchTrips({legs: [1,2,3]});
       expect(client.poller.timer).not.equal(null);
     });
   });

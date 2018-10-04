@@ -15,14 +15,15 @@ module.exports = {
 
     function getDepartureTime(legIndex) {
       return function(trip) {
-        return trip.legs[legIndex].departureTimeMinutes;
+        var leg = trip.legs[legIndex];
+        return leg && leg.departureTimeMinutes;
       }
     }
 
     function getArrivalTime(legIndex) {
       return function(trip) {
         var leg = trip.legs[legIndex];
-        return leg.arrivalTimeMinutes + leg.durationDays * 24 * 60;
+        return leg && (leg.arrivalTimeMinutes + leg.durationDays * 24 * 60);
       }
     }
 
@@ -33,12 +34,16 @@ module.exports = {
     var getterMap = {
       PRICE: getBestFare,
       DURATION: getDuration,
-      OUTBOUND_DEPARTURE_TIME: getDepartureTime(0),
-      INBOUND_DEPARTURE_TIME: getDepartureTime(1),
-      OUTBOUND_ARRIVAL_TIME: getArrivalTime(0),
-      INBOUND_ARRIVAL_TIME: getArrivalTime(1),
       SCORE: getScore,
     };
+
+    // changed OUTBOUND_DEPARTURE_TIME to LEG1_DEPARTURE_TIME
+    //  and INBOUND_DEPARTURE_TIME to LEG2_DEPARTURE_TIME
+    // Max 6 legs for now
+    for(var i=0; i<6; i++) {
+      getterMap['LEG' + (i+1) + '_DEPARTURE_TIME'] = getDepartureTime(i);
+      getterMap['LEG' + (i+1) + '_ARRIVAL_TIME'] = getArrivalTime(i);
+    }
 
     var propertyGetter = getterMap[sort.by] || function() {};
     var clonedTrips = utils.cloneArray(trips);

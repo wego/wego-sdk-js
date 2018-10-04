@@ -65,12 +65,12 @@ function filterByStopoverOptions(trip, stopoverOptions) {
 }
 
 function filterByItineraryOptions(trip, itineraryOptions) {
-  if (!itineraryOptions) return true;
-  for (var i = 0; i < itineraryOptions.length; i++) {
-    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
-    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
+  if (!itineraryOptions) return true;  
+  for (var i = itineraryOptions.length; i--;) {
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
   }
-  return false;
+  return true;
 }
 
 function filterByRanges(trip, ranges, field) {
@@ -138,33 +138,82 @@ module.exports = {
   passFareConditions: function(value) {
     this.fareConditions = value;
   },
-  filterTrips: function(trips, filter) {
+  filterTrips: function(trips, filter, multiCity) {
     if (!filter) return trips;
     var self = this;
-    var stopCodeMap = utils.arrayToMap(filter.stopCodes);
-    var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
-    var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
+    var stopCodes = filter.stopCodes;
+    var stopCodeMap = utils.arrayToMaps(stopCodes, multiCity);
+    var airlineCodeMap = utils.arrayToMaps(filter.airlineCodes, multiCity);
+    var allianceCodeMap = utils.arrayToMaps(filter.allianceCodes, multiCity);
     var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
     var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
-
+    var stopoverAirportCodesMap = multiCity && utils.arrayToMaps(filter.stopoverAirportCodes, multiCity);
+    var itineraryOptionsMap = multiCity && utils.arrayToMaps(filter.itineraryOptions, multiCity);
+    var stopoverRanges = filter.stopoverDurationMinutesRanges;
+    
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
     var providerFilter = {providerCodeMap, providerTypes};
+
     var filteredTrips = trips.filter(function(trip) {
-      return filterByPrice(trip, filter.priceRange)
-        && utils.filterByKey(trip.stopCode, stopCodeMap)
+      if(!filterByPrice(trip, filter.priceRange)) return false;
+
+      if( multiCity ) {
+        var legs = trip.legs, legsCount = legs.length;
+
+        for(var i=0; i<legsCount; i++) {
+          var leg = legs[i];
+
+          // if filter on this leg applied and leg's stopCode not selected
+          if(stopCodeMap && stopCodeMap[i] && !stopCodeMap[i][leg.stopCode]) {
+            return false;
+          }
+
+          let filterByAll = (map, legCodes) => {
+            var mapCodes = map && Object.keys(map[i] || {});
+            var mapCodesLength = mapCodes && mapCodes.length;
+            if( mapCodesLength ) {
+              var found = false;
+              for(var j = mapCodesLength; !found && j && j--;) {
+                found = legCodes.indexOf(mapCodes[j]) >= 0;
+              }
+              if( !found ) return false;
+            }
+            return true;
+          }
+
+          // filter each leg by airline codes
+          if( !filterByAll(airlineCodeMap, leg.airlineCodes) ) return false;
+
+          // filter each leg by alliance codes
+          if( !filterByAll(allianceCodeMap, leg.allianceCodes) ) return false;
+          
+          // filter each leg by stopover codes
+          if( !filterByAll(stopoverAirportCodesMap, leg.stopoverAirportCodes) ) return false;
+
+          // itinerary options for each leg (no overnight & short stopovers)
+          var itineraryOptions = itineraryOptionsMap && Object.keys(itineraryOptionsMap[i] || {});
+          if( !filterByItineraryOptions(leg, itineraryOptions) ) return false;
+          
+          if( !filterByRanges(trip, stopoverRanges, 'stopoverDurationMinutes') ) return false;
+
+        } // end for
+
+      } // end if multiCity
+
+      return (multiCity || utils.filterByKey(trip.stopCode, stopCodeMap))
         && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
         && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
-        && filterByAirlines(trip, airlineCodeMap)
-        && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
+        && (multiCity || filterByAirlines(trip, airlineCodeMap))
+        && (multiCity || utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap))
         && filterByTripOptions(trip, filter.tripOptions)
         && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
         && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
-        && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
+        && (multiCity || utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes))
         && filterByStopoverOptions(trip, filter.stopoverOptions)
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
-        && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
-        && filterByItineraryOptions(trip, filter.itineraryOptions)
+        && (multiCity || utils.filterByRange(trip.stopoverDurationMinutes, stopoverRanges && stopoverRanges[0]))
+        && (multiCity || filterByItineraryOptions(trip, filter.itineraryOptions))
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
