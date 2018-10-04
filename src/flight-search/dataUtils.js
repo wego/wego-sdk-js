@@ -7,26 +7,23 @@ module.exports = {
 
     trip.legIdMap = {};
 
-    legs.forEach(function(leg) {
-      trip.legIdMap[leg.id] = true;
+    legs.forEach(function(leg, index) {
+      trip.legIdMap[index + leg.id] = true;
     });
 
     var firstLeg = legs[0];
 
-    function getStopCode(legs) {
+    function setStopCodes(trip, legs) {
       var maxStopsCount = 0;
+      var getStopCode = length => Math.min(length, 2);
+
       legs.forEach(function(leg) {
-        maxStopsCount = Math.max(maxStopsCount, leg.stopoversCount);
+        var stopoversCount = leg.stopoversCount;
+        maxStopsCount = Math.max(maxStopsCount, stopoversCount);
+        leg.stopCode = getStopCode(stopoversCount);
       });
 
-      switch (maxStopsCount) {
-        case 0:
-          return 'DIRECT';
-        case 1:
-          return 'ONE_STOP';
-        default:
-          return 'MORE_THAN_ONE_STOP';
-      }
+      trip.stopCode = getStopCode(maxStopsCount);
     }
 
     function hasOvernightLeg(legs) {
@@ -126,7 +123,7 @@ module.exports = {
       return codes;
     }
 
-    trip.stopCode = getStopCode(legs);
+    setStopCodes(trip, legs);
 
     trip.airlineCodes = concatListsToList(legs.map(function(leg){
       return leg.airlineCodes;

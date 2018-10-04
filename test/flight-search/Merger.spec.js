@@ -510,18 +510,18 @@ describe('FlightSearchMerger', function() {
 
     it('inserting new option in alphabet sorted order', function() {
       var option1 = {
-        code: 1,
-        count: 5
+        code: '1',
+        count: '5'
       };
 
       var option2 = {
-        code: 2,
-        count: 7
+        code: '2',
+        count: '7'
       };
 
       var option3 = {
-        code: 3,
-        count: 7
+        code: '3',
+        count: '7'
       };
 
       merger.__staticData.airlines = {
@@ -549,7 +549,7 @@ describe('FlightSearchMerger', function() {
       });
 
       var filter = merger.getFilter();
-      expect(filter.airlines[1].code).to.equal(3);
+      expect(filter.airlines[1].code).to.equal('3');
     });
 
     it('airlines', function() {

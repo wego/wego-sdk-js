@@ -106,19 +106,19 @@ describe('filtering', function() {
 
     it('filtering by stopCodes', function() {
       var trip1 = {
-        stopCode: 'DIRECT'
+        stopCode: 0 //'DIRECT'
       };
 
       var trip2 = {
-        stopCode: 'ONE_STOP',
+        stopCode: 1,
       };
 
       var trip3 = {
-        stopCode: 'DIRECT',
+        stopCode: 0,
       };
 
       var filter = {
-        stopCodes: ['DIRECT'],
+        stopCodes: [0],
       };
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
@@ -457,7 +457,7 @@ describe('filtering', function() {
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip2, trip3]);
     });
 
-    it('filtering by stopoverDurationMinutesRange', function() {
+    it('filtering by stopoverDurationMinutesRanges', function() {
       var trip1 = {
         stopoverDurationMinutes: 20,
       };
@@ -471,10 +471,10 @@ describe('filtering', function() {
       };
 
       var filter = {
-        stopoverDurationMinutesRange: {
+        stopoverDurationMinutesRanges: [{
           min: 7,
           max: 22,
-        }
+        }]
       };
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
@@ -483,27 +483,27 @@ describe('filtering', function() {
     it('filtering by legIds', function() {
       var trip1 = {
         legIdMap: {
-          2: true,
-          3: true,
+          '2': true,
+          '3': true,
         }
       };
 
       var trip2 = {
         legIdMap: {
-          1: true,
-          4: true,
+          '1': true,
+          '4': true,
         }
       };
 
       var trip3 = {
         legIdMap: {
-          1: true,
-          5: true,
+          '1': true,
+          '5': true,
         }
       };
 
       var filter = {
-        legIds: [1],
+        legIds: ['1'],
       };
 
       expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip2, trip3]);

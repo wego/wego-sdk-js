@@ -87,6 +87,7 @@ var utils = {
     return clonedArr;
   },
 
+  // Get array of values from map
   mapValues: function(obj) {
     return Object.keys(obj).map(function(key) {
       return obj[key];
@@ -137,9 +138,13 @@ var utils = {
     return this.stripAccents(text).toLowerCase().indexOf(this.stripAccents(query).toLowerCase()) > -1;
   },
 
+  // Filter by range, min/max undefined means unset
+  // value: 10  range: {min: 8, max: undefined}  = true
   filterByRange: function(value, range) {
     if (!range) return true;
-    return range.min <= value && value <= range.max;
+    var undef, min = range.min === undef ? 0 : range.min;
+    var max = range.max === undef ? (1 << 30) : range.max;
+    return min <= value && value <= max;
   },
 
   arrayToMap: function(items) {
@@ -147,6 +152,18 @@ var utils = {
     var map = {};
     items.forEach(function(item) {
       map[item] = true;
+    });
+    return map;
+  },
+
+  arrayToMaps: function(items, multiCity) {
+    if( !multiCity ) return this.arrayToMap(items);
+    if (!items || items.length === 0) return null;
+    var map = {};
+    items.forEach(function(item) {
+      var legPrefix = item[0]-1, code = item.substr(2);
+      map[legPrefix] = map[legPrefix] || {};
+      map[legPrefix][code] = true;
     });
     return map;
   },
@@ -611,30 +628,28 @@ var Poller = __webpack_require__(2);
 var FlightSearchClient = function(options) {
   var self = this;
   options = options || {};
-  this.currency = options.currency || {};
-  this.locale = options.locale;
-  this.siteCode = options.siteCode;
-  this.deviceType = options.deviceType || "DESKTOP";
-  this.appType = options.appType || "WEB_APP";
-  this.userLoggedIn = options.userLoggedIn;
-  this.paymentMethodIds = options.paymentMethodIds || [];
-  this.providerTypes = options.providerTypes || [];
-  this.onProgressChanged = options.onProgressChanged || function() {};
-  this.onTripsChanged = options.onTripsChanged || function() {};
-  this.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
-  this.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
-  this.onFastestTripChanged = options.onFastestTripChanged || function() {};
-  this.onBestExperienceTripChanged =
+  self.currency = options.currency || {};
+  self.locale = options.locale;
+  self.siteCode = options.siteCode;
+  self.deviceType = options.deviceType || "DESKTOP";
+  self.appType = options.appType || "WEB_APP";
+  self.userLoggedIn = options.userLoggedIn;
+  self.paymentMethodIds = options.paymentMethodIds || [];
+  self.providerTypes = options.providerTypes || [];
+  self.onProgressChanged = options.onProgressChanged || function() {};
+  self.onTripsChanged = options.onTripsChanged || function() {};
+  self.onTotalTripsChanged = options.onTotalTripsChanged || function() {};
+  self.onCheapestTripChanged = options.onCheapestTripChanged || function() {};
+  self.onFastestTripChanged = options.onFastestTripChanged || function() {};
+  self.onBestExperienceTripChanged =
     options.onBestExperienceTripChanged || function() {};
-  this.onDisplayedFilterChanged =
+  self.onDisplayedFilterChanged =
     options.onDisplayedFilterChanged || function() {};
-  this.onSearchCreated = options.onSearchCreated || function() {};
+  self.onSearchCreated = options.onSearchCreated || function() {};
 
-  this.merger = new FlightSearchMerger();
+  self.merger = new FlightSearchMerger();
 
-  this.poller = new Poller({
-    delays: [0, 1000, 3000, 4000, 5000, 6000, 6000, 6000],
-    pollLimit: 7,
+  self.poller = new Poller({
     initCallApi: function() {
       return Api.searchTrips(self.getSearchRequestBody(), {
         currencyCode: self.currency.code,
@@ -648,15 +663,36 @@ var FlightSearchClient = function(options) {
       return self.handleSearchResponse(response);
     }
   });
-  this.reset();
+  self.reset();
 };
 
 FlightSearchClient.prototype = {
   searchTrips: function(search) {
-    this.search = search;
-    this.reset();
-    this.updateResult();
-    this.poller.start();
+    var self = this;
+    self.search = search;
+    self.reset();
+
+    // determine whether multi city 
+    var legs = search.legs;
+    var multiCity = legs.length > 2;        
+    // 2 legs can still be multi city
+    if( legs.length === 2 ) {
+      var p = ['departureCityCode', 'departureAirportCode', 'arrivalCityCode', 'arrivalAirportCode'];
+      let sameLocations = (a, b) => a === b || (a[p[0]] === b[p[2]] && a[p[1]] === b[p[3]]);
+      if( !sameLocations(legs[0], legs[1]) ) multiCity = true;
+    }
+    self.multiCity = multiCity;
+    self.merger.multiCity = multiCity;
+
+    var poller = self.poller;
+    poller.delays = (multiCity ? 
+                      [0, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6] : 
+                      [0, 1, 3, 4, 5, 6, 6, 6]
+                    ).map(v => v*1000);
+    poller.pollLimit = poller.delays.length - 1;
+
+    self.updateResult();
+    poller.start();
   },
 
   handleSearchResponse: function(response) {
@@ -666,9 +702,10 @@ FlightSearchClient.prototype = {
   },
 
   mergeResponse: function(response) {
-    this.merger.mergeResponse(response);
-    this.processedFaresCount = response.count;
-    this.responseSearch = response.search;
+    var self = this, merger = self.merger;
+    merger.mergeResponse(response);
+    self.processedFaresCount = response.count;
+    self.responseSearch = response.search;
   },
 
   reset: function() {
@@ -709,28 +746,28 @@ FlightSearchClient.prototype = {
   },
 
   updateResult: function() {
-    var trips = this.merger.getTrips();
+    var self = this, trips = self.merger.getTrips();
 
-    if (Object.keys(this.merger.getLegConditions()).length !== 0) {
-      filtering.passLegConditions(this.merger.getLegConditions());
+    if (Object.keys(self.merger.getLegConditions()).length !== 0) {
+      filtering.passLegConditions(self.merger.getLegConditions());
     }
 
-    if (Object.keys(this.merger.getFareConditions()).length !== 0) {
-      filtering.passFareConditions(this.merger.getFareConditions());
+    if (Object.keys(self.merger.getFareConditions()).length !== 0) {
+      filtering.passFareConditions(self.merger.getFareConditions());
     }
 
-    var filteredTrips = filtering.filterTrips(trips, this.filter);
-    var sortedTrips = sorting.sortTrips(filteredTrips, this.sort);
+    var filteredTrips = filtering.filterTrips(trips, self.filter, self.multiCity);
+    var sortedTrips = sorting.sortTrips(filteredTrips, self.sort);
 
-    this.onTripsChanged(sortedTrips);
-    this.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
-    this.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
-    this.onBestExperienceTripChanged(
+    self.onTripsChanged(sortedTrips);
+    self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
+    self.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
+    self.onBestExperienceTripChanged(
       sorting.getBestExperienceTrip(filteredTrips)
     );
-    this.onTotalTripsChanged(trips);
-    this.onDisplayedFilterChanged(this.merger.getFilter());
-    this.onProgressChanged(this.poller.getProgress());
+    self.onTotalTripsChanged(trips);
+    self.onDisplayedFilterChanged(self.merger.getFilter());
+    self.onProgressChanged(self.poller.getProgress());
   },
 
   getSearchRequestBody: function() {
@@ -1116,17 +1153,19 @@ var FlightSearchMerger = function(options) {
 
 FlightSearchMerger.prototype = {
   mergeResponse: function(response) {
-    var updatedTripIds = this._getUpdatedTripIds(response);
+    var self = this, 
+        updatedTripIds = self._getUpdatedTripIds(response),
+        legs = response.legs;
+    
+    self._mergeStaticData(response);
+    self._mergeLegs(legs);
+    self._mergeLegConditions(response.legConditionIds);
+    self._mergeTrips(response.trips);
+    self._mergeFilter(response.filters);
+    self._mergeScores(response.scores);
+    self._mergeFares(response.fares);
 
-    this._mergeStaticData(response);
-    this._mergeLegs(response.legs);
-    this._mergeLegConditions(response.legConditionIds);
-    this._mergeTrips(response.trips);
-    this._mergeFilter(response.filters);
-    this._mergeScores(response.scores);
-    this._mergeFares(response.fares);
-
-    this._cloneTrips(updatedTripIds);
+    self._cloneTrips(updatedTripIds);
   },
 
   reset: function() {
@@ -1155,20 +1194,20 @@ FlightSearchMerger.prototype = {
   },
 
   updateCurrency: function(currency) {
-    this.currency = currency;
     var self = this;
+    self.currency = currency;
 
-    var tripMap = this.__tripMap;
+    var tripMap = self.__tripMap;
     for (var tripId in tripMap) {
       tripMap[tripId].fares.forEach(function(fare) {
         fare.price = dataUtils.convertPrice(fare.price, currency);
         fare.paymentFees = dataUtils.convertPaymentFees(fare.paymentFees, currency);
       });
     }
-    this._cloneTrips(Object.keys(tripMap));
+    self._cloneTrips(Object.keys(tripMap));
 
-    var filter = this.__filter;
-    this.__filterOptionTypes.forEach(function(type) {
+    var filter = self.__filter;
+    self.__filterOptionTypes.forEach(function(type) {
       var optionMap = self.__filterOptionsMap[type];
       for (var code in optionMap) {
         var option = optionMap[code];
@@ -1179,7 +1218,7 @@ FlightSearchMerger.prototype = {
     });
     filter.minPrice = dataUtils.convertPrice(filter.minPrice, currency);
     filter.maxPrice = dataUtils.convertPrice(filter.maxPrice, currency);
-    this._cloneFilter();
+    self._cloneFilter();
   },
 
   _mergeStaticData: function(response) {
@@ -1281,39 +1320,58 @@ FlightSearchMerger.prototype = {
 
   _mergeFilter: function(newFilter) {
     if (!newFilter) return;
-    var self = this;
+    var self = this, 
+        filter = self.__filter, 
+        multiCity = self.multiCity,
+        newFilterLegs = newFilter.legs;
 
-    var filter = this.__filter;
-
-    if (newFilter.legs) {
-      newFilter.legs.forEach(function(leg) {
+    if (newFilterLegs) {
+      newFilterLegs.forEach(function(leg) {
         dataUtils.prepareLegFilter(leg, self.__staticData);
       });
-      filter.legs = newFilter.legs;
+      filter.legs = newFilterLegs;
     }
 
     if (newFilter.minPrice) {
-      filter.minPrice = dataUtils.convertPrice(newFilter.minPrice, this.currency);
+      filter.minPrice = dataUtils.convertPrice(newFilter.minPrice, self.currency);
     }
 
     if (newFilter.maxPrice) {
-      filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, this.currency);
+      filter.maxPrice = dataUtils.convertPrice(newFilter.maxPrice, self.currency);
     }
 
     if (newFilter.stopoverDurations) {
       filter.stopoverDurations = newFilter.stopoverDurations;
     }
 
-    this.__filterOptionTypes.forEach(function(type) {
-      var options = newFilter[type] || [];
-      options.forEach(function(option) {
-        dataUtils.prepareFilterOption(option, type, self.currency, self.__staticData);
-        self.__filterOptionsMap[type][option.code] = option;
-      });
+    var stopCodesMap = {'DIRECT': 0, 'ONE_STOP': 1, 'MORE_THAN_ONE_STOP': 2};    
+
+    self.__filterOptionTypes.forEach(type => {
+
+      let buildOptions = (options, legIndex) => {
+        options && options.forEach(option => {
+          var isByLeg = legIndex >= 0;
+          if( type === 'stops' ) option.code = stopCodesMap[option.code];
+          var code = (isByLeg ? (legIndex+1) + '_' : '') + option.code;
+          dataUtils.prepareFilterOption(option, type, self.currency, self.__staticData);
+          self.__filterOptionsMap[type][code] = option;
+          option.code = code;
+          isByLeg && (option.legIndex = legIndex);
+        });
+      }
+
+      if( multiCity && newFilterLegs ) {
+        for(var i=newFilterLegs.length; i--;) {
+          buildOptions(newFilterLegs[i][type], i);
+        }
+      }
+      else {
+        buildOptions(newFilter[type]);
+      }
       self._buildFilterOptions(type);
     });
 
-    this._cloneFilter();
+    self._cloneFilter();
   },
 
   _getUpdatedTripIds: function(response) {
@@ -1356,17 +1414,24 @@ FlightSearchMerger.prototype = {
   },
 
   _buildFilterOptions: function(type) {
-    this.__filter[type] = utils.mapValues(this.__filterOptionsMap[type]);
-    this.__filter[type].sort(function(option1, option2) {
+    var self = this, values = utils.mapValues(self.__filterOptionsMap[type]);
+    values.sort((option1, option2) => {
       if (type === 'stops') {
-        var codes = ['DIRECT','ONE_STOP', 'MORE_THAN_ONE_STOP'];
-        return codes.indexOf(option1.code) - codes.indexOf(option2.code);
+        var code1 = option1.code, code2 = option2.code;
+
+        // multi city has leg prefix. i.e: '1_0' (leg 0 direct), '3_1' (leg 2 one stop)
+        if( self.multiCity ) {
+          code1 = code1.substr(2);
+          code2 = code2.substr(2);
+        }
+        return code1 - code2;
       } else {
         if (option1.name < option2.name) return -1;
         else if (option1.name === option2.name) return 0;
         else return 1;
       }
     });
+    self.__filter[type] = values;
   },
 
   _getEmptyFilter: function() {
@@ -1438,26 +1503,23 @@ module.exports = {
 
     trip.legIdMap = {};
 
-    legs.forEach(function(leg) {
-      trip.legIdMap[leg.id] = true;
+    legs.forEach(function(leg, index) {
+      trip.legIdMap[index + leg.id] = true;
     });
 
     var firstLeg = legs[0];
 
-    function getStopCode(legs) {
+    function setStopCodes(trip, legs) {
       var maxStopsCount = 0;
+      var getStopCode = length => Math.min(length, 2);
+
       legs.forEach(function(leg) {
-        maxStopsCount = Math.max(maxStopsCount, leg.stopoversCount);
+        var stopoversCount = leg.stopoversCount;
+        maxStopsCount = Math.max(maxStopsCount, stopoversCount);
+        leg.stopCode = getStopCode(stopoversCount);
       });
 
-      switch (maxStopsCount) {
-        case 0:
-          return 'DIRECT';
-        case 1:
-          return 'ONE_STOP';
-        default:
-          return 'MORE_THAN_ONE_STOP';
-      }
+      trip.stopCode = getStopCode(maxStopsCount);
     }
 
     function hasOvernightLeg(legs) {
@@ -1557,7 +1619,7 @@ module.exports = {
       return codes;
     }
 
-    trip.stopCode = getStopCode(legs);
+    setStopCodes(trip, legs);
 
     trip.airlineCodes = concatListsToList(legs.map(function(leg){
       return leg.airlineCodes;
@@ -1805,12 +1867,12 @@ function filterByStopoverOptions(trip, stopoverOptions) {
 }
 
 function filterByItineraryOptions(trip, itineraryOptions) {
-  if (!itineraryOptions) return true;
-  for (var i = 0; i < itineraryOptions.length; i++) {
-    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && !trip.overnight) return true;
-    if (itineraryOptions[i] === 'SHORT_STOPOVER' && !trip.longStopover) return true;
+  if (!itineraryOptions) return true;  
+  for (var i = itineraryOptions.length; i--;) {
+    if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
+    if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
   }
-  return false;
+  return true;
 }
 
 function filterByRanges(trip, ranges, field) {
@@ -1878,33 +1940,82 @@ module.exports = {
   passFareConditions: function(value) {
     this.fareConditions = value;
   },
-  filterTrips: function(trips, filter) {
+  filterTrips: function(trips, filter, multiCity) {
     if (!filter) return trips;
     var self = this;
-    var stopCodeMap = utils.arrayToMap(filter.stopCodes);
-    var airlineCodeMap = utils.arrayToMap(filter.airlineCodes);
-    var allianceCodeMap = utils.arrayToMap(filter.allianceCodes);
+    var stopCodes = filter.stopCodes;
+    var stopCodeMap = utils.arrayToMaps(stopCodes, multiCity);
+    var airlineCodeMap = utils.arrayToMaps(filter.airlineCodes, multiCity);
+    var allianceCodeMap = utils.arrayToMaps(filter.allianceCodes, multiCity);
     var originAirportCodeMap = utils.arrayToMap(filter.originAirportCodes);
     var destinationAirportCodeMap = utils.arrayToMap(filter.destinationAirportCodes);
-
+    var stopoverAirportCodesMap = multiCity && utils.arrayToMaps(filter.stopoverAirportCodes, multiCity);
+    var itineraryOptionsMap = multiCity && utils.arrayToMaps(filter.itineraryOptions, multiCity);
+    var stopoverRanges = filter.stopoverDurationMinutesRanges;
+    
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
     var providerFilter = {providerCodeMap, providerTypes};
+
     var filteredTrips = trips.filter(function(trip) {
-      return filterByPrice(trip, filter.priceRange)
-        && utils.filterByKey(trip.stopCode, stopCodeMap)
+      if(!filterByPrice(trip, filter.priceRange)) return false;
+
+      if( multiCity ) {
+        var legs = trip.legs, legsCount = legs.length;
+
+        for(var i=0; i<legsCount; i++) {
+          var leg = legs[i];
+
+          // if filter on this leg applied and leg's stopCode not selected
+          if(stopCodeMap && stopCodeMap[i] && !stopCodeMap[i][leg.stopCode]) {
+            return false;
+          }
+
+          let filterByAll = (map, legCodes) => {
+            var mapCodes = map && Object.keys(map[i] || {});
+            var mapCodesLength = mapCodes && mapCodes.length;
+            if( mapCodesLength ) {
+              var found = false;
+              for(var j = mapCodesLength; !found && j && j--;) {
+                found = legCodes.indexOf(mapCodes[j]) >= 0;
+              }
+              if( !found ) return false;
+            }
+            return true;
+          }
+
+          // filter each leg by airline codes
+          if( !filterByAll(airlineCodeMap, leg.airlineCodes) ) return false;
+
+          // filter each leg by alliance codes
+          if( !filterByAll(allianceCodeMap, leg.allianceCodes) ) return false;
+          
+          // filter each leg by stopover codes
+          if( !filterByAll(stopoverAirportCodesMap, leg.stopoverAirportCodes) ) return false;
+
+          // itinerary options for each leg (no overnight & short stopovers)
+          var itineraryOptions = itineraryOptionsMap && Object.keys(itineraryOptionsMap[i] || {});
+          if( !filterByItineraryOptions(leg, itineraryOptions) ) return false;
+          
+          if( !filterByRanges(trip, stopoverRanges, 'stopoverDurationMinutes') ) return false;
+
+        } // end for
+
+      } // end if multiCity
+
+      return (multiCity || utils.filterByKey(trip.stopCode, stopCodeMap))
         && filterByRanges(trip, filter.departureTimeMinutesRanges, 'departureTimeMinutes')
         && filterByRanges(trip, filter.arrivalTimeMinutesRanges, 'arrivalTimeMinutes')
-        && filterByAirlines(trip, airlineCodeMap)
-        && utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap)
+        && (multiCity || filterByAirlines(trip, airlineCodeMap))
+        && (multiCity || utils.filterByAllKeys(trip.allianceCodes, allianceCodeMap))
         && filterByTripOptions(trip, filter.tripOptions)
         && utils.filterByAllKeys(trip.originAirportCodes, originAirportCodeMap)
         && utils.filterByAllKeys(trip.destinationAirportCodes, destinationAirportCodeMap)
-        && utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes)
+        && (multiCity || utils.filterBySomeKeys(trip.stopoverAirportCodeMap, filter.stopoverAirportCodes))
         && filterByStopoverOptions(trip, filter.stopoverOptions)
         && filterByRanges(trip, filter.durationMinutesRanges, 'durationMinutes')
-        && utils.filterByRange(trip.stopoverDurationMinutes, filter.stopoverDurationMinutesRange)
-        && filterByItineraryOptions(trip, filter.itineraryOptions)
+        && (multiCity || utils.filterByRange(trip.stopoverDurationMinutes, stopoverRanges && stopoverRanges[0]))
+        && (multiCity || filterByItineraryOptions(trip, filter.itineraryOptions))
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
@@ -1937,14 +2048,15 @@ module.exports = {
 
     function getDepartureTime(legIndex) {
       return function(trip) {
-        return trip.legs[legIndex].departureTimeMinutes;
+        var leg = trip.legs[legIndex];
+        return leg && leg.departureTimeMinutes;
       }
     }
 
     function getArrivalTime(legIndex) {
       return function(trip) {
         var leg = trip.legs[legIndex];
-        return leg.arrivalTimeMinutes + leg.durationDays * 24 * 60;
+        return leg && (leg.arrivalTimeMinutes + leg.durationDays * 24 * 60);
       }
     }
 
@@ -1955,12 +2067,16 @@ module.exports = {
     var getterMap = {
       PRICE: getBestFare,
       DURATION: getDuration,
-      OUTBOUND_DEPARTURE_TIME: getDepartureTime(0),
-      INBOUND_DEPARTURE_TIME: getDepartureTime(1),
-      OUTBOUND_ARRIVAL_TIME: getArrivalTime(0),
-      INBOUND_ARRIVAL_TIME: getArrivalTime(1),
       SCORE: getScore,
     };
+
+    // changed OUTBOUND_DEPARTURE_TIME to LEG1_DEPARTURE_TIME
+    //  and INBOUND_DEPARTURE_TIME to LEG2_DEPARTURE_TIME
+    // Max 6 legs for now
+    for(var i=0; i<6; i++) {
+      getterMap['LEG' + (i+1) + '_DEPARTURE_TIME'] = getDepartureTime(i);
+      getterMap['LEG' + (i+1) + '_ARRIVAL_TIME'] = getArrivalTime(i);
+    }
 
     var propertyGetter = getterMap[sort.by] || function() {};
     var clonedTrips = utils.cloneArray(trips);

@@ -15,6 +15,7 @@ var utils = {
     return clonedArr;
   },
 
+  // Get array of values from map
   mapValues: function(obj) {
     return Object.keys(obj).map(function(key) {
       return obj[key];
@@ -65,9 +66,13 @@ var utils = {
     return this.stripAccents(text).toLowerCase().indexOf(this.stripAccents(query).toLowerCase()) > -1;
   },
 
+  // Filter by range, min/max undefined means unset
+  // value: 10  range: {min: 8, max: undefined}  = true
   filterByRange: function(value, range) {
     if (!range) return true;
-    return range.min <= value && value <= range.max;
+    var undef, min = range.min === undef ? 0 : range.min;
+    var max = range.max === undef ? (1 << 30) : range.max;
+    return min <= value && value <= max;
   },
 
   arrayToMap: function(items) {
@@ -75,6 +80,18 @@ var utils = {
     var map = {};
     items.forEach(function(item) {
       map[item] = true;
+    });
+    return map;
+  },
+
+  arrayToMaps: function(items, multiCity) {
+    if( !multiCity ) return this.arrayToMap(items);
+    if (!items || items.length === 0) return null;
+    var map = {};
+    items.forEach(function(item) {
+      var legPrefix = item[0]-1, code = item.substr(2);
+      map[legPrefix] = map[legPrefix] || {};
+      map[legPrefix][code] = true;
     });
     return map;
   },
