@@ -6,16 +6,7 @@ describe("API", () => {
       beforeEach(function() {
         Api.setEnvironment("production");
       });
-      it("returns searchHotelsUrl", function() {
-        expect(Api._hotelEndpoints.searchHotelsUrl()).to.equal(
-          "https://srv.wego.com/v3/metasearch/hotels/searches"
-        );
-      });
-      it("returns searchSingleHotelUrl", function() {
-        expect(Api._hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
-          "https://srv.wego.com/v3/metasearch/hotels/9001/searches"
-        );
-      });
+      
       it("returns hotelDetailsUrl", function() {
         expect(Api._hotelEndpoints.hotelDetailsUrl(9001)).to.equal(
           "https://srv.wego.com/hotels/hotels/9001"
@@ -26,16 +17,7 @@ describe("API", () => {
       beforeEach(function() {
         Api.setEnvironment("staging");
       });
-      it("returns searchHotelsUrl", function() {
-        expect(Api._hotelEndpoints.searchHotelsUrl()).to.equal(
-          "https://srv.wegostaging.com/v3/metasearch/hotels/searches"
-        );
-      });
-      it("returns searchSingleHotelUrl", function() {
-        expect(Api._hotelEndpoints.searchSingleHotelUrl(9001)).to.equal(
-          "https://srv.wegostaging.com/v3/metasearch/hotels/9001/searches"
-        );
-      });
+      
       it("returns hotelDetailsUrl", function() {
         expect(Api._hotelEndpoints.hotelDetailsUrl(9001)).to.equal(
           "https://srv.wegostaging.com/hotels/hotels/9001"

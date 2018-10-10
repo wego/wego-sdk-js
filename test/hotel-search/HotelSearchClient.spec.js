@@ -1,31 +1,33 @@
-var sinon = require("sinon");
-var HotelSearchClient = require("../../src/hotel-search/Client");
+const sinon = require("sinon");
+const HotelSearchClient = require("../../src/hotel-search/HotelSearchClient");
 
-describe("HotelSearchClient", function() {
-  var client;
-  beforeEach(function() {
-    client = new HotelSearchClient();
+describe("HotelSearchClient", function () {
+  const hotelSearchEndpointUrl = 'https://srv.wegostaging.com/v3/metasearch/hotels/searches';
+  let client;
+
+  beforeEach(function () {
+    client = new HotelSearchClient(hotelSearchEndpointUrl);
     mockAjaxCall(client);
   });
 
   function mockAjaxCall(client) {
-    client._callApi = function() {};
+    client._callApi = function () { };
   }
 
-  describe("#reset", function() {
-    it("reset lastRatesCount", function() {
+  describe("#reset", function () {
+    it("reset lastRatesCount", function () {
       client.lastRatesCount = 10;
       client.reset();
       expect(client.lastRatesCount).to.equal(0);
     });
 
-    it("resets poller", function() {
+    it("resets poller", function () {
       client.poller.pollCount = 4;
       client.reset();
       expect(client.poller.pollCount).to.equal(0);
     });
 
-    it("#reset merger", function() {
+    it("#reset merger", function () {
       client.handleSearchResponse({
         brands: [{ id: 1 }]
       });
@@ -35,7 +37,7 @@ describe("HotelSearchClient", function() {
       expect(client.merger.__staticData.brands).to.deep.equal({});
     });
 
-    it("abort last request call", function() {
+    it("abort last request call", function () {
       var abort = sinon.spy();
       client.__abortLastRequest = abort;
       client.reset();
@@ -43,10 +45,10 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  it("#updateSort", function() {
+  it("#updateSort", function () {
     var hotels;
-    var client = new HotelSearchClient({
-      onHotelsChanged: function(_hotels) {
+    var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+      onHotelsChanged: function (_hotels) {
         hotels = _hotels;
       }
     });
@@ -72,17 +74,17 @@ describe("HotelSearchClient", function() {
       order: "DESC"
     });
 
-    var hotelIds = hotels.map(function(hotel) {
+    var hotelIds = hotels.map(function (hotel) {
       return hotel.id;
     });
 
     expect(hotelIds).to.deep.equal([2, 1]);
   });
 
-  it("#updateFilter", function() {
+  it("#updateFilter", function () {
     var hotels;
-    var client = new HotelSearchClient({
-      onHotelsChanged: function(_hotels) {
+    var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+      onHotelsChanged: function (_hotels) {
         hotels = _hotels;
       }
     });
@@ -107,20 +109,20 @@ describe("HotelSearchClient", function() {
       districtIds: [2]
     });
 
-    var hotelIds = hotels.map(function(hotel) {
+    var hotelIds = hotels.map(function (hotel) {
       return hotel.id;
     });
 
     expect(hotelIds).to.deep.equal([2]);
   });
 
-  it("#updateCurrency", function() {
+  it("#updateCurrency", function () {
     var hotels, filter;
-    var client = new HotelSearchClient({
-      onHotelsChanged: function(_hotels) {
+    var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+      onHotelsChanged: function (_hotels) {
         hotels = _hotels;
       },
-      onDisplayedFilterChanged: function(_filter) {
+      onDisplayedFilterChanged: function (_filter) {
         filter = _filter;
       }
     });
@@ -153,16 +155,16 @@ describe("HotelSearchClient", function() {
     expect(hotels[0].rates[0].price.amount).to.equal(200);
   });
 
-  describe("#searchHotels", function() {
-    it("start poller", function() {
+  describe("#searchHotels", function () {
+    it("start poller", function () {
       client.poller.timer = null;
       client.searchHotels({});
       expect(client.poller.timer).not.equal(null);
     });
   });
 
-  describe("#handleSearchResponse", function() {
-    it("update lastRatesCount", function() {
+  describe("#handleSearchResponse", function () {
+    it("update lastRatesCount", function () {
       var lastRatesCount = 10;
 
       client.handleSearchResponse({
@@ -172,12 +174,12 @@ describe("HotelSearchClient", function() {
       expect(client.lastRatesCount).to.equal(lastRatesCount);
     });
 
-    it("onDisplayedFilterChanged", function() {
+    it("onDisplayedFilterChanged", function () {
       var price = {};
       var displayedFilter;
 
-      var client = new HotelSearchClient({
-        onDisplayedFilterChanged: function(filter) {
+      var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+        onDisplayedFilterChanged: function (filter) {
           displayedFilter = filter;
         }
       });
@@ -193,15 +195,15 @@ describe("HotelSearchClient", function() {
       expect(displayedFilter.minPrice).to.equal(price);
     });
 
-    it("onHotelsChanged", function() {
+    it("onHotelsChanged", function () {
       var hotel = {
         id: 1
       };
 
       var hotels;
 
-      client = new HotelSearchClient({
-        onHotelsChanged: function(_hotels) {
+      client = new HotelSearchClient(hotelSearchEndpointUrl, {
+        onHotelsChanged: function (_hotels) {
           hotels = _hotels;
         }
       });
@@ -218,7 +220,7 @@ describe("HotelSearchClient", function() {
         ]
       });
 
-      var hotelIds = hotels.map(function(hotel) {
+      var hotelIds = hotels.map(function (hotel) {
         return hotel.id;
       });
       expect(hotelIds).to.deep.equal([1]);
@@ -227,7 +229,7 @@ describe("HotelSearchClient", function() {
     it("onDestinationInfoChanged", function () {
       var destinationInfo;
 
-      client = new HotelSearchClient({
+      client = new HotelSearchClient(hotelSearchEndpointUrl, {
         onDestinationInfoChanged: function (_destinationInfo) {
           destinationInfo = _destinationInfo;
         }
@@ -245,7 +247,7 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  describe("#getSearchRequestBody", function() {
+  describe("#getSearchRequestBody", function () {
     var lastRatesCount = 10,
       locale = "en",
       currencyCode = "currencyCode",
@@ -266,7 +268,7 @@ describe("HotelSearchClient", function() {
       responseSearch = {
         id: searchId
       },
-      client = new HotelSearchClient({
+      client = new HotelSearchClient(hotelSearchEndpointUrl, {
         siteCode: siteCode,
         deviceType: deviceType,
         appType: appType,
@@ -287,7 +289,7 @@ describe("HotelSearchClient", function() {
     client.responseSearch = responseSearch;
     client.lastRatesCount = lastRatesCount;
 
-    it("passes the correct parameters", function() {
+    it("passes the correct parameters", function () {
       var requestBody = client.getSearchRequestBody(),
         requestSearch = requestBody.search;
 
@@ -305,7 +307,7 @@ describe("HotelSearchClient", function() {
       expect(requestSearch.appType).to.equal(appType);
     });
 
-    it("allows to pass an array of selectedHotelIds", function() {
+    it("allows to pass an array of selectedHotelIds", function () {
       client.selectedHotelIds = selectedHotelIds;
 
       var requestBody = client.getSearchRequestBody();
@@ -313,7 +315,7 @@ describe("HotelSearchClient", function() {
       expect(requestBody.selectedHotelIds).to.deep.equal(selectedHotelIds);
     });
 
-    it("does not allow to pass a string of selectedHotelIds", function() {
+    it("does not allow to pass a string of selectedHotelIds", function () {
       client.selectedHotelIds = "957766";
 
       var requestBody = client.getSearchRequestBody();
@@ -321,7 +323,7 @@ describe("HotelSearchClient", function() {
       expect(requestBody.selectedHotelIds).to.equal(undefined);
     });
 
-    it("return isLastPolling flag at the last polling request", function() {
+    it("return isLastPolling flag at the last polling request", function () {
       client.poller.pollCount = 2;
       client.poller.pollLimit = 1;
       var params = client.fetchHotelsParams();
@@ -329,8 +331,8 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  describe("#mergeResponse", function() {
-    it("responseSearch", function() {
+  describe("#mergeResponse", function () {
+    it("responseSearch", function () {
       var regionId = 101;
       var cityCode = "DXB";
 
@@ -346,7 +348,7 @@ describe("HotelSearchClient", function() {
       var search = {
         region: region
       };
-      
+
       client.merger.__staticData = {
         cities: {
           "DXB": city
@@ -361,7 +363,7 @@ describe("HotelSearchClient", function() {
       expect(client.responseSearch.region.cities[0]).to.equal(city);
     });
 
-    it("lastRatesCount", function() {
+    it("lastRatesCount", function () {
       var lastRatesCount = 15;
       client.handleSearchResponse({
         count: lastRatesCount
@@ -369,7 +371,7 @@ describe("HotelSearchClient", function() {
       expect(client.lastRatesCount).to.equal(lastRatesCount);
     });
 
-    it("merge response by merger", function() {
+    it("merge response by merger", function () {
       var brand = {
         id: 1
       };
@@ -384,13 +386,13 @@ describe("HotelSearchClient", function() {
     it("no hotel can have more than 1 rate from a provider when search's status is not'done'", () => {
       var response = {
         done: false,
-        hotels: [{ id: 1},{ id: 2}],
+        hotels: [{ id: 1 }, { id: 2 }],
         rates: [
-          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
-          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
-          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
-          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
-          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+          { id: 1, hotelId: 1, providerCode: "a.com", price: { amount: 100, taxAmountUsd: 1 } },
+          { id: 2, hotelId: 1, providerCode: "a.com", price: { amount: 110, taxAmountUsd: 1 } },
+          { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
+          { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
+          { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
         ]
       }
       client.poller.pollCount = 1;
@@ -404,13 +406,13 @@ describe("HotelSearchClient", function() {
     it("some hotels may have more than 1 from a provider rate when search's status is not 'done' but reaching limit polling time", () => {
       var response = {
         done: true,
-        hotels: [{ id: 1},{ id: 2}],
+        hotels: [{ id: 1 }, { id: 2 }],
         rates: [
-          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
-          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
-          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
-          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
-          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+          { id: 1, hotelId: 1, providerCode: "a.com", price: { amount: 100, taxAmountUsd: 1 } },
+          { id: 2, hotelId: 1, providerCode: "a.com", price: { amount: 110, taxAmountUsd: 1 } },
+          { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
+          { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
+          { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
         ]
       }
       client.poller.pollCount = 2;
@@ -422,13 +424,13 @@ describe("HotelSearchClient", function() {
     it("some hotels may have more than 1 from a provider rate when search's status is 'done'", () => {
       var response = {
         done: true,
-        hotels: [{ id: 1},{ id: 2}],
+        hotels: [{ id: 1 }, { id: 2 }],
         rates: [
-          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
-          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
-          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
-          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
-          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}},
+          { id: 1, hotelId: 1, providerCode: "a.com", price: { amount: 100, taxAmountUsd: 1 } },
+          { id: 2, hotelId: 1, providerCode: "a.com", price: { amount: 110, taxAmountUsd: 1 } },
+          { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
+          { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
+          { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
         ]
       }
       client.handleSearchResponse(response);
@@ -437,12 +439,12 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  describe("#updateResults", function() {
-    it("totalHotels", function() {
+  describe("#updateResults", function () {
+    it("totalHotels", function () {
       var hotels;
 
-      var client = new HotelSearchClient({
-        onTotalHotelsChanged: function(_hotels) {
+      var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+        onTotalHotelsChanged: function (_hotels) {
           hotels = _hotels;
         }
       });
@@ -453,17 +455,17 @@ describe("HotelSearchClient", function() {
         hotels: [hotel]
       });
 
-      var hotelIds = hotels.map(function(hotel) {
+      var hotelIds = hotels.map(function (hotel) {
         return hotel.id;
       });
 
       expect(hotelIds).to.deep.equal([1]);
     });
 
-    it("hotels", function() {
+    it("hotels", function () {
       var hotels;
-      var client = new HotelSearchClient({
-        onHotelsChanged: function(_hotels) {
+      var client = new HotelSearchClient(hotelSearchEndpointUrl, {
+        onHotelsChanged: function (_hotels) {
           hotels = _hotels;
         }
       });
@@ -513,7 +515,7 @@ describe("HotelSearchClient", function() {
         hotels: [hotel1, hotel2, hotel3]
       });
 
-      var hotelIds = hotels.map(function(hotel) {
+      var hotelIds = hotels.map(function (hotel) {
         return hotel.id;
       });
 
@@ -522,7 +524,7 @@ describe("HotelSearchClient", function() {
 
     it("calls onProgressChanged", () => {
       var onProgressChanged = sinon.spy();
-      client = new HotelSearchClient({
+      client = new HotelSearchClient(hotelSearchEndpointUrl, {
         onProgressChanged: onProgressChanged
       });
       client.poller.fetchCount = 10;
@@ -531,7 +533,7 @@ describe("HotelSearchClient", function() {
     });
   });
 
-  describe("#fetchHotelsParams", function() {
+  describe("#fetchHotelsParams", function () {
     var lastRatesCount = 10;
     var locale = "ar";
     var currencyCode = "currencyCode";
@@ -549,7 +551,7 @@ describe("HotelSearchClient", function() {
     var appType = "IOS_APP";
     var wgCampaign = "test_campaign";
     var searchId = 111;
-    var client = new HotelSearchClient({
+    var client = new HotelSearchClient(hotelSearchEndpointUrl, {
       siteCode: siteCode,
       deviceType: deviceType,
       appType: appType,
@@ -562,15 +564,15 @@ describe("HotelSearchClient", function() {
     client.lastRatesCount = lastRatesCount;
     client.trackingParams = { wgCampaign: wgCampaign };
 
-    it("returns offset", function() {
+    it("returns offset", function () {
       var params = client.fetchHotelsParams();
       expect(params.offset).to.equal(lastRatesCount);
     });
-    it("returns locale", function() {
+    it("returns locale", function () {
       var params = client.fetchHotelsParams();
       expect(params.locale).to.equal(locale);
     });
-    it("returns currencyCode", function() {
+    it("returns currencyCode", function () {
       var params = client.fetchHotelsParams();
       expect(params.currencyCode).to.equal(currencyCode);
     });
@@ -578,12 +580,12 @@ describe("HotelSearchClient", function() {
       var params = client.fetchHotelsParams();
       expect(params.wgCampaign).to.equal(wgCampaign);
     });
-    it("has not selectedHotelIds", function() {
+    it("has not selectedHotelIds", function () {
       var params = client.fetchHotelsParams();
       expect(params.selectedHotelIds).to.equal(undefined);
     });
-    it("returns selectedHotelIds", function() {
-      var client = new HotelSearchClient({
+    it("returns selectedHotelIds", function () {
+      var client = new HotelSearchClient(hotelSearchEndpointUrl, {
         siteCode: siteCode,
         deviceType: deviceType,
         appType: appType,

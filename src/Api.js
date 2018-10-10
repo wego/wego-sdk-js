@@ -73,7 +73,7 @@ var Api = {
       method: "POST",
       credentials: "include",
       mode: 'cors',
-      headers: new Headers(Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' })),
+      headers: Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' }),
       body: JSON.stringify(requestBody)
     }).then(function (response) {
       if (response.ok) {
@@ -91,7 +91,7 @@ var Api = {
       method: "GET",
       credentials: "include",
       mode: 'cors',
-      headers: new Headers(Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' }))
+      headers: Object.assign({}, requestHeaders, { 'Content-Type': 'application/json' })
     }).then(function (response) {
       if (response.ok) {
         return response.json();
