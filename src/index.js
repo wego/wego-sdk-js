@@ -1,7 +1,7 @@
-var Api = require("./Api");
-var FlightSearchClient = require("./flight-search/Client");
-var HotelSearchClient = require("./hotel-search/Client");
-var HotelDetailsClient = require("./hotel-details/Client");
+const Api = require("./Api");
+const FlightSearchClient = require("./flight-search/FlightSearchClient");
+const HotelSearchClient = require("./hotel-search/HotelSearchClient");
+const HotelDetailsClient = require("./hotel-details/HotelDetailsClient");
 
 module.exports = {
   Api: Api,

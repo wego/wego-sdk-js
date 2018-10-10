@@ -1,25 +1,27 @@
-var sinon = require("sinon");
-var FlightSearchClient = require("../../src/flight-search/Client");
+const sinon = require("sinon");
+const FlightSearchClient = require("../../src/flight-search/FlightSearchClient");
 
-describe("FlightSearchClient", function() {
-  var client;
-  beforeEach(function() {
-    client = new FlightSearchClient();
+describe("FlightSearchClient", function () {
+  const flightSearchEndpointUrl = 'https://srv.wegostaging.com/v3/metasearch/flights/searches';
+  let client;
+  
+  beforeEach(function () {
+    client = new FlightSearchClient(flightSearchEndpointUrl);
     mockAjaxCall(client);
   });
 
   function mockAjaxCall(client) {
-    client._callApi = function() {};
+    client._callApi = function () { };
   }
 
-  describe("#reset", function() {
-    it("resets poller", function() {
+  describe("#reset", function () {
+    it("resets poller", function () {
       client.poller.pollCount = 4;
       client.reset();
       expect(client.poller.pollCount).to.equal(0);
     });
 
-    it("#reset merger", function() {
+    it("#reset merger", function () {
       client.handleSearchResponse({
         airports: [{ id: 1 }]
       });
@@ -29,7 +31,7 @@ describe("FlightSearchClient", function() {
       expect(client.merger.__staticData.airports).to.deep.equal({});
     });
 
-    it("abort last request call", function() {
+    it("abort last request call", function () {
       var abort = sinon.spy();
       client.__abortLastRequest = abort;
       client.reset();
@@ -37,8 +39,8 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  describe("paymentMethodIds change", function() {
-    it("should reset and do new polling", function() {
+  describe("paymentMethodIds change", function () {
+    it("should reset and do new polling", function () {
       client.mergeResponse({});
 
       client.poller.timer = null;
@@ -51,8 +53,8 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  describe("providerTypes change", function() {
-    it("should reset and do new polling", function() {
+  describe("providerTypes change", function () {
+    it("should reset and do new polling", function () {
       client.mergeResponse({});
 
       client.poller.timer = null;
@@ -65,10 +67,10 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  it("#updateSort", function() {
+  it("#updateSort", function () {
     var trips;
-    var client = new FlightSearchClient({
-      onTripsChanged: function(_trips) {
+    var client = new FlightSearchClient(flightSearchEndpointUrl, {
+      onTripsChanged: function (_trips) {
         trips = _trips;
       }
     });
@@ -127,17 +129,17 @@ describe("FlightSearchClient", function() {
       order: "DESC"
     });
 
-    var tripIds = trips.map(function(trip) {
+    var tripIds = trips.map(function (trip) {
       return trip.id;
     });
 
     expect(tripIds).to.deep.equal([2, 1]);
   });
 
-  it("#updateFilter", function() {
+  it("#updateFilter", function () {
     var trips;
-    var client = new FlightSearchClient({
-      onTripsChanged: function(_trips) {
+    var client = new FlightSearchClient(flightSearchEndpointUrl, {
+      onTripsChanged: function (_trips) {
         trips = _trips;
       }
     });
@@ -172,20 +174,20 @@ describe("FlightSearchClient", function() {
       stopCodes: [1]
     });
 
-    var tripIds = trips.map(function(trip) {
+    var tripIds = trips.map(function (trip) {
       return trip.id;
     });
 
     expect(tripIds).to.deep.equal([2]);
   });
 
-  it("#updateCurrency", function() {
+  it("#updateCurrency", function () {
     var trips, filter;
-    var client = new FlightSearchClient({
-      onTripsChanged: function(_trips) {
+    var client = new FlightSearchClient(flightSearchEndpointUrl, {
+      onTripsChanged: function (_trips) {
         trips = _trips;
       },
-      onDisplayedFilterChanged: function(_filter) {
+      onDisplayedFilterChanged: function (_filter) {
         filter = _filter;
       }
     });
@@ -235,16 +237,16 @@ describe("FlightSearchClient", function() {
     expect(filter.airlines[0].price.amount).to.equal(100);
   });
 
-  describe("#searchTrips", function() {
-    it("start poller", function() {
+  describe("#searchTrips", function () {
+    it("start poller", function () {
       client.poller.timer = null;
-      client.searchTrips({legs: [1,2,3]});
+      client.searchTrips({ legs: [1, 2, 3] });
       expect(client.poller.timer).not.equal(null);
     });
   });
 
-  describe("handleSearchResponse", function() {
-    it("update processedFaresCount", function() {
+  describe("handleSearchResponse", function () {
+    it("update processedFaresCount", function () {
       var processedFaresCount = 10;
 
       client.handleSearchResponse({
@@ -254,12 +256,12 @@ describe("FlightSearchClient", function() {
       expect(client.processedFaresCount).to.equal(processedFaresCount);
     });
 
-    it("update displayed filter", function() {
+    it("update displayed filter", function () {
       var price = {};
       var displayedFilter;
 
-      var client = new FlightSearchClient({
-        onDisplayedFilterChanged: function(filter) {
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onDisplayedFilterChanged: function (filter) {
           displayedFilter = filter;
         }
       });
@@ -275,15 +277,15 @@ describe("FlightSearchClient", function() {
       expect(displayedFilter.minPrice).to.equal(price);
     });
 
-    it("update displayed flights", function() {
+    it("update displayed flights", function () {
       var trip = {
         id: 1
       };
 
       var trips;
 
-      client = new FlightSearchClient({
-        onTripsChanged: function(_trips) {
+      client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onTripsChanged: function (_trips) {
           trips = _trips;
         }
       });
@@ -300,15 +302,15 @@ describe("FlightSearchClient", function() {
         ]
       });
 
-      var tripIds = trips.map(function(trip) {
+      var tripIds = trips.map(function (trip) {
         return trip.id;
       });
       expect(tripIds).to.deep.equal([1]);
     });
   });
 
-  describe("#getSearchRequestBody", function() {
-    it("search", function() {
+  describe("#getSearchRequestBody", function () {
+    it("search", function () {
       var searchId = 1;
       var cabin = "ECONOMIC";
       var adultsCount = 2;
@@ -331,7 +333,7 @@ describe("FlightSearchClient", function() {
         code: currencyCode
       };
 
-      var client = new FlightSearchClient({
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
         locale: locale,
         siteCode: siteCode,
         currency: currency,
@@ -388,8 +390,8 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  describe("#mergerRespnose", function() {
-    it("responseSearch", function() {
+  describe("#mergerRespnose", function () {
+    it("responseSearch", function () {
       var search = {};
       client.handleSearchResponse({
         search: search
@@ -398,7 +400,7 @@ describe("FlightSearchClient", function() {
       expect(client.responseSearch).to.equal(search);
     });
 
-    it("processedFaresCount", function() {
+    it("processedFaresCount", function () {
       var processedFaresCount = 15;
       client.handleSearchResponse({
         count: processedFaresCount
@@ -406,7 +408,7 @@ describe("FlightSearchClient", function() {
       expect(client.processedFaresCount).to.equal(processedFaresCount);
     });
 
-    it("merge response by merger", function() {
+    it("merge response by merger", function () {
       var airport = {
         id: 1
       };
@@ -419,12 +421,12 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  describe("#updateResults", function() {
-    it("totalTrips", function() {
+  describe("#updateResults", function () {
+    it("totalTrips", function () {
       var trips;
 
-      var client = new FlightSearchClient({
-        onTotalTripsChanged: function(_trips) {
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onTotalTripsChanged: function (_trips) {
           trips = _trips;
         }
       });
@@ -435,17 +437,17 @@ describe("FlightSearchClient", function() {
         trips: [trip]
       });
 
-      var tripIds = trips.map(function(trip) {
+      var tripIds = trips.map(function (trip) {
         return trip.id;
       });
 
       expect(tripIds).to.deep.equal([1]);
     });
 
-    it("trips", function() {
+    it("trips", function () {
       var trips;
-      var client = new FlightSearchClient({
-        onTripsChanged: function(_trips) {
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onTripsChanged: function (_trips) {
           trips = _trips;
         }
       });
@@ -486,17 +488,17 @@ describe("FlightSearchClient", function() {
         trips: [trip1, trip2]
       });
 
-      var tripIds = trips.map(function(trip) {
+      var tripIds = trips.map(function (trip) {
         return trip.id;
       });
 
       expect(tripIds).to.deep.equal([2, 1]);
     });
 
-    it("cheapestTrip", function() {
+    it("cheapestTrip", function () {
       var cheapestTrip;
-      var client = new FlightSearchClient({
-        onCheapestTripChanged: function(trip) {
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onCheapestTripChanged: function (trip) {
           cheapestTrip = trip;
         }
       });
@@ -535,10 +537,10 @@ describe("FlightSearchClient", function() {
       expect(cheapestTrip.id).to.equal(2);
     });
 
-    it("fastestTrip", function() {
+    it("fastestTrip", function () {
       var fastestTrip;
-      var client = new FlightSearchClient({
-        onFastestTripChanged: function(trip) {
+      var client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onFastestTripChanged: function (trip) {
           fastestTrip = trip;
         }
       });
@@ -583,10 +585,10 @@ describe("FlightSearchClient", function() {
       expect(fastestTrip.id).to.equal(1);
     });
 
-    it("bestExperienceTrip", function() {
+    it("bestExperienceTrip", function () {
       var bestExperienceTrip;
-      client = new FlightSearchClient({
-        onBestExperienceTripChanged: function(trip) {
+      client = new FlightSearchClient(flightSearchEndpointUrl, {
+        onBestExperienceTripChanged: function (trip) {
           bestExperienceTrip = trip;
         }
       });
@@ -633,7 +635,7 @@ describe("FlightSearchClient", function() {
 
     it("calls onProgressChanged", () => {
       var onProgressChanged = sinon.spy();
-      client = new FlightSearchClient({
+      client = new FlightSearchClient(flightSearchEndpointUrl, {
         onProgressChanged: onProgressChanged
       });
       client.poller.fetchCount = 10;
@@ -641,9 +643,9 @@ describe("FlightSearchClient", function() {
       expect(onProgressChanged).to.have.been.calledOnce();
     });
 
-    it("onCreatedTrip", function() {
+    it("onCreatedTrip", function () {
       var onSearchCreated = sinon.spy();
-      client = new FlightSearchClient({
+      client = new FlightSearchClient(flightSearchEndpointUrl, {
         onSearchCreated: onSearchCreated
       });
 
@@ -658,9 +660,9 @@ describe("FlightSearchClient", function() {
     });
   });
 
-  describe("#fetchTripsParams", function() {
-    it("returns currencyCode", function() {
-      const client = new FlightSearchClient({
+  describe("#fetchTripsParams", function () {
+    it("returns currencyCode", function () {
+      const client = new FlightSearchClient(flightSearchEndpointUrl, {
         currency: {
           code: "SGD"
         }
@@ -668,28 +670,28 @@ describe("FlightSearchClient", function() {
       params = client.fetchTripsParams();
       expect(params.currencyCode).to.equal("SGD");
     });
-    it("returns locale", function() {
-      const client = new FlightSearchClient({
+    it("returns locale", function () {
+      const client = new FlightSearchClient(flightSearchEndpointUrl, {
         locale: "ar"
       });
       params = client.fetchTripsParams();
       expect(params.locale).to.equal("ar");
     });
-    it("returns offset", function() {
-      const client = new FlightSearchClient({
+    it("returns offset", function () {
+      const client = new FlightSearchClient(flightSearchEndpointUrl, {
         locale: "ar"
       });
       client.processedFaresCount = 1000;
       params = client.fetchTripsParams();
       expect(params.offset).to.equal(1000);
     });
-    it("returns empty paymentMethodIds", function() {
-      const client = new FlightSearchClient();
+    it("returns empty paymentMethodIds", function () {
+      const client = new FlightSearchClient(flightSearchEndpointUrl);
       params = client.fetchTripsParams();
       expect(params.paymentMethodIds).to.deep.equal([]);
     });
-    it("returns paymentMethodIds", function() {
-      const client = new FlightSearchClient({
+    it("returns paymentMethodIds", function () {
+      const client = new FlightSearchClient(flightSearchEndpointUrl, {
         paymentMethodIds: [1, 2]
       });
       params = client.fetchTripsParams();

@@ -5,7 +5,7 @@
   "main": "build/npm.bundle.js",
   "scripts": {
     "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js",
+    "build": "./node_modules/.bin/webpack --config webpack.prod.js",
     "start": "./node_modules/.bin/webpack --watch"
   },
   "repository": "git+https://github.com/wego/wego-sdk-js.git",
@@ -15,6 +15,9 @@
   },
   "homepage": "https://github.com/wego/wego-sdk-js#readme",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-spies": "^0.7.1",
@@ -24,6 +27,8 @@
     "sinon-chai": "^2.9.0",
     "uglify-js": "^2.8.22",
     "uglifyjs-webpack-plugin": "^0.4.1",
-    "webpack": "^2.3.3"
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-merge": "^4.1.3"
   }
 }
