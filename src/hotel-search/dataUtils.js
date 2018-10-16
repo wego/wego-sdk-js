@@ -48,7 +48,9 @@ module.exports = {
       var roomTypeCategory = staticData.roomTypeCategories[hotel.roomTypeCategoryId];
 
       // Re-use badges array for room type category
-      hotel.badges.push({ text: roomTypeCategory.name });
+      if (roomTypeCategory) {
+        hotel.badges.push({ text: roomTypeCategory.name });
+      }
     }
   },
 
