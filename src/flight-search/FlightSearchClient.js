@@ -176,8 +176,10 @@ class FlightSearchClient {
         locale: self.locale,
         legs: legs.map(leg => {
           return {
+            departureRegionId: leg.departureRegionId,
             departureCityCode: leg.departureCityCode,
             departureAirportCode: leg.departureAirportCode,
+            arrivalRegionId: leg.arrivalRegionId,
             arrivalCityCode: leg.arrivalCityCode,
             arrivalAirportCode: leg.arrivalAirportCode,
             outboundDate: leg.outboundDate
