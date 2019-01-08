@@ -18,6 +18,7 @@ class HotelDetailsClient {
     self.onHotelRatesChanged = options.onHotelRatesChanged || function () { };
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.requestHeaders = options.requestHeaders;
+    self.similarHotels = options.similarHotels || {};
     self.hotelDetailsEndpointUrl = hotelDetailsEndpointUrl;
 
     self.poller = new Poller({
@@ -107,6 +108,11 @@ class HotelDetailsClient {
     if (self.searchId !== undefined) {
       searchRequestBody.search.id = self.searchId;
     }
+    
+    if (self.similarHotels != null) {
+      searchRequestBody.similarHotels = self.similarHotels;
+    }
+    
     return searchRequestBody;
   }
 }
