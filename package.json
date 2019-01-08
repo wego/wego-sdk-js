@@ -1,19 +1,23 @@
 {
   "name": "wego-sdk",
-  "version": "1.0.0-beta-1",
+  "version": "0.0.20",
   "description": "Wego SDK",
-  "main": "build/npm.bundle.js",
+  "main": "dist/WegoSdk.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "NODE_ENV=test NODE_PATH=$NODE_PATH:$PWD/ ./node_modules/.bin/mocha --recursive --require ./test/setup.js",
     "build": "./node_modules/.bin/webpack --config webpack.prod.js",
-    "start": "./node_modules/.bin/webpack --watch"
+    "start": "./node_modules/.bin/webpack --watch",
+    "prepublishOnly": "npm run build"
   },
   "repository": "git+https://github.com/wego/wego-sdk-js.git",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/wego/wego-sdk-js/issues"
   },
-  "homepage": "https://github.com/wego/wego-sdk-js#readme",
+  "homepage": "https://github.com/wego/wego-sdk-js",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
@@ -30,5 +34,8 @@
     "webpack": "^4.16.1",
     "webpack-cli": "^3.0.8",
     "webpack-merge": "^4.1.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
