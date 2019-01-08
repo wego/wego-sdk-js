@@ -1,21 +1,44 @@
-# Wego SDK for javascript [![Build Status](https://travis-ci.org/wego/wego-sdk-js.svg?branch=master)](https://travis-ci.org/wego/wego-sdk-js)
-The official Wego SDK for JavaScript, available for browsers and mobile devices (if you are using javascript), or Node.js backends
+<div align="center" style="text-align: center;">
+  <h1 style="border-bottom: none;">Wego SDK</h1>
 
-## Installing
+  <p>Wego SDK for JavaScript</p>
+</div>
+
+<hr />
+
+
+[![Version][version-badge]][version-url]
+
+[![Downloads][downloads-badge]][downloads-url]
+[![Total downloads][total-downloads-badge]][downloads-url]
+[![Packagephobia][packagephobia-badge]][packagephobia-url]
+[![Bundlephobia][bundlephobia-badge]][bundlephobia-url]
+
+[![Build Status][travis-badge]][travis-url]
+
+The official Wego SDK for JavaScript, available for browsers and mobile devices (if you are using JavaScript), or [Node.js][nodejs-url] backends
+
+## Installation
+
 ### Bower
+
+```sh
+$ bower install wego-sdk
 ```
-bower install wego-sdk
-```
+
 ### NPM
-```
-npm install wego-sdk
+
+```sh
+$ npm install wego-sdk
 ```
 
 ## Usage
+
 ### Flight Search Client
-Create client
-```
-var client = new WegoSdk.FlightSearchClient({
+
+```js
+/** Create `FlighSearchClient` */
+const client = new WegoSdk.FlightSearchClient({
   onTotalTripsChanged: function(trips) {
     // Do something with trips
   },
@@ -41,144 +64,153 @@ var client = new WegoSdk.FlightSearchClient({
     // Do something with newSearch
   }
 });
-```
-Make a new search
-```
+
+/** Make a new search for trips */
 client.searchTrips(search);
 ```
 
 ### List of Flight Filters
-Stops
-```
-stopCodes: [
-  "DIRECT",
-  "ONE_STOP",
-  "MORE_THAN_ONE_STOP"
-]
-```
 
-Price
-```
-priceRange: {
-  "legIndex": undefined
-  "min": 1397
-  "max": 10924
-}
-```
+1. Stops
 
-Fare Types
-```
-conditions: [
-  "refundable",
-  "non_refundable",
-  "scheduled",
-  "chartered"
-]
-```
+    ```js
+    stopCodes: [
+      'DIRECT',
+      'ONE_STOP',
+      'MORE_THAN_ONE_STOP',
+    ],
+    ```
 
-Flight Times
-```
-departureTimeMinutesRanges: [
-  {
-    "min": 171,
-    "max": 1241,
-    "legIndex": 0
-  },
-  {
-    "min": 360,
-    "max": 1296,
-    "legIndex": 1
-  }
-]
+2. Price
 
-arrivalTimeMinutesRanges: [
-  {
-    "min": 171,
-    "max": 1241,
-    "legIndex": 0
-  },
-  {
-    "min": 360,
-    "max": 1296,
-    "legIndex": 1
-  }
-]
-```
+    ```js
+    priceRange: {
+      'legIndex': undefined,
+      'min': 1397,
+      'max': 10924,
+    },
+    ```
 
-Airlines/Alliances
-```
-airlineCodes: [
-  "AF",
-  "NH"
-],
-allianceCodes: [
-  "sky_team",
-  "star_alliance",
-  "oneworld",
-  "lcc"
-]
+3. Fare Types
+   
+    ```js
+    conditions: [
+      'refundable',
+      'non_refundable',
+      'scheduled',
+      'chartered',
+    ],
+    ```
 
-Complete trip on the same airline
-tripOptions: ["SAME_AIRLINE"]
-```
+4. Flight Times
 
-Booking Options
-```
-providerTypes: [
-  "instant",
-  "airline"
-]
-```
+    ```js
+    departureTimeMinutesRanges: [
+      {
+        'min': 171,
+        'max': 1241,
+        'legIndex': 0,
+      },
+      {
+        'min': 360,
+        'max': 1296,
+        'legIndex': 1,
+      }
+    ];
+    ```
 
-Origin/Destination
-```
-originAirportCodes: ["SIN"],
-destinationAirportCodes: ["IAD"]
-```
+    ```js
+    arrivalTimeMinutesRanges: [
+      {
+        'min': 171,
+        'max': 1241,
+        'legIndex': 0,
+      },
+      {
+        'min': 360,
+        'max': 1296,
+        'legIndex': 1,
+      }
+    ];
+    ```
 
-Stopover Airports
-```
-stopoverAirportCodes: [
-  "BRU",
-  "PEK"
-]
-```
+5. Airlines/Alliances
 
-Duration
-```
-durationMinutesRanges: [
-  {
-    "min": 1553,
-    "max": 3113,
-    "legIndex": 0
-  },
-  {
-    "min": 1564,
-    "max": 3379,
-    "legIndex": 1
-  }
-],
-stopoverDurationMinutesRanges: [
-  {
-    "min": 190,
-    "max": 2275,
-    "legIndex": undefined
-  }
-]
-```
+    ```js
+    airlineCodes: [
+      'AF',
+      'NH',
+    ],
+    allianceCodes: [
+      'sky_team',
+      'star_alliance',
+      'oneworld',
+      'lcc',
+    ],
+    /** Complete trip on the same airline */
+    tripOptions: ['SAME_AIRLINE'],
+    ```
 
-Flight Experience
-```
-itineraryOptions: [
-  "NOT_OVERNIGHT",
-  "SHORT_STOPOVER"
-]
-```
+6. Booking Options
+
+    ```js
+    providerTypes: [
+      'instant',
+      'airline',
+    ],
+    ```
+
+7. Origin/Destination
+
+    ```js
+    originAirportCodes: ['SIN'],
+    destinationAirportCodes: ['IAD'],
+    ```
+
+8. Stopover Airports
+
+    ```js
+    stopoverAirportCodes: ['BRU', 'PEK'],
+    ```
+
+9. Duration
+
+    ```js
+    durationMinutesRanges: [
+      {
+        'min': 1553,
+        'max': 3113,
+        'legIndex': 0,
+      },
+      {
+        'min': 1564,
+        'max': 3379,
+        'legIndex': 1,
+      },
+    ],
+    stopoverDurationMinutesRanges: [
+      {
+        'min': 190,
+        'max': 2275,
+        'legIndex': undefined,
+      },
+    ],
+    ```
+
+10. Flight Experience
+
+    ```js
+    itineraryOptions: [
+      'NOT_OVERNIGHT',
+      'SHORT_STOPOVER',
+    ],
+    ```
 
 ### Hotel SDK Client
-Create client
-```
-var client = new WegoSdk.HotelSearchClient({
+
+```js
+/** Create `HotelSearchClient` */
+const client = new WegoSdk.HotelSearchClient({
   onTotalHotelsChanged: function(hotels) {
     // Do something with hotels
   },
@@ -195,11 +227,14 @@ var client = new WegoSdk.HotelSearchClient({
     // Do something with newSearch
   }
 });
-```
-Make a new search ([More Info](https://github.com/wego/wego-api-docs#create-new-hotels-search))
-```
-// valid search object
-var searchParams = {
+
+/**
+ * Make a new search by calling `searchHotels`.
+ * 
+ * For more info about the `searchParams`, please visit 
+ * https://github.com/wego/wego-api-docs#create-new-hotels-search.
+ */
+const searchParams = {
   "search": {
     "id": "2d8805fd14337580",
     "siteCode": "SG",
@@ -214,19 +249,23 @@ var searchParams = {
     "deviceType": "DESKTOP",
     "appType": "WEB_APP",
     "userLoggedIn": true
-    "hotelId": "12345", // optional
-    "districtId": "12345" // optional
+    "hotelId": "12345", /** Optional */
+    "districtId": "12345" /** Optional */
   },
   "offset": 500,
-  "selectedHotelIds": ['258101'] // optional
+  "selectedHotelIds": ['258101'], /** Optional */
+
+  similarHotels: { limit: 10 }, /** New, optional */
 }
 
 client.searchHotels(searchParams);
 ```
+
 ### Hotel Details Rates SDK Client
-Create client
-```
-var client = new WegoSdk.HotelDetailsClient({
+
+```js
+/** Create `HotelDetailsClient` */
+const client = new WegoSdk.HotelDetailsClient({
   onHotelRatesChanged: function(rates) {
     // Do something with rates
   },
@@ -237,19 +276,63 @@ var client = new WegoSdk.HotelDetailsClient({
     // Do something with newSearch
   }
 });
-```
-Make a new search
-```
+
+/** Create new search */
 client.searchHotelRates(hotelSearch, mainSearchId);
 ```
 
 ### Test
-```
-npm run test
+
+```sh
+$ npm run test
 ```
 
 ### Commit
-Need to update and commit bower.bundle.js and npm.bundle.js files
+
+The final bundle will be output at `dist` directory named `WegoSdk.js`.
+
+```sh
+$ npm run build
 ```
-npm run build
-```
+
+## References
+
+[Wego API documentation][wego-api-documentation-url]
+
+## License
+
+ISC
+
+<!-- References -->
+[nodejs-url]: https://nodejs.org
+[npm-url]: https://www.npmjs.com
+[wego-api-documentation-url]: https://github.com/wego/wego-docs
+
+
+<!-- MDN -->
+[map-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+[string-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
+[object-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+[number-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number
+[boolean-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[html-style-element-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLStyleElement
+[promise-mdn-url]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+<!-- Badges -->
+[version-badge]: https://flat.badgen.net/npm/v/wego-sdk
+
+[downloads-badge]: https://flat.badgen.net/npm/dm/wego-sdk
+[total-downloads-badge]: https://flat.badgen.net/npm/dt/wego-sdk?label=total%20downloads
+[packagephobia-badge]: https://flat.badgen.net/packagephobia/install/wego-sdk
+[bundlephobia-badge]: https://flat.badgen.net/bundlephobia/minzip/wego-sdk
+
+[travis-badge]: https://flat.badgen.net/travis/wego/wego-sdk-js
+
+<!-- Links -->
+[version-url]: https://www.npmjs.com/package/wego-sdk
+
+[downloads-url]: http://www.npmtrends.com/wego-sdk
+[packagephobia-url]: https://packagephobia.now.sh/result?p=wego-sdk
+[bundlephobia-url]: https://bundlephobia.com/result?p=wego-sdk
+
+[travis-url]: https://travis-ci.org/wego/wego-sdk
