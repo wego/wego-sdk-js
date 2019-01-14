@@ -52,10 +52,10 @@ class FlightSearchClient {
     let multiCity = legs.length > 2;
     // 2 legs can still be multi city
     if (legs.length === 2) {
-      let p = ['departureCityCode', 'departureAirportCode', 'arrivalCityCode', 'arrivalAirportCode'];
+      let p = ['departureRegionId', 'departureCityCode', 'departureAirportCode', 'arrivalRegionId', 'arrivalCityCode', 'arrivalAirportCode'];
       // compare leg 1's departure codes vs leg 2's arrival codes
       let sameLocations = (a, b) => a === b ||
-        (a[p[0]] === b[p[2]] && a[p[1]] === b[p[3]] && a[p[2]] === b[p[0]] && a[p[3]] === b[p[1]]);
+        (a[p[0]] === b[p[3]] && a[p[1]] === b[p[4]] && a[p[2]] === b[p[5]] && a[p[3]] === b[p[0]] && a[p[4]] == b[p[1]] && a[p[5]] == b[p[2]]);
       if (!sameLocations(legs[0], legs[1])) multiCity = true;
     }
     self.multiCity = multiCity;
@@ -176,8 +176,10 @@ class FlightSearchClient {
         locale: self.locale,
         legs: legs.map(leg => {
           return {
+            departureRegionId: leg.departureRegionId,
             departureCityCode: leg.departureCityCode,
             departureAirportCode: leg.departureAirportCode,
+            arrivalRegionId: leg.arrivalRegionId,
             arrivalCityCode: leg.arrivalCityCode,
             arrivalAirportCode: leg.arrivalAirportCode,
             outboundDate: leg.outboundDate
