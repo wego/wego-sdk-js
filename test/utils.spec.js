@@ -8,9 +8,9 @@ describe('utils', () => {
       expect(utils.filterByTextMatching(text, query)).to.equal(true);
     });
 
-    it('filters out undefined text', () => {
+    it("filters out undefined text", () => {
       var text = undefined;
-      var query = 'Movenpick';
+      var query = "Movenpick";
       expect(utils.filterByTextMatching(text, query)).to.equal(false);
     });
   });
