@@ -111,7 +111,7 @@ var utils = {
     }
 
     return function (text) {
-      return text.replace(charsRgx, lookup);
+      return !!text ? text.replace(charsRgx, lookup) : "";
     }
   })(),
 };
