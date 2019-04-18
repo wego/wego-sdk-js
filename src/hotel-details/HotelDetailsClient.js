@@ -35,7 +35,7 @@ class HotelDetailsClient {
         }
 
         if (self.similarHotels) {
-          params.similarHotels = self.similarHotels.limit;
+          params.similarHotelLimit = self.similarHotels.limit;
         }
 
         if (self.searchId) {
