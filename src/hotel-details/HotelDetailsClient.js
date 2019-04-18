@@ -33,7 +33,16 @@ class HotelDetailsClient {
             params[key] = trackingParams[key];
           }
         }
-        return Api.searchHotel(self.hotelDetailsEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
+
+        if (self.similarHotels) {
+          params.similarHotels = self.similarHotels.limit;
+        }
+
+        if (self.searchId) {
+          params.searchId = self.searchId;
+        }
+
+        return Api.fetchHotelRates(self.search.hotelId, params);
       },
       onSuccessResponse: response => {
         return self.handleSearchResponse(response);
@@ -108,11 +117,11 @@ class HotelDetailsClient {
     if (self.searchId !== undefined) {
       searchRequestBody.search.id = self.searchId;
     }
-    
+
     if (self.similarHotels != null) {
       searchRequestBody.similarHotels = self.similarHotels;
     }
-    
+
     return searchRequestBody;
   }
 }
