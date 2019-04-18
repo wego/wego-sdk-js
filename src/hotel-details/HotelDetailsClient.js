@@ -13,6 +13,7 @@ class HotelDetailsClient {
     self.siteCode = options.siteCode;
     self.deviceType = options.deviceType || "DESKTOP";
     self.appType = options.appType || "WEB_APP";
+    self.clientId = options.clientId;
     self.userLoggedIn = options.userLoggedIn;
     self.onProgressChanged = options.onProgressChanged || function () { };
     self.onHotelRatesChanged = options.onHotelRatesChanged || function () { };
@@ -25,7 +26,7 @@ class HotelDetailsClient {
       delays: DELAYS,
       pollLimit: 7,
       callApi: () => {
-        let params = { currencyCode: self.currency.code, locale: self.locale };
+        let params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId };
         let trackingParams = self.trackingParams || {};
 
         for (let key in trackingParams) {
