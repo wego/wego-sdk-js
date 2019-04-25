@@ -33,6 +33,9 @@ describe('HotelDetailsClient', function () {
     it('start poller', function () {
       client.poller.timer = 0;
       client.poller.start();
+      client.search = {
+        hotelId: "258101"
+      };
       expect(client.poller.timer).not.equal(0);
     })
 
