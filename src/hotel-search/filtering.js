@@ -65,7 +65,7 @@ function filterByName(hotel, name) {
 }
 
 function filterByBedroomCount(hotel, count) {
-  return hotel.bedroomsCount >= count;
+  return count > 0 ? hotel.bedroomsCount >= count : true;
 }
 
 function filterByProviders(hotel, providerCodes) {
