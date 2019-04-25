@@ -53,6 +53,11 @@ var Api = {
     return this.post(requestBody, url, query, requestHeaders);
   },
 
+  fetchHotelRates: function (hotelId, query) {
+    var uri = this.__host[this.getEnvironment()].v3 + "/metasearch/hotels/" + hotelId + "/rates";
+    return this.get(uri, query);
+  },
+
   fetchHotelDetails: function (hotelId, query) {
     var uri = this._hotelEndpoints.hotelDetailsUrl(hotelId);
     return this.get(uri, query);
