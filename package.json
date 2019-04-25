@@ -2,7 +2,7 @@
   "name": "wego-sdk",
   "version": "0.0.20",
   "description": "Wego SDK",
-  "main": "dist/WegoSdk.js",
+  "main": "src/index.js",
   "files": [
     "dist"
   ],
