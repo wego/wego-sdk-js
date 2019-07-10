@@ -26,13 +26,19 @@ class HotelSearchClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
+    self.isNightyAverage = options.isNightyAverage;
 
     self.merger = new HotelSearchMerger();
+
+    let params = { currencyCode: self.currency.code, locale: self.locale };
+    if (options.isNightyAverage) {
+      params.amountType = 'NIGHTLY';
+    }
     self.poller = new Poller({
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
-        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale }, self.requestHeaders);
+        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
       },
       callApi: () => {
         return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
@@ -158,12 +164,16 @@ class HotelSearchClient {
   }
 
   fetchHotelsParams() {
-    let self = this;
+    const self = this;
     let params = {
       currencyCode: self.currency.code,
       locale: self.locale,
       offset: self.lastRatesCount || 0
     };
+
+    if (self.isNightyAverage) {
+      params.amountType = 'NIGHTLY';
+    }
 
     let trackingParams = self.trackingParams || {};
     for (let key in trackingParams) {
