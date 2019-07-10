@@ -29,17 +29,17 @@ class HotelSearchClient {
     self.isNightlyAverage = options.isNightlyAverage;
 
     self.merger = new HotelSearchMerger();
-
-    let params = {}
-    // let params = { currencyCode: self.currency.code, locale: self.locale };
     
-    if (options.isNightlyAverage) {
-      params.amountType = 'NIGHTLY';
-    }
     self.poller = new Poller({
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
+        let params = { currencyCode: self.currency.code, locale: self.locale };
+        
+        if (options.isNightlyAverage) {
+          params.amountType = 'NIGHTLY';
+        }
+
         return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
       },
       callApi: () => {
