@@ -13,6 +13,7 @@ class HotelDetailsClient {
     self.siteCode = options.siteCode;
     self.deviceType = options.deviceType || "DESKTOP";
     self.appType = options.appType || "WEB_APP";
+    self.clientId = options.clientId;
     self.userLoggedIn = options.userLoggedIn;
     self.onProgressChanged = options.onProgressChanged || function () { };
     self.onHotelRatesChanged = options.onHotelRatesChanged || function () { };
@@ -25,7 +26,7 @@ class HotelDetailsClient {
       delays: DELAYS,
       pollLimit: 7,
       callApi: () => {
-        let params = { currencyCode: self.currency.code, locale: self.locale };
+        let params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId };
         let trackingParams = self.trackingParams || {};
 
         for (let key in trackingParams) {
@@ -33,7 +34,16 @@ class HotelDetailsClient {
             params[key] = trackingParams[key];
           }
         }
-        return Api.searchHotel(self.hotelDetailsEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
+
+        if (self.similarHotels) {
+          params.similarHotelLimit = self.similarHotels.limit;
+        }
+
+        if (self.searchId) {
+          params.searchId = self.searchId;
+        }
+
+        return Api.fetchHotelRates(self.search.hotelId, params);
       },
       onSuccessResponse: response => {
         return self.handleSearchResponse(response);
@@ -108,11 +118,11 @@ class HotelDetailsClient {
     if (self.searchId !== undefined) {
       searchRequestBody.search.id = self.searchId;
     }
-    
+
     if (self.similarHotels != null) {
       searchRequestBody.similarHotels = self.similarHotels;
     }
-    
+
     return searchRequestBody;
   }
 }
