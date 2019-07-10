@@ -26,12 +26,12 @@ class HotelSearchClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
-    self.isNightyAverage = options.isNightyAverage;
+    self.isNightlyAverage = options.isNightlyAverage;
 
     self.merger = new HotelSearchMerger();
 
     let params = { currencyCode: self.currency.code, locale: self.locale };
-    if (options.isNightyAverage) {
+    if (options.isNightlyAverage) {
       params.amountType = 'NIGHTLY';
     }
     self.poller = new Poller({
@@ -171,7 +171,7 @@ class HotelSearchClient {
       offset: self.lastRatesCount || 0
     };
 
-    if (self.isNightyAverage) {
+    if (self.isNightlyAverage) {
       params.amountType = 'NIGHTLY';
     }
 
