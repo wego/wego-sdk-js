@@ -32,6 +32,7 @@ class HotelSearchClient {
 
     let params = {}
     // let params = { currencyCode: self.currency.code, locale: self.locale };
+    
     if (options.isNightlyAverage) {
       params.amountType = 'NIGHTLY';
     }
