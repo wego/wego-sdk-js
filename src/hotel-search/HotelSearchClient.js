@@ -30,7 +30,8 @@ class HotelSearchClient {
 
     self.merger = new HotelSearchMerger();
 
-    let params = { currencyCode: self.currency.code, locale: self.locale };
+    let params = {}
+    // let params = { currencyCode: self.currency.code, locale: self.locale };
     if (options.isNightlyAverage) {
       params.amountType = 'NIGHTLY';
     }
