@@ -32,7 +32,9 @@ class HotelSearchClient {
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
-        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale }, self.requestHeaders);
+        const params = { currencyCode: self.currency.code, locale: self.locale, amountType: 'NIGHTLY' };
+
+        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
       },
       callApi: () => {
         return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
@@ -159,10 +161,11 @@ class HotelSearchClient {
 
   fetchHotelsParams() {
     let self = this;
-    let params = {
+    const params = {
       currencyCode: self.currency.code,
       locale: self.locale,
-      offset: self.lastRatesCount || 0
+      offset: self.lastRatesCount || 0,
+      amountType: 'NIGHTLY'
     };
 
     let trackingParams = self.trackingParams || {};

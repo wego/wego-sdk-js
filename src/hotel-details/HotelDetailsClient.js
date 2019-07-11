@@ -26,7 +26,7 @@ class HotelDetailsClient {
       delays: DELAYS,
       pollLimit: 7,
       callApi: () => {
-        let params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId };
+        const params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId, amountType: 'NIGHTLY' };
         let trackingParams = self.trackingParams || {};
 
         for (let key in trackingParams) {
@@ -63,7 +63,7 @@ class HotelDetailsClient {
       self.searchId = mainSearchId;
       self.poller.start();
     } else {
-      let params = { currencyCode: self.currency.code, locale: self.locale };
+      const params = { currencyCode: self.currency.code, locale: self.locale, amountType: 'NIGHTLY' };
 
       Api.searchHotel(self.hotelDetailsEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders)
         .then(hotelSearch => {
