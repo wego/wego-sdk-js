@@ -1,7 +1,7 @@
 var Api = {
   __host: {
     staging: {
-      v3: "https://srv.wegostaging.com/v3",
+      v3: "http://localhost:9092",
       v2: "https://srv.wegostaging.com/v2",
       v1: "https://srv.wegostaging.com"
     },
