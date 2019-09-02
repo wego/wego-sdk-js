@@ -63,7 +63,12 @@ class HotelDetailsClient {
       self.searchId = mainSearchId;
       self.poller.start();
     } else {
-      const params = { currencyCode: self.currency.code, locale: self.locale, amountType: 'NIGHTLY' };
+      const params = {
+        currencyCode: self.currency.code,
+        locale: self.locale,
+        clientId: self.clientId,
+        amountType: 'NIGHTLY'
+      };
 
       Api.searchHotel(self.hotelDetailsEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders)
         .then(hotelSearch => {
