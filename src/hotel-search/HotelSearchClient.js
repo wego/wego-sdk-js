@@ -16,6 +16,7 @@ class HotelSearchClient {
     self.siteCode = options.siteCode;
     self.deviceType = options.deviceType || "DESKTOP";
     self.appType = options.appType || "WEB_APP";
+    self.clientId = options.clientId;
     self.userLoggedIn = options.userLoggedIn;
     self.rateAmenityIds = options.rateAmenityIds || [];
     self.selectedHotelIds = options.selectedHotelIds || [];
@@ -32,7 +33,12 @@ class HotelSearchClient {
       delays: DELAYS,
       pollLimit: DELAYS.length - 1,
       initCallApi: () => {
-        const params = { currencyCode: self.currency.code, locale: self.locale, amountType: 'NIGHTLY' };
+        const params = {
+          currencyCode: self.currency.code,
+          locale: self.locale,
+          clientId: self.clientId,
+          amountType: 'NIGHTLY'
+        };
 
         return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
       },
@@ -165,7 +171,8 @@ class HotelSearchClient {
       currencyCode: self.currency.code,
       locale: self.locale,
       offset: self.lastRatesCount || 0,
-      amountType: 'NIGHTLY'
+      amountType: 'NIGHTLY',
+      clientId: self.clientId
     };
 
     let trackingParams = self.trackingParams || {};
