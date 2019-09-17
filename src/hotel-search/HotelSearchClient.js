@@ -27,6 +27,7 @@ class HotelSearchClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
+    self.shortlistedHotelIds = options.shortlistedHotelIds || [];
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -154,6 +155,7 @@ class HotelSearchClient {
         appType: self.appType,
         userLoggedIn: self.userLoggedIn
       },
+      shortlistedHotelIds: self.shortlistedHotelIds,
       rateAmenityIds: self.rateAmenityIds,
       offset: self.lastRatesCount
     };
