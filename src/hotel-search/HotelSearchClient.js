@@ -155,13 +155,16 @@ class HotelSearchClient {
         appType: self.appType,
         userLoggedIn: self.userLoggedIn
       },
-      shortlistedHotelIds: self.shortlistedHotelIds,
       rateAmenityIds: self.rateAmenityIds,
       offset: self.lastRatesCount
     };
 
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       searchParams.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
+      searchParams.shortlistedHotelIds = shortlistedHotelIds;
     }
 
     return searchParams;
@@ -187,6 +190,11 @@ class HotelSearchClient {
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
+    }
+
+    let shortlistedHotelIds = dataUtils.trimArray(self.shortlistedHotelIds);
+    if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
+      params.shortlistedHotelIds = shortlistedHotelIds;
     }
 
     if (self.poller.isLastPolling()) {
