@@ -137,6 +137,8 @@ class HotelSearchClient {
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     let shortlistedHotelIds = dataUtils.trimArray(self.shortlistedHotelIds);
+    console.log(shortlistedHotelIds);
+    console.log("inside");
 
     searchParams = {
       search: {
