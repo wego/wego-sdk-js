@@ -28,6 +28,8 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
+    console.log(self.shortlistedHotelIds);
+    console.log("after options");
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -168,6 +170,8 @@ class HotelSearchClient {
 
     if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
       searchParams.shortlistedHotelIds = shortlistedHotelIds;
+      console.log(searchParams.shortlistedHotelIds);
+      console.log("searchParams");
     }
 
     return searchParams;
