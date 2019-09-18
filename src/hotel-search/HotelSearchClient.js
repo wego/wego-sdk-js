@@ -136,6 +136,7 @@ class HotelSearchClient {
     let locale = self.locale;
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
+    let shortlistedHotelIds = dataUtils.trimArray(self.shortlistedHotelIds);
 
     searchParams = {
       search: {
