@@ -138,7 +138,7 @@ class HotelSearchClient {
     let locale = self.locale;
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
-    let shortlistedHotelIds = dataUtils.trimArray(self.shortlistedHotelIds);
+    let shortlistedHotelIds = self.shortlistedHotelIds;
     console.log(shortlistedHotelIds);
     console.log("inside");
 
@@ -194,15 +194,13 @@ class HotelSearchClient {
       }
     }
 
+    console.log(typeof(self.selectedHotelIds));
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
     }
 
-    let shortlistedHotelIds = dataUtils.trimArray(self.shortlistedHotelIds);
-    if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
-      params.shortlistedHotelIds = shortlistedHotelIds;
-    }
+    params.shortlistedHotelIds = self.shortlistedHotelIds;
 
     if (self.poller.isLastPolling()) {
       params.isLastPolling = true;
