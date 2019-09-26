@@ -53,7 +53,6 @@ class HotelSearchClient {
         return self.handleSearchResponse(response);
       }
     });
-    console.log(self.poller.isLastPolling);
     console.log("after options");
     self.reset();
   }
@@ -63,6 +62,8 @@ class HotelSearchClient {
     self.search = search;
     self.reset();
     self.updateResult();
+    console.log(self.poller);
+    console.log("hi this is poller");
     self.poller.start();
   }
 
