@@ -28,7 +28,7 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
-    // self.isLastPolling = options.isLastPolling || self.isLastPolling;
+    self.onLastPoll = options.onLastPoll || function () { };
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -39,8 +39,7 @@ class HotelSearchClient {
           currencyCode: self.currency.code,
           locale: self.locale,
           clientId: self.clientId,
-          amountType: 'NIGHTLY',
-          isLastPolling: self.isLastPolling
+          amountType: 'NIGHTLY'
         };
 
         return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
@@ -69,6 +68,7 @@ class HotelSearchClient {
   handleSearchResponse(response) {
     let self = this;
     if (response.done) {
+      self.onLastPoll();
       self.poller.stop();
     }
     self.mergeResponse(response);
