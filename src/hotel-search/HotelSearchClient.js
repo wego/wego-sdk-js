@@ -28,6 +28,7 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
+    console.log("after options");
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -47,6 +48,8 @@ class HotelSearchClient {
         return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
       },
       onSuccessResponse: (response) => {
+        console.log("response");
+        console.log(response);
         return self.handleSearchResponse(response);
       }
     });
@@ -137,6 +140,8 @@ class HotelSearchClient {
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     let shortlistedHotelIds = self.shortlistedHotelIds;
+    console.log(shortlistedHotelIds);
+    console.log("inside");
 
     searchParams = {
       search: {
@@ -166,6 +171,8 @@ class HotelSearchClient {
 
     if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
       searchParams.shortlistedHotelIds = shortlistedHotelIds;
+      console.log(searchParams.shortlistedHotelIds);
+      console.log("searchParams");
     }
 
     return searchParams;
@@ -188,6 +195,7 @@ class HotelSearchClient {
       }
     }
 
+    console.log(typeof(self.selectedHotelIds));
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
