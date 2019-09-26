@@ -62,8 +62,6 @@ class HotelSearchClient {
     self.search = search;
     self.reset();
     self.updateResult();
-    console.log(self.poller);
-    console.log("hi this is poller");
     self.poller.start();
   }
 
@@ -208,6 +206,9 @@ class HotelSearchClient {
 
     if (self.poller.isLastPolling()) {
       params.isLastPolling = true;
+      console.log(params.isLastPolling);
+      console.log(params);
+      console.log("params");
     }
     return params;
   }
