@@ -29,8 +29,6 @@ class HotelSearchClient {
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
     // self.isLastPolling = options.isLastPolling || self.isLastPolling;
-    console.log(self.isLastPolling);
-    console.log("after options");
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -55,6 +53,8 @@ class HotelSearchClient {
         return self.handleSearchResponse(response);
       }
     });
+    console.log(self.poller.isLastPolling);
+    console.log("after options");
     self.reset();
   }
 
