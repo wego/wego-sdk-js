@@ -28,7 +28,8 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
-    self.onLastPoll = options.onLastPoll || function () { };
+    self.isLastPolling = options.isLastPolling || function () { };
+  
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -142,6 +143,7 @@ class HotelSearchClient {
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     let shortlistedHotelIds = self.shortlistedHotelIds;
+    let isLastPolling = self.isLastPolling;
     console.log(shortlistedHotelIds);
     console.log("inside");
 
@@ -177,6 +179,8 @@ class HotelSearchClient {
       console.log(searchParams.shortlistedHotelIds);
       console.log("searchParams");
     }
+
+    searchParams.isLastPolling = isLastPolling;
 
     return searchParams;
   }
