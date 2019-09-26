@@ -28,6 +28,8 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
+    // self.isLastPolling = options.isLastPolling || self.isLastPolling;
+    console.log(self.isLastPolling);
     console.log("after options");
 
     self.merger = new HotelSearchMerger();
