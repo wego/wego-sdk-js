@@ -39,7 +39,8 @@ class HotelSearchClient {
           currencyCode: self.currency.code,
           locale: self.locale,
           clientId: self.clientId,
-          amountType: 'NIGHTLY'
+          amountType: 'NIGHTLY',
+          isLastPolling: self.isLastPolling
         };
 
         return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
@@ -187,7 +188,8 @@ class HotelSearchClient {
       locale: self.locale,
       offset: self.lastRatesCount || 0,
       amountType: 'NIGHTLY',
-      clientId: self.clientId
+      clientId: self.clientId,
+      isLastPolling: self.isLastPolling
     };
 
     let trackingParams = self.trackingParams || {};
