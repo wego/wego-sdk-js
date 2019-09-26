@@ -44,10 +44,16 @@ class HotelSearchClient {
           isLastPolling: self.isLastPolling
         };
 
-        return Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
+        let initCallApiReturn = Api.searchHotels(hotelSearchEndpointUrl, self.getSearchRequestBody(), params, self.requestHeaders);
+        console.log(initCallApiReturn);
+        console.log("init");
+        return initCallApiReturn;
       },
       callApi: () => {
-        return Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
+        let callApiReturn = Api.fetchHotels(hotelSearchEndpointUrl, self.responseSearch.id, self.fetchHotelsParams(), self.requestHeaders);
+        console.log(callApiReturns);
+        console.log("callApi");
+        return callApiReturn;
       },
       onSuccessResponse: (response) => {
         console.log("response");
@@ -145,8 +151,6 @@ class HotelSearchClient {
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     let shortlistedHotelIds = self.shortlistedHotelIds;
     let isLastPolling = self.isLastPolling;
-    console.log(shortlistedHotelIds);
-    console.log("inside");
 
     searchParams = {
       search: {
