@@ -172,6 +172,7 @@ class HotelSearchClient {
 
     if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
       searchParams.shortlistedHotelIds = shortlistedHotelIds;
+      console.log(searchParams);
       console.log(searchParams.shortlistedHotelIds);
       console.log("searchParams");
     }
