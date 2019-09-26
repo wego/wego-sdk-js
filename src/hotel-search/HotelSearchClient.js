@@ -176,9 +176,6 @@ class HotelSearchClient {
 
     if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
       searchParams.shortlistedHotelIds = shortlistedHotelIds;
-      console.log(searchParams);
-      console.log(searchParams.shortlistedHotelIds);
-      console.log("searchParams");
     }
 
     searchParams.isLastPolling = isLastPolling;
@@ -218,6 +215,10 @@ class HotelSearchClient {
       console.log(params);
       console.log("params");
     }
+
+    console.log("fetchHotelParams");
+    console.log(params);
+
     return params;
   }
 }
