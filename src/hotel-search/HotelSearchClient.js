@@ -203,6 +203,7 @@ class HotelSearchClient {
 
     params.shortlistedHotelIds = self.shortlistedHotelIds;
 
+    console.log("inside SDK");
     if (self.poller.isLastPolling()) {
       params.isLastPolling = true;
       console.log(params.isLastPolling);
@@ -212,6 +213,7 @@ class HotelSearchClient {
 
     console.log("fetchHotelParams");
     console.log(params);
+    console.log("outside SDK");
 
     return params;
   }
