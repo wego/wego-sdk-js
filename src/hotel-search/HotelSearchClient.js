@@ -53,7 +53,6 @@ class HotelSearchClient {
         return self.handleSearchResponse(response);
       }
     });
-    console.log("after options");
     self.reset();
   }
 
@@ -197,7 +196,6 @@ class HotelSearchClient {
       }
     }
 
-    console.log(typeof(self.selectedHotelIds));
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
