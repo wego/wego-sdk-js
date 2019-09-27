@@ -12,6 +12,7 @@ Poller.prototype = {
     var self = this;
     this.timer = setTimeout(function() {
       self.pollCount++;
+      console.log(self.pollCount);
       self.retryCount = 0;
       self.fetch(self.initCallApi || self.callApi);
     }, 0);
