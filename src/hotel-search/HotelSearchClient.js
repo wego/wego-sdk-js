@@ -28,7 +28,6 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
-  
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -139,7 +138,6 @@ class HotelSearchClient {
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     let shortlistedHotelIds = self.shortlistedHotelIds;
-    let isLastPolling = self.isLastPolling;
 
     searchParams = {
       search: {
@@ -171,8 +169,6 @@ class HotelSearchClient {
       searchParams.shortlistedHotelIds = shortlistedHotelIds;
     }
 
-    searchParams.isLastPolling = isLastPolling;
-
     return searchParams;
   }
 
@@ -183,8 +179,7 @@ class HotelSearchClient {
       locale: self.locale,
       offset: self.lastRatesCount || 0,
       amountType: 'NIGHTLY',
-      clientId: self.clientId,
-      isLastPolling: self.isLastPolling
+      clientId: self.clientId
     };
 
     let trackingParams = self.trackingParams || {};
@@ -200,18 +195,6 @@ class HotelSearchClient {
     }
 
     params.shortlistedHotelIds = self.shortlistedHotelIds;
-
-    console.log("inside SDK");
-    if (self.poller.isLastPolling()) {
-      params.isLastPolling = true;
-      console.log(params.isLastPolling);
-      console.log(params);
-      console.log("params");
-    }
-
-    console.log("fetchHotelParams");
-    console.log(params);
-    console.log("outside SDK");
 
     return params;
   }
