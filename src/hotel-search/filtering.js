@@ -6,11 +6,6 @@ function filterByReviewScore(hotel, reviewScoreRange) {
   return utils.filterByRange(review.score, reviewScoreRange);
 }
 
-function airbnbFilterByReviewScore(hotel, reviewScoreRange) {
-  if (!reviewScoreRange) return true;
-  return utils.filterByRange(hotel.reviewsScore, reviewScoreRange);
-}
-
 function filterByReviewerGroups(hotel, reviewerGroups) {
   if (!reviewerGroups || reviewerGroups.length === 0) return true;
   for (var i = 0; i < reviewerGroups.length; i++) {
@@ -106,15 +101,15 @@ module.exports = {
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds)
         && filterByProviders(hotel, filter.providerCodes)
-        && filterByDeals(hotel, filter.deals);
+        && filterByDeals(hotel, filter.deals)
+        && filterByReviewScore(hotel, filter.reviewScoreRange);
 
       if (hotel.propertyTypeId === 39) {
         return conditionResult
-          && airbnbFilterByReviewScore(hotel, filter.reviewScoreRange)
           && filterByBedroomCount(hotel, filter.airbnbBedroomCount ? filter.airbnbBedroomCount : 0)
           && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
       }
-      return conditionResult && filterByReviewScore(hotel, filter.reviewScoreRange);
+      return conditionResult;
     });
   }
 };
