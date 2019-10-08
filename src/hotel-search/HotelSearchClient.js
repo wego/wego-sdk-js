@@ -64,7 +64,6 @@ class HotelSearchClient {
   handleSearchResponse(response) {
     let self = this;
     if (response.done) {
-      self.onLastPoll();
       self.poller.stop();
     }
     self.mergeResponse(response);
@@ -192,6 +191,10 @@ class HotelSearchClient {
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       params.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (self.poller.isLastPolling()) {
+      params.isLastPolling = true;
     }
 
     params.shortlistedHotelIds = self.shortlistedHotelIds;
