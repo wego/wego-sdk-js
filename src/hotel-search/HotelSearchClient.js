@@ -27,6 +27,7 @@ class HotelSearchClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
+    self.shortlistedHotelIds = options.shortlistedHotelIds || [];
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -135,6 +136,7 @@ class HotelSearchClient {
     let locale = self.locale;
     let searchParams;
     let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
+    let shortlistedHotelIds = self.shortlistedHotelIds;
 
     searchParams = {
       search: {
@@ -160,6 +162,10 @@ class HotelSearchClient {
 
     if (!!selectedHotelIds.length && Array.isArray(selectedHotelIds)) {
       searchParams.selectedHotelIds = selectedHotelIds;
+    }
+
+    if (!!shortlistedHotelIds.length && Array.isArray(shortlistedHotelIds)) {
+      searchParams.shortlistedHotelIds = shortlistedHotelIds;
     }
 
     return searchParams;
@@ -190,6 +196,9 @@ class HotelSearchClient {
     if (self.poller.isLastPolling()) {
       params.isLastPolling = true;
     }
+
+    params.shortlistedHotelIds = self.shortlistedHotelIds;
+
     return params;
   }
 }
