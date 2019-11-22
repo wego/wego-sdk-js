@@ -38,7 +38,9 @@ function filterByDeals(hotel, deals) {
   if (!rates) return false;
 
   for (var i = 0; i < rates.length; i++) {
-    if (rates[i]['usualPrice'] !== undefined) return true;
+    var rate = rates[i];
+
+    if (rate.usualPrice !== undefined || (rate.promos && rate.promos.length > 0)) return true;
   }
 
   return false;
