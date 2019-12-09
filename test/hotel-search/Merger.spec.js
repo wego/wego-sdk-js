@@ -200,6 +200,18 @@ describe('Merger', function() {
       expect(merger.__staticData.amenities[1]).to.equal(amenity);
     });
 
+    it('merging rooms', function() {
+      var room = {
+        id: 1,
+      };
+
+      merger.mergeResponse({
+        rooms: [room]
+      });
+
+      expect(merger.__staticData.rooms[1]).to.equal(room);
+    });
+
     it('merging rateAmenities', function() {
       var amenity1 = {
         code: 'BREAKFAST_INCLUDED',
