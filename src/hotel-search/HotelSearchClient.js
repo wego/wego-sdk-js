@@ -28,6 +28,7 @@ class HotelSearchClient {
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
+    self.onGroupSearchChanged = options.onGroupSearchChanged || function () { };
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -69,6 +70,7 @@ class HotelSearchClient {
     self.mergeResponse(response);
     self.updateResult();
     if (self.poller.pollCount === 1) self.onSearchCreated(response.search);
+    self.onGroupSearchChanged(response.groupSearch);
   }
 
   mergeResponse(response) {
