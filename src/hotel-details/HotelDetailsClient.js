@@ -43,7 +43,7 @@ class HotelDetailsClient {
           params.searchId = self.searchId;
         }
 
-        return Api.fetchHotelRates(self.search.hotelId, params);
+        return Api.fetchHotelRates(self.hotelDetailsEndpointUrl, self.search.hotelId, params);
       },
       onSuccessResponse: response => {
         return self.handleSearchResponse(response);
