@@ -5,7 +5,7 @@ const dataUtils = require("./dataUtils");
 const Api = require("../Api");
 const Poller = require("../Poller");
 
-const DELAYS = [0, 300, 600, 900, 2400, 3800, 5000, 6000];
+const DELAYS = [0, 300, 600, 900, 2400, 3800, 5000, 6000, 6000, 6000];
 
 class HotelSearchClient {
   constructor(hotelSearchEndpointUrl, options) {
