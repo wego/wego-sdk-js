@@ -31,11 +31,19 @@ function filterByProviders(trip, providerFilter) {
 
 function isFareMatchProviderType (fare, providerTypes) {
   if (!providerTypes) return true;
-  return _isFacilitatedBooking(fare, providerTypes) || _hasProviderType(fare, providerTypes);
+  return (
+    _isFacilitatedBooking(fare, providerTypes) ||
+    _isWegoFares(fare, providerTypes) ||
+    _hasProviderType(fare, providerTypes)
+  );
 }
 
 function _isFacilitatedBooking(fare, providerTypes) {
   return providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
+}
+
+function _isWegoFares(fare, providerTypes) {
+  return providerTypes.indexOf("instant") !== -1 && fare.provider.wegoFare;
 }
 
 function _hasProviderType(fare, providerTypes) {
@@ -65,7 +73,7 @@ function filterByStopoverOptions(trip, stopoverOptions) {
 }
 
 function filterByItineraryOptions(trip, itineraryOptions) {
-  if (!itineraryOptions) return true;  
+  if (!itineraryOptions) return true;
   for (var i = itineraryOptions.length; i--;) {
     if (itineraryOptions[i] === 'NOT_OVERNIGHT' && trip.overnight) return false;
     if (itineraryOptions[i] === 'SHORT_STOPOVER' && trip.longStopover) return false;
@@ -150,7 +158,7 @@ module.exports = {
     var stopoverAirportCodesMap = multiCity && utils.arrayToMaps(filter.stopoverAirportCodes, multiCity);
     var itineraryOptionsMap = multiCity && utils.arrayToMaps(filter.itineraryOptions, multiCity);
     var stopoverRanges = filter.stopoverDurationMinutesRanges;
-    
+
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
     var providerFilter = {providerCodeMap, providerTypes};
@@ -187,14 +195,14 @@ module.exports = {
 
           // filter each leg by alliance codes
           if( !filterByAll(allianceCodeMap, leg.allianceCodes) ) return false;
-          
+
           // filter each leg by stopover codes
           if( !filterByAll(stopoverAirportCodesMap, leg.stopoverAirportCodes) ) return false;
 
           // itinerary options for each leg (no overnight & short stopovers)
           var itineraryOptions = itineraryOptionsMap && Object.keys(itineraryOptionsMap[i] || {});
           if( !filterByItineraryOptions(leg, itineraryOptions) ) return false;
-          
+
           if( !filterByRanges(trip, stopoverRanges, 'stopoverDurationMinutes') ) return false;
 
         } // end for
