@@ -10,6 +10,7 @@ class FlightSearchClient {
     options = options || {};
     self.currency = options.currency || {};
     self.locale = options.locale;
+    self.showWegoFares = options.showWegoFares || false;
     self.siteCode = options.siteCode;
     self.deviceType = options.deviceType || "DESKTOP";
     self.appType = options.appType || "WEB_APP";
@@ -47,7 +48,7 @@ class FlightSearchClient {
     self.search = search;
     self.reset();
 
-    // determine whether multi city 
+    // determine whether multi city
     let legs = search.legs;
     let multiCity = legs.length > 2;
     // 2 legs can still be multi city
@@ -174,6 +175,7 @@ class FlightSearchClient {
         siteCode: self.siteCode,
         currencyCode: self.currency.code,
         locale: self.locale,
+        showWegoFares: self.showWegoFares,
         legs: legs.map(leg => {
           return {
             departureCityCode: leg.departureCityCode,
