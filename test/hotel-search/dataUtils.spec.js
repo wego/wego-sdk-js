@@ -315,6 +315,32 @@ describe('dataUtils', function() {
       expect(bestRateOf([r1, r2, r3])).to.equal(r3);
     });
 
+    it('prioritizes directBooking when prices are the same but one is directBooking', function() {
+      var r1 = {
+        price: {
+          amount: 10000,
+          ecpc: 1
+        },
+        provider: {
+          code: 'provider1',
+          directBooking: true
+        }
+      };
+
+      var r2 = {
+        price: {
+          amount: 10000,
+          ecpc: 2
+        },
+        provider: {
+          code: 'provider2',
+          directBooking: false
+        }
+      };
+
+      expect(bestRateOf([r1, r2])).to.equals(r1);
+    });
+
     it('compare two rates when price and provider type same', function() {
       var r1 = {
         price: {
