@@ -103,6 +103,7 @@ module.exports = {
         && filterByReviewerGroups(hotel, filter.reviewerGroups)
         && filterByRateAmenities(hotel, filter.rateAmenityIds)
         && filterByProviders(hotel, filter.providerCodes)
+        && filterByProviders(hotel, filter.providers)
         && filterByDeals(hotel, filter.deals)
         && filterByReviewScore(hotel, filter.reviewScoreRange);
 
