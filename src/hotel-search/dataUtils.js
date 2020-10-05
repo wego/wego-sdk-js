@@ -42,6 +42,7 @@ module.exports = {
     hotel.rates = [];
     hotel.images = hotel.images || [];
     hotel.propertyType = staticData.propertyTypes[hotel.propertyTypeId];
+    hotel.provider = staticData.propertyTypes[hotel.provider];
 
     // Check for airbnb
     if (hotel.badges && hotel.propertyTypeId === 39) {
@@ -147,6 +148,7 @@ module.exports = {
     amenities: 'amenities',
     rateAmenities: 'rateAmenities',
     chains: 'chains',
+    providers: 'providers',
     reviewerGroups: 'reviewerGroups',
     roomTypeCategories: 'roomTypeCategories'
   }
