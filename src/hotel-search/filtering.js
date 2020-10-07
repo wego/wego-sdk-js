@@ -78,6 +78,34 @@ function filterByProviders(hotel, providerCodes) {
   return false;
 }
 
+function filterByProviderTypes(hotel, providers) {
+  // providers = wego, hotels, ota
+  if (!providers || providers.length === 0) return true;
+  var rates = hotel.rates;
+
+  if (!rates) return false;
+
+  for (var i = 0; i < rates.length; i++) {
+    if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
+      return rates[i].provider.directBooking || rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA';
+    } else if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1) {
+      return rates[i].provider.directBooking || rates[i].provider.isHotelWebsite;
+    } else if (providers.indexOf('wego') !== -1 && providers.indexOf('ota') !== -1) {
+      return rates[i].provider.directBooking || rates[i].provider.type === 'OTA';
+    } else if (providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
+      return rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA';
+    } else if (providers.indexOf('wego') !== -1) {
+      return rates[i].provider.directBooking;
+    } else if (providers.indexOf('hotels') !== -1) {
+      return rates[i].provider.isHotelWebsite;
+    } else if (providers.indexOf('ota') !== -1) {
+      return rates[i].provider.type === 'OTA';
+    }
+  }
+
+  return false;
+}
+
 module.exports = {
   filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
@@ -91,26 +119,29 @@ module.exports = {
     var chainIdMap = utils.arrayToMap(filter.chainIds);
 
     return hotels.filter(function (hotel) {
-      var conditionResult = filterByPrice(hotel, filter.priceRange)
-        && utils.filterByKey(hotel.star, starMap)
-        && utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds)
-        && utils.filterByKey(hotel.districtId, districtIdMap)
-        && utils.filterByKey(hotel.cityCode, cityCodeMap)
-        && utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap)
-        && utils.filterByKey(hotel.brandId, brandIdMap)
-        && filterByName(hotel, filter.name)
-        && utils.filterByKey(hotel.chainId, chainIdMap)
-        && filterByReviewerGroups(hotel, filter.reviewerGroups)
-        && filterByRateAmenities(hotel, filter.rateAmenityIds)
-        && filterByProviders(hotel, filter.providerCodes)
-        && filterByProviders(hotel, filter.providers)
-        && filterByDeals(hotel, filter.deals)
-        && filterByReviewScore(hotel, filter.reviewScoreRange);
+      var conditionResult =
+        filterByPrice(hotel, filter.priceRange) &&
+        utils.filterByKey(hotel.star, starMap) &&
+        utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds) &&
+        utils.filterByKey(hotel.districtId, districtIdMap) &&
+        utils.filterByKey(hotel.cityCode, cityCodeMap) &&
+        utils.filterByKey(hotel.propertyTypeId, propertyTypeIdMap) &&
+        utils.filterByKey(hotel.brandId, brandIdMap) &&
+        filterByName(hotel, filter.name) &&
+        utils.filterByKey(hotel.chainId, chainIdMap) &&
+        filterByReviewerGroups(hotel, filter.reviewerGroups) &&
+        filterByRateAmenities(hotel, filter.rateAmenityIds) &&
+        filterByProviders(hotel, filter.providerCodes) &&
+        filterByProviderTypes(hotel, filter.providers) &&
+        filterByDeals(hotel, filter.deals) &&
+        filterByReviewScore(hotel, filter.reviewScoreRange);
 
       if (hotel.propertyTypeId === 39) {
-        return conditionResult
-          && filterByBedroomCount(hotel, filter.airbnbBedroomCount ? filter.airbnbBedroomCount : 0)
-          && utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap);
+        return (
+          conditionResult &&
+          filterByBedroomCount(hotel, filter.airbnbBedroomCount ? filter.airbnbBedroomCount : 0) &&
+          utils.filterByKey(hotel.roomTypeCategoryId, roomTypeCategoryMap)
+        );
       }
       return conditionResult;
     });
