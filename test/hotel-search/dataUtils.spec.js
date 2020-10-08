@@ -323,7 +323,7 @@ describe('dataUtils', function() {
         },
         provider: {
           code: 'provider1',
-          directBooking: true
+          directBooking: false
         }
       };
 
@@ -334,11 +334,11 @@ describe('dataUtils', function() {
         },
         provider: {
           code: 'provider2',
-          directBooking: false
+          directBooking: true
         }
       };
 
-      expect(bestRateOf([r1, r2])).to.equals(r1);
+      expect(bestRateOf([r1, r2])).to.equals(r2);
     });
 
     it('compare two rates when price and provider type same', function() {
