@@ -87,19 +87,33 @@ function filterByProviderTypes(hotel, providers) {
 
   for (var i = 0; i < rates.length; i++) {
     if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
-      return rates[i].provider.directBooking || rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA';
+      if (rates[i].provider.directBooking || rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA') {
+        return true;
+      }
     } else if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1) {
-      return rates[i].provider.directBooking || rates[i].provider.isHotelWebsite;
+      if (rates[i].provider.directBooking || rates[i].provider.isHotelWebsite) {
+        return true;
+      }
     } else if (providers.indexOf('wego') !== -1 && providers.indexOf('ota') !== -1) {
-      return rates[i].provider.directBooking || rates[i].provider.type === 'OTA';
+      if (rates[i].provider.directBooking || rates[i].provider.type === 'OTA') {
+        return true;
+      }
     } else if (providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
-      return rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA';
+      if (rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA') {
+        return true;
+      }
     } else if (providers.indexOf('wego') !== -1) {
-      return rates[i].provider.directBooking;
+      if (rates[i].provider.directBooking) {
+        return true;
+      }
     } else if (providers.indexOf('hotels') !== -1) {
-      return rates[i].provider.isHotelWebsite;
+      if (rates[i].provider.isHotelWebsite) {
+        return true;
+      }
     } else if (providers.indexOf('ota') !== -1) {
-      return rates[i].provider.type === 'OTA';
+      if (rates[i].provider.type === 'OTA') {
+        return true;
+      }
     }
   }
 

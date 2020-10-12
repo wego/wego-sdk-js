@@ -233,6 +233,89 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel1, hotel2]);
     });
 
+    it('filters by "wego" and "hotels" provider types', function() {
+      var filter = {
+        providers: ['wego', 'hotels']
+      };
+
+      var hotel1 = {
+        rates: [
+          {
+            provider: { directBooking: true, isHotelWebsite: false, type: 'OTA' }
+          },
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          }
+        ]
+      };
+
+      var hotel2 = {
+        rates: [
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          },
+          {
+            provider: { directBooking: false, isHotelWebsite: true, type: 'DIRECT' }
+          }
+        ]
+      };
+
+      var hotel3 = {
+        rates: [
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          },
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          }
+        ]
+      };
+
+      var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
+
+      expect(hotels).to.deep.equal([hotel1, hotel2]);
+    });
+
+    it('filters by "ota" provider types', function() {
+      var filter = {
+        providers: ['ota']
+      };
+
+      var hotel1 = {
+        rates: [
+          {
+            provider: { directBooking: true, isHotelWebsite: false, type: 'OTA' }
+          },
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          }
+        ]
+      };
+
+      var hotel2 = {
+        rates: [
+          {
+            provider: { directBooking: false, isHotelWebsite: true, type: 'DIRECT' }
+          }
+        ]
+      };
+
+      var hotel3 = {
+        rates: [
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          },
+          {
+            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+          }
+        ]
+      };
+
+      var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
+
+      expect(hotels).to.deep.equal([hotel1, hotel3]);
+    });
+
   });
 
   function createRateWithRateAmenities(amenities) {
