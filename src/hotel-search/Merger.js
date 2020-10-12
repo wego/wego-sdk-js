@@ -20,7 +20,7 @@ HotelSearchClient.prototype = {
 
     this._mergeStaticData(response);
     this._mergeHotels(response.hotels);
-    this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter)); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
+    this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter), response.providers); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
     this._mergeSortedRatesByBasePrice();
     this._mergeScores(response.scores);
@@ -220,7 +220,7 @@ HotelSearchClient.prototype = {
     });
   },
 
-  _mergeFilter: function (newFilter) {
+  _mergeFilter: function (newFilter, providers) {
     if (!newFilter) return;
 
     var filter = this.__filter;
@@ -240,6 +240,13 @@ HotelSearchClient.prototype = {
 
     this.__filterOptionTypes.forEach(function (type) {
       var options = newFilter[type] || [];
+
+      if (type === 'providers') {
+        // if type is providers, override normal procedure.
+        // use providers directly instead of getting from `filters.*`
+        options = providers || [];
+      }
+
       options.forEach(function (option) {
         dataUtils.prepareFilterOption(option, type, self.__staticData);
         self.__filterOptionsMap[type][option.code] = option;
@@ -351,6 +358,7 @@ HotelSearchClient.prototype = {
     'amenities',
     'rateAmenities',
     'chains',
+    'providers',
     'reviewerGroups',
     'roomTypeCategories'
   ],
