@@ -130,6 +130,12 @@ module.exports = {
     var secondRateAmount = processRateAmount(secondRate);
     if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
 
+    if (firstRate.provider.directBooking && !secondRate.provider.directBooking) {
+      return true;
+    } else if (secondRate.provider.directBooking && !firstRate.provider.directBooking) {
+      return false;
+    }
+
     if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
       return true;
     } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
