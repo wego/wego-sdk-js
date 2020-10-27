@@ -157,8 +157,8 @@ class HotelSearchClient {
         deviceType: self.deviceType,
         appType: self.appType,
         userLoggedIn: self.userLoggedIn,
-        includeDirect: search.includeDirect
       },
+      includeDirect: true, // to show Book on Wego rates
       rateAmenityIds: self.rateAmenityIds,
       offset: self.lastRatesCount
     };
