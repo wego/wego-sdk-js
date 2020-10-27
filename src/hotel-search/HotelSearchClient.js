@@ -156,7 +156,8 @@ class HotelSearchClient {
         checkOut: search.checkOut,
         deviceType: self.deviceType,
         appType: self.appType,
-        userLoggedIn: self.userLoggedIn
+        userLoggedIn: self.userLoggedIn,
+        includeDirect: search.includeDirect
       },
       rateAmenityIds: self.rateAmenityIds,
       offset: self.lastRatesCount
