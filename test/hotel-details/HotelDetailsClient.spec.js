@@ -87,6 +87,7 @@ describe('HotelDetailsClient', function () {
     var requestBody = client.getSearchRequestBody();
     var requestSearch = requestBody.search;
 
+    expect(requestBody.includeDirect).to.equal(true);
     expect(requestSearch.cityCode).to.equal(cityCode);
     expect(requestSearch.locale).to.equal(locale);
     expect(requestSearch.currencyCode).to.equal(currencyCode);
