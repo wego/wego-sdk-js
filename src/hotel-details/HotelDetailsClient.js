@@ -26,7 +26,7 @@ class HotelDetailsClient {
       delays: DELAYS,
       pollLimit: 7,
       callApi: () => {
-        const params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId, amountType: 'NIGHTLY' };
+        const params = { currencyCode: self.currency.code, locale: self.locale, clientId: self.clientId, amountType: 'NIGHTLY', includeDirect: true };
         let trackingParams = self.trackingParams || {};
 
         for (let key in trackingParams) {
@@ -117,7 +117,8 @@ class HotelDetailsClient {
         deviceType: self.deviceType,
         appType: self.appType,
         userLoggedIn: self.userLoggedIn
-      }
+      },
+      includeDirect: true
     };
 
     if (self.searchId !== undefined) {
