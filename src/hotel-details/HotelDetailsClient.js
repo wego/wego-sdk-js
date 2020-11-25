@@ -117,7 +117,8 @@ class HotelDetailsClient {
         deviceType: self.deviceType,
         appType: self.appType,
         userLoggedIn: self.userLoggedIn
-      }
+      },
+      includeDirect: true
     };
 
     if (self.searchId !== undefined) {
