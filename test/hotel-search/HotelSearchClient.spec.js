@@ -1,3 +1,4 @@
+const { expect } = require("chai");
 const sinon = require("sinon");
 const HotelSearchClient = require("../../src/hotel-search/HotelSearchClient");
 
@@ -293,6 +294,7 @@ describe("HotelSearchClient", function () {
       var requestBody = client.getSearchRequestBody(),
         requestSearch = requestBody.search;
 
+      expect(requestBody.includeDirect).to.equal(true);
       expect(requestBody.offset).to.equal(lastRatesCount);
       expect(requestSearch.id).to.equal(searchId);
       expect(requestSearch.cityCode).to.equal(cityCode);
