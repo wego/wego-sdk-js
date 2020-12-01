@@ -577,6 +577,10 @@ describe("HotelSearchClient", function () {
       var params = client.fetchHotelsParams();
       expect(params.currencyCode).to.equal(currencyCode);
     });
+    it("returns moreRates", function() {
+      var params = client.fetchHotelsParams();
+      expect(params.moreRates).to.equal(true);
+    });
     it("returns wgCampaign", function () {
       var params = client.fetchHotelsParams();
       expect(params.wgCampaign).to.equal(wgCampaign);
