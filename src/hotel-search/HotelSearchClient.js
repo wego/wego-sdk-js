@@ -181,7 +181,8 @@ class HotelSearchClient {
       locale: self.locale,
       offset: self.lastRatesCount || 0,
       amountType: 'NIGHTLY',
-      clientId: self.clientId
+      clientId: self.clientId,
+      moreRates: true
     };
 
     let trackingParams = self.trackingParams || {};
