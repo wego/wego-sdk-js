@@ -1,17 +1,17 @@
 var dataUtils = require('./dataUtils');
 var utils = require('../utils');
 
-var FlightSearchMerger = function(options) {
+var FlightSearchMerger = function (options) {
   options = options || {};
-  this.currency  = options.currency;
+  this.currency = options.currency;
 };
 
 FlightSearchMerger.prototype = {
-  mergeResponse: function(response) {
-    var self = this, 
-        updatedTripIds = self._getUpdatedTripIds(response),
-        legs = response.legs;
-    
+  mergeResponse: function (response) {
+    var self = this,
+      updatedTripIds = self._getUpdatedTripIds(response),
+      legs = response.legs;
+
     self._mergeStaticData(response);
     self._mergeLegs(legs);
     self._mergeLegConditions(response.legConditionIds);
@@ -19,42 +19,48 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
+    self._mergeProviders(response.providers);
 
     self._cloneTrips(updatedTripIds);
   },
 
-  reset: function() {
+  reset: function () {
     this.__staticData = this._getEmptyStaticData();
     this.__legMap = {};
     this.__tripMap = {};
     this.__trips = [];
+    this.__providers = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
 
-  getTrips: function() {
+  getTrips: function () {
     return this.__trips;
   },
 
-  getLegConditions: function() {
+  getLegConditions: function () {
     return this.__staticData["legConditions"];
   },
 
-  getFareConditions: function() {
+  getFareConditions: function () {
     return this.__staticData["fareConditions"];
   },
 
-  getFilter: function() {
+  getProviders: function () {
+    return this.__providers;
+  },
+
+  getFilter: function () {
     return this.__filter;
   },
 
-  updateCurrency: function(currency) {
+  updateCurrency: function (currency) {
     var self = this;
     self.currency = currency;
 
     var tripMap = self.__tripMap;
     for (var tripId in tripMap) {
-      tripMap[tripId].fares.forEach(function(fare) {
+      tripMap[tripId].fares.forEach(function (fare) {
         fare.price = dataUtils.convertPrice(fare.price, currency);
         fare.paymentFees = dataUtils.convertPaymentFees(fare.paymentFees, currency);
       });
@@ -62,7 +68,7 @@ FlightSearchMerger.prototype = {
     self._cloneTrips(Object.keys(tripMap));
 
     var filter = self.__filter;
-    self.__filterOptionTypes.forEach(function(type) {
+    self.__filterOptionTypes.forEach(function (type) {
       var optionMap = self.__filterOptionsMap[type];
       for (var code in optionMap) {
         var option = optionMap[code];
@@ -76,12 +82,12 @@ FlightSearchMerger.prototype = {
     self._cloneFilter();
   },
 
-  _mergeStaticData: function(response) {
+  _mergeStaticData: function (response) {
     var staticData = this.__staticData;
 
     function merge(itemMap, items, type) {
       if (!items) return;
-      items.forEach(function(item) {
+      items.forEach(function (item) {
         var key = item.id || item.code;
         itemMap[key] = item;
         if (type === 'airports') {
@@ -92,16 +98,16 @@ FlightSearchMerger.prototype = {
       });
     }
 
-    this.__staticDataTypes.forEach(function(type) {
+    this.__staticDataTypes.forEach(function (type) {
       merge(staticData[type], response[type], type);
     });
   },
 
-  _mergeLegs: function(newLegs) {
+  _mergeLegs: function (newLegs) {
     if (!newLegs) return;
     var self = this;
     var legMap = this.__legMap;
-    newLegs.forEach(function(newLeg) {
+    newLegs.forEach(function (newLeg) {
       var legId = newLeg.id;
       if (!legMap[legId]) {
         dataUtils.prepareLeg(newLeg, self.__staticData);
@@ -120,20 +126,20 @@ FlightSearchMerger.prototype = {
         legMap[legId].conditions = newLegConditions[legId].map(function (legConditionId) {
           return legConditions[legConditionId];
         });
-        legMap[legId].conditionIds = newLegConditions[legId]; 
+        legMap[legId].conditionIds = newLegConditions[legId];
       }
     });
   },
 
-  _mergeTrips: function(newTrips) {
+  _mergeTrips: function (newTrips) {
     if (!newTrips) return;
     var self = this;
     var tripMap = this.__tripMap;
-    newTrips.forEach(function(newTrip) {
+    newTrips.forEach(function (newTrip) {
       var tripId = newTrip.id;
       if (!tripMap[tripId]) {
         var legIds = newTrip.legIds || [];
-        newTrip.legs = legIds.map(function(legId) {
+        newTrip.legs = legIds.map(function (legId) {
           return self.__legMap[legId];
         });
 
@@ -143,10 +149,10 @@ FlightSearchMerger.prototype = {
     });
   },
 
-  _mergeFares: function(newFares) {
+  _mergeFares: function (newFares) {
     if (!newFares) return;
     var self = this;
-    newFares.forEach(function(newFare) {
+    newFares.forEach(function (newFare) {
       dataUtils.prepareFare(newFare, self.currency, self.__staticData);
       var tripId = newFare.tripId;
       var trip = self.__tripMap[tripId];
@@ -154,7 +160,7 @@ FlightSearchMerger.prototype = {
 
       var fares = trip.fares;
       var i = 0;
-      for(; i < fares.length; i++) {
+      for (; i < fares.length; i++) {
         if (newFare.id === fares[i].id) return;
         if (newFare.price.amountUsd < fares[i].price.amountUsd) break;
       }
@@ -162,7 +168,20 @@ FlightSearchMerger.prototype = {
     });
   },
 
-  _mergeScores: function(scores) {
+  _mergeProviders: function (newProviders) {
+    if (newProviders) {
+      // concat with new providers
+      let providers = this.__providers.concat(newProviders);
+
+      // sort ascending
+      providers.sort((a, b) => a.name.localeCompare(b.name));
+
+      // assign dedup providers to __providers
+      this.__providers = providers.filter((v, i, a) => a.findIndex(t => (t.code === v.code)) === i);
+    }
+  },
+
+  _mergeScores: function (scores) {
     if (!scores) return;
     var tripMap = this.__tripMap;
     for (var tripId in scores) {
@@ -173,15 +192,15 @@ FlightSearchMerger.prototype = {
     }
   },
 
-  _mergeFilter: function(newFilter) {
+  _mergeFilter: function (newFilter) {
     if (!newFilter) return;
-    var self = this, 
-        filter = self.__filter, 
-        multiCity = self.multiCity,
-        newFilterLegs = newFilter.legs;
+    var self = this,
+      filter = self.__filter,
+      multiCity = self.multiCity,
+      newFilterLegs = newFilter.legs;
 
     if (newFilterLegs) {
-      newFilterLegs.forEach(function(leg) {
+      newFilterLegs.forEach(function (leg) {
         dataUtils.prepareLegFilter(leg, self.__staticData);
       });
       filter.legs = newFilterLegs;
@@ -199,15 +218,15 @@ FlightSearchMerger.prototype = {
       filter.stopoverDurations = newFilter.stopoverDurations;
     }
 
-    var stopCodesMap = {'DIRECT': 0, 'ONE_STOP': 1, 'MORE_THAN_ONE_STOP': 2};    
+    var stopCodesMap = { 'DIRECT': 0, 'ONE_STOP': 1, 'MORE_THAN_ONE_STOP': 2 };
 
     self.__filterOptionTypes.forEach(type => {
 
       let buildOptions = (options, legIndex) => {
         options && options.forEach(option => {
           var isByLeg = legIndex >= 0;
-          if( type === 'stops' ) option.code = stopCodesMap[option.code];
-          var code = (isByLeg ? (legIndex+1) + '_' : '') + option.code;
+          if (type === 'stops') option.code = stopCodesMap[option.code];
+          var code = (isByLeg ? (legIndex + 1) + '_' : '') + option.code;
           dataUtils.prepareFilterOption(option, type, self.currency, self.__staticData);
           self.__filterOptionsMap[type][code] = option;
           option.code = code;
@@ -215,8 +234,8 @@ FlightSearchMerger.prototype = {
         });
       }
 
-      if( multiCity && newFilterLegs ) {
-        for(var i=newFilterLegs.length; i--;) {
+      if (multiCity && newFilterLegs) {
+        for (var i = newFilterLegs.length; i--;) {
           buildOptions(newFilterLegs[i][type], i);
         }
       }
@@ -229,7 +248,7 @@ FlightSearchMerger.prototype = {
     self._cloneFilter();
   },
 
-  _getUpdatedTripIds: function(response) {
+  _getUpdatedTripIds: function (response) {
     var tripIds = {};
     var self = this;
     if (response.scores) {
@@ -239,19 +258,19 @@ FlightSearchMerger.prototype = {
     }
 
     if (response.fares) {
-      response.fares.forEach(function(fare) {
+      response.fares.forEach(function (fare) {
         tripIds[fare.tripId] = true;
       });
     }
 
-    return Object.keys(tripIds).filter(function(tripId) {
+    return Object.keys(tripIds).filter(function (tripId) {
       return self.__tripMap[tripId];
     });
   },
 
-  _cloneTrips: function(tripIds) {
+  _cloneTrips: function (tripIds) {
     var tripMap = this.__tripMap;
-    tripIds.forEach(function(tripId) {
+    tripIds.forEach(function (tripId) {
       var trip = tripMap[tripId];
       if (!trip) {
         console.error("Trip with " + tripId + " is missing");
@@ -264,18 +283,18 @@ FlightSearchMerger.prototype = {
     this.__trips = utils.mapValues(tripMap);
   },
 
-  _cloneFilter: function() {
+  _cloneFilter: function () {
     this.__filter = utils.cloneObject(this.__filter);
   },
 
-  _buildFilterOptions: function(type) {
+  _buildFilterOptions: function (type) {
     var self = this, values = utils.mapValues(self.__filterOptionsMap[type]);
     values.sort((option1, option2) => {
       if (type === 'stops') {
         var code1 = option1.code, code2 = option2.code;
 
         // multi city has leg prefix. i.e: '1_0' (leg 0 direct), '3_1' (leg 2 one stop)
-        if( self.multiCity ) {
+        if (self.multiCity) {
           code1 = code1.substr(2);
           code2 = code2.substr(2);
         }
@@ -289,29 +308,29 @@ FlightSearchMerger.prototype = {
     self.__filter[type] = values;
   },
 
-  _getEmptyFilter: function() {
+  _getEmptyFilter: function () {
     var filter = {
       legs: [],
     };
 
-    this.__filterOptionTypes.forEach(function(type) {
+    this.__filterOptionTypes.forEach(function (type) {
       filter[type] = [];
     });
 
     return filter;
   },
 
-  _getEmptyFilterOptionsMap: function() {
+  _getEmptyFilterOptionsMap: function () {
     var map = {};
-    this.__filterOptionTypes.forEach(function(type) {
+    this.__filterOptionTypes.forEach(function (type) {
       map[type] = {};
     });
     return map;
   },
 
-  _getEmptyStaticData: function() {
+  _getEmptyStaticData: function () {
     var staticData = {};
-    this.__staticDataTypes.forEach(function(type) {
+    this.__staticDataTypes.forEach(function (type) {
       staticData[type] = {};
     });
     return staticData;
