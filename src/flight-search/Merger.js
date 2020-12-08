@@ -19,7 +19,6 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
-    self._mergeProviders(response.providers);
 
     self._cloneTrips(updatedTripIds);
   },
@@ -47,7 +46,7 @@ FlightSearchMerger.prototype = {
   },
 
   getProviders: function () {
-    return this.__providers;
+    return this.__staticData.providers;
   },
 
   getFilter: function () {
@@ -166,19 +165,6 @@ FlightSearchMerger.prototype = {
       }
       fares.splice(i, 0, newFare);
     });
-  },
-
-  _mergeProviders: function (newProviders) {
-    if (newProviders) {
-      // concat with new providers
-      let providers = this.__providers.concat(newProviders);
-
-      // sort ascending
-      providers.sort((a, b) => a.name.localeCompare(b.name));
-
-      // assign dedup providers to __providers
-      this.__providers = providers.filter((v, i, a) => a.findIndex(t => (t.code === v.code)) === i);
-    }
   },
 
   _mergeScores: function (scores) {
