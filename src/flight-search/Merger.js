@@ -45,7 +45,8 @@ FlightSearchMerger.prototype = {
   },
 
   getProviders: function () {
-    return this.__staticData.providers;
+    const providers = this.__staticData.providers;
+    return Object.keys(providers).map(providerCode => providers[providerCode]);
   },
 
   getFilter: function () {
@@ -81,6 +82,7 @@ FlightSearchMerger.prototype = {
   },
 
   _mergeStaticData: function (response) {
+    console.log('static data: ', response);
     var staticData = this.__staticData;
 
     function merge(itemMap, items, type) {
