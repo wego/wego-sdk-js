@@ -28,7 +28,6 @@ FlightSearchMerger.prototype = {
     this.__legMap = {};
     this.__tripMap = {};
     this.__trips = [];
-    this.__providers = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
   },
