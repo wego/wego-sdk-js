@@ -1,14 +1,14 @@
 var FlightSearchMerger = require('../../src/flight-search/Merger');
 
-describe('FlightSearchMerger', function() {
+describe('FlightSearchMerger', function () {
   var merger;
-  beforeEach(function() {
+  beforeEach(function () {
     merger = new FlightSearchMerger();
     merger.reset();
   });
 
-  describe('#updateCurrency', function() {
-    it('update trip fare', function() {
+  describe('#updateCurrency', function () {
+    it('update trip fare', function () {
       var trip = {
         id: 1,
       };
@@ -56,7 +56,7 @@ describe('FlightSearchMerger', function() {
       expect(newTrip.fares[0].paymentFees[0].amount).to.equal(2);
     });
 
-    it('update filter', function() {
+    it('update filter', function () {
       var currency = {
         code: 'sgd',
         rate: 2,
@@ -92,7 +92,7 @@ describe('FlightSearchMerger', function() {
       expect(newFilter).to.not.equal(oldFilter);
     });
 
-    it('update minPrice', function() {
+    it('update minPrice', function () {
       merger.mergeResponse({
         filters: {
           minPrice: {
@@ -120,7 +120,7 @@ describe('FlightSearchMerger', function() {
       expect(newMinPrice).to.not.equal(oldMinPrice);
     });
 
-    it('update maxPrice', function() {
+    it('update maxPrice', function () {
       merger.mergeResponse({
         filters: {
           maxPrice: {
@@ -149,8 +149,8 @@ describe('FlightSearchMerger', function() {
     });
   });
 
-  describe('mergeStaticData', function() {
-    it('merging countries', function() {
+  describe('mergeStaticData', function () {
+    it('merging countries', function () {
       var city = {
         code: 1,
         name: 1,
@@ -171,7 +171,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.cities[1].country).to.equal(country);
     });
 
-    it('merging airports', function() {
+    it('merging airports', function () {
       var airport = {
         code: 1,
         name: 1,
@@ -192,7 +192,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.airports[1].city).to.equal(city);
     });
 
-    it('merging airlines', function() {
+    it('merging airlines', function () {
       var airline = {
         code: 1,
         name: 1,
@@ -205,7 +205,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.airlines[1]).to.equal(airline);
     });
 
-    it('merging providers', function() {
+    it('merging providers', function () {
       var provider = {
         code: 1,
         name: 1,
@@ -218,7 +218,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.providers[1]).to.equal(provider);
     });
 
-    it('merging fareConditions', function() {
+    it('merging fareConditions', function () {
       var fareCondition = {
         id: 1,
         name: 1,
@@ -231,7 +231,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__staticData.fareConditions[1]).to.equal(fareCondition);
     });
 
-    it('merging legConditions', function() {
+    it('merging legConditions', function () {
       var legCondition = {
         id: 1,
         name: 1,
@@ -245,8 +245,8 @@ describe('FlightSearchMerger', function() {
     });
   });
 
-  describe('merge trips', function() {
-    it('add legs', function() {
+  describe('merge trips', function () {
+    it('add legs', function () {
       var legId = 2;
       var leg = {
         id: legId,
@@ -299,7 +299,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__legMap["id2"].conditionIds).to.deep.equal([3]);
     });
 
-    it('add trip', function() {
+    it('add trip', function () {
       var legId = 2;
       var leg = {
         id: legId,
@@ -325,7 +325,7 @@ describe('FlightSearchMerger', function() {
       expect(merger.__tripMap[tripId].legs[0]).to.equal(leg);
     });
 
-    it('processing trip', function() {
+    it('processing trip', function () {
       var tripId = 4;
       var departureTimeMinutes = 1;
       var legId = 2;
@@ -353,7 +353,7 @@ describe('FlightSearchMerger', function() {
     });
   });
 
-  it('merge experience scores', function() {
+  it('merge experience scores', function () {
     var tripId = 4;
     var score = 5;
     var trip = {
@@ -376,7 +376,7 @@ describe('FlightSearchMerger', function() {
     expect(merger.__tripMap[tripId]).to.not.equal(oldTrip);
   });
 
-  it('merge fares', function() {
+  it('merge fares', function () {
     var tripId = 4;
     var providerCode = 'PC';
     var provider = {
@@ -444,7 +444,7 @@ describe('FlightSearchMerger', function() {
 
     var fares = merger.__tripMap[tripId].fares;
 
-    var faresIds = fares.map(function(fare) {
+    var faresIds = fares.map(function (fare) {
       return fare.id;
     });
 
@@ -453,8 +453,8 @@ describe('FlightSearchMerger', function() {
     expect(merger.__tripMap[tripId]).to.not.equal(oldTrip);
   });
 
-  describe('merge filter', function() {
-    it('updating price for existing options', function() {
+  describe('merge filter', function () {
+    it('updating price for existing options', function () {
       var price = {
         amountUsd: 5,
         originalAmountUsd: 5,
@@ -508,7 +508,7 @@ describe('FlightSearchMerger', function() {
       expect(filter).to.not.equal(oldFilter);
     });
 
-    it('inserting new option in alphabet sorted order', function() {
+    it('inserting new option in alphabet sorted order', function () {
       var option1 = {
         code: '1',
         count: '5'
@@ -552,7 +552,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.airlines[1].code).to.equal('3');
     });
 
-    it('airlines', function() {
+    it('airlines', function () {
       var option = {
         code: 1,
       };
@@ -574,7 +574,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.airlines[0].name).to.equal('chain');
     });
 
-    it('airlines', function() {
+    it('airlines', function () {
       var option = {
         code: 1,
       };
@@ -597,7 +597,7 @@ describe('FlightSearchMerger', function() {
       expect(filterOption.item).to.equal(airline);
     });
 
-    it('stops', function() {
+    it('stops', function () {
       var directOption = {
         code: 'DIRECT',
       };
@@ -620,7 +620,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.stops).to.deep.equal([directOption, oneStopOption, moreThanOneStopOption]);
     });
 
-    it('alliances', function() {
+    it('alliances', function () {
       var option = {
         code: 1,
       };
@@ -642,7 +642,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.alliances[0].name).to.equal('name');
     });
 
-    it('originAirports', function() {
+    it('originAirports', function () {
       var option = {
         code: 1,
       };
@@ -664,7 +664,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.originAirports[0].name).to.equal('name');
     });
 
-    it('destinationAirports', function() {
+    it('destinationAirports', function () {
       var option = {
         code: 1,
       };
@@ -686,7 +686,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.destinationAirports[0].name).to.equal('name');
     });
 
-    it('stopoverAirports', function() {
+    it('stopoverAirports', function () {
       var option = {
         code: 1,
       };
@@ -708,7 +708,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.stopoverAirports[0].name).to.equal('name');
     });
 
-    it('fareConditions', function() {
+    it('fareConditions', function () {
       var option = {
         code: 1,
       };
@@ -730,7 +730,7 @@ describe('FlightSearchMerger', function() {
       expect(filter.fareConditions[0].name).to.equal('name');
     });
 
-    it('legConditions', function() {
+    it('legConditions', function () {
       var option = {
         code: 1,
       };
@@ -752,8 +752,8 @@ describe('FlightSearchMerger', function() {
       expect(filter.legConditions[0].name).to.equal('name');
     });
 
-    it('minPrice', function() {
-      var price  = {
+    it('minPrice', function () {
+      var price = {
         currencyCode: 'sgd',
         amountUsd: 10,
         originalAmountUsd: 10,
@@ -775,8 +775,8 @@ describe('FlightSearchMerger', function() {
       expect(filter.minPrice.amount).to.equal(20);
     });
 
-    it('maxPrice', function() {
-      var price  = {
+    it('maxPrice', function () {
+      var price = {
         currencyCode: 'sgd',
         amountUsd: 10,
         originalAmountUsd: 10,
@@ -798,8 +798,8 @@ describe('FlightSearchMerger', function() {
       expect(filter.maxPrice.amount).to.equal(20);
     });
 
-    describe('legs', function() {
-      it('add departureCity, departureAirport, arrivalCity, arrivalAirport', function() {
+    describe('legs', function () {
+      it('add departureCity, departureAirport, arrivalCity, arrivalAirport', function () {
         var departureCityCode = 'X1';
         var departureAirportCode = 'X2';
         var arrivalCityCode = 'X3';
@@ -846,7 +846,7 @@ describe('FlightSearchMerger', function() {
         expect(filterLeg.arrivalAirport).to.equal(arrivalAirport);
       });
 
-      it('departureTimes', function() {
+      it('departureTimes', function () {
         var range = { min: 1, max: 2 };
 
         var leg1 = {
@@ -882,7 +882,7 @@ describe('FlightSearchMerger', function() {
         expect(filter).not.to.equal(oldFilter);
       });
 
-      it('durations', function() {
+      it('durations', function () {
         var range = { min: 1, max: 2 };
 
         var leg1 = {
@@ -912,8 +912,21 @@ describe('FlightSearchMerger', function() {
       });
     });
 
-    it('stopoverDurations', function() {
-      var range  = { min: 1, max: 3 };
+    describe('getProviders', function () {
+      it('retrieves the correct list of providers', function () {
+        let providers = ['aaa', 'bbb', 'ccc'];
+
+        merger.__staticData.providers = providers;
+
+        expect(merger.getProviders()[0]).to.equal(providers[0]);
+        expect(merger.getProviders()[1]).to.equal(providers[1]);
+        expect(merger.getProviders()[2]).to.equal(providers[2]);
+      });
+
+    });
+
+    it('stopoverDurations', function () {
+      var range = { min: 1, max: 3 };
       merger.mergeResponse({
         filters: {
           stopoverDurations: range,
