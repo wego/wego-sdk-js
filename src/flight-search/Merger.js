@@ -82,7 +82,6 @@ FlightSearchMerger.prototype = {
   },
 
   _mergeStaticData: function (response) {
-    console.log('static data: ', response);
     var staticData = this.__staticData;
 
     function merge(itemMap, items, type) {
