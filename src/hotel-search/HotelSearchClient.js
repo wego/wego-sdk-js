@@ -24,6 +24,7 @@ class HotelSearchClient {
     self.onHotelsChanged = options.onHotelsChanged || function () { };
     self.onTotalHotelsChanged = options.onTotalHotelsChanged || function () { };
     self.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function () { };
+    self.onProvidersChanged = options.onProvidersChanged || function () { };
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.onDestinationInfoChanged = options.onDestinationInfoChanged || function () { };
     self.requestHeaders = options.requestHeaders;
@@ -128,6 +129,7 @@ class HotelSearchClient {
     self.onDisplayedFilterChanged(self.merger.getFilter());
     self.onProgressChanged(self.poller.getProgress());
     self.onDestinationInfoChanged(self.merger.getStaticData().destinationInfo);
+    self.onProvidersChanged(self.merger.getProviders());
   }
 
   getSearchRequestBody() {
