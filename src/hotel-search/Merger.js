@@ -33,6 +33,11 @@ HotelSearchClient.prototype = {
     return this.__filter;
   },
 
+  getProviders: function () {
+    const providers = this.__staticData.providers;
+    return !!providers ? Object.keys(providers).map(providerCode => providers[providerCode]) : [];
+  },
+
   getHotels: function () {
     return this.__hotels;
   },
