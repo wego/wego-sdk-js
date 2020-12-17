@@ -24,6 +24,7 @@ class FlightSearchClient {
     self.onFastestTripChanged = options.onFastestTripChanged || function () { };
     self.onBestExperienceTripChanged = options.onBestExperienceTripChanged || function () { };
     self.onDisplayedFilterChanged = options.onDisplayedFilterChanged || function () { };
+    self.onProvidersChanged = options.onProvidersChanged || function () { };
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.requestHeaders = options.requestHeaders;
 
@@ -156,6 +157,9 @@ class FlightSearchClient {
     self.onTotalTripsChanged(trips);
     self.onDisplayedFilterChanged(self.merger.getFilter());
     self.onProgressChanged(self.poller.getProgress());
+
+    // changes in providers
+    self.onProvidersChanged(self.merger.getProviders());
   }
 
   getSearchRequestBody() {
