@@ -717,4 +717,17 @@ describe('Merger', function() {
       return rate.id;
     });
   }
+
+  describe('getProviders', function () {
+    it('retrieves the correct list of providers', function () {
+      let providers = ['aaa', 'bbb', 'ccc'];
+
+      merger.__staticData.providers = providers;
+
+      expect(merger.getProviders()[0]).to.equal(providers[0]);
+      expect(merger.getProviders()[1]).to.equal(providers[1]);
+      expect(merger.getProviders()[2]).to.equal(providers[2]);
+    });
+
+  });
 });
