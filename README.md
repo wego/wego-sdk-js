@@ -256,6 +256,7 @@ const searchParams = {
   "selectedHotelIds": ['258101'], /** Optional */
 
   similarHotels: { limit: 10 }, /** New, optional */
+  nearbyHotels: { limit: 10, radiusInKm: 2 }, /** New, optional */
 }
 
 client.searchHotels(searchParams);

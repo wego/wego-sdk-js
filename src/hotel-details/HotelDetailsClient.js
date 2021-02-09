@@ -20,6 +20,7 @@ class HotelDetailsClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.requestHeaders = options.requestHeaders;
     self.similarHotels = options.similarHotels || {};
+    self.nearbyHotels = options.nearbyHotels || {};
     self.hotelDetailsEndpointUrl = hotelDetailsEndpointUrl;
 
     self.poller = new Poller({
@@ -37,6 +38,11 @@ class HotelDetailsClient {
 
         if (self.similarHotels) {
           params.similarHotelLimit = self.similarHotels.limit;
+        }
+
+        if (self.nearbyHotels) {
+          params.nearbyHotelLimit = self.nearbyHotels.limit;
+          params.nearbyHotelRadiusInKm = self.nearbyHotels.radiusInKm;
         }
 
         if (self.searchId) {
@@ -127,6 +133,10 @@ class HotelDetailsClient {
 
     if (self.similarHotels != null) {
       searchRequestBody.similarHotels = self.similarHotels;
+    }
+
+    if (self.nearbyHotels != null) {
+      searchRequestBody.nearbyHotels = self.nearbyHotels;
     }
 
     return searchRequestBody;
