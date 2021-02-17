@@ -46,26 +46,41 @@ function filterByDeals(hotel, deals) {
   return false;
 }
 
-function filterByPrice(hotel = {}, priceRange, providers = []) {
+function filterByPrice(hotel = {}, filter = {}) {
+
+  const { providers = [], providerCodes = [], rateAmenityIds = [], priceRange } = filter;
+
   if (!priceRange) {
     return true;
   }
 
+  let filteredRates = hotel.rates || [];
+
   // if provider exists
   if (providers.length > 0) {
-    const filteredRates = (hotel.rates || []).filter(rate => {
+    filteredRates = filteredRates.filter(rate => {
       const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
       const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
       const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
       return isBookOnWego || isHotelSite || isTravelAgencySite;
     });
-    if (filteredRates.length > 0) {
-      return utils.filterByRange(filteredRates[0].price.amountUsd, priceRange);
-    }
-    return false;
   }
 
-  return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
+  // if provider code exists
+  if (providerCodes.length > 0) {
+    filteredRates = filteredRates.filter(rate => providerCodes.includes(rate.providerCode));
+  }
+
+  // if rate amenity id exists
+  if (rateAmenityIds.length > 0) {
+    filteredRates = filteredRates.filter(rate => rate.rateAmenityIds.some(amenityId => rateAmenityIds.includes(amenityId)));
+  }
+
+  if (filteredRates.length > 0) {
+    return utils.filterByRange(filteredRates[0].price.amountUsd, priceRange);
+  }
+
+  return false;
 }
 
 function filterByName(hotel, name) {
@@ -118,7 +133,7 @@ module.exports = {
 
     return hotels.filter(function (hotel) {
       var conditionResult =
-        filterByPrice(hotel, filter.priceRange, filter.providers) &&
+        filterByPrice(hotel, filter) &&
         utils.filterByKey(hotel.star, starMap) &&
         utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds) &&
         utils.filterByKey(hotel.districtId, districtIdMap) &&
