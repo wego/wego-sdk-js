@@ -1,8 +1,13 @@
 var utils = require('../utils');
 
 module.exports = {
-  sortHotels: function(hotels, sort) {
+  sortHotels: function (hotels, sort, filter = {}) {
     if (!sort) return hotels;
+
+    console.log("filter: ", filter)
+    const { providers = [], providerCodes = [], rateAmenityIds = [] } = filter;
+    console.log("check providers: ", providers);
+    console.log("check provider codes: ", providerCodes);
 
     function getPrice(hotel) {
       if (hotel.rates && hotel.rates.length > 0) {
@@ -41,7 +46,7 @@ module.exports = {
     }
 
     function getReviewScore(type) {
-      return function(hotel) {
+      return function (hotel) {
         var review = hotel.reviewMap[type];
         if (!review) return null;
         return review.score;
@@ -79,10 +84,56 @@ module.exports = {
       DISTANCE_TO_NEAREST_AIRPORT: getDistanceToNearestAirport,
     };
 
-    var propertyGetter = getterMap[sort.by] || function() {};
+    var propertyGetter = getterMap[sort.by] || function () { };
     var cloneHotels = utils.cloneArray(hotels);
 
-    cloneHotels.sort(function(hotel1, hotel2) {
+    const filteredRates = (hotel, providers = [], providerCodes = [], rateAmenityIds = []) => {
+      let rates = hotel.rates || [];
+
+      // if provider exists
+      if (providers.length > 0) {
+        rates = rates.filter(rate => {
+          const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
+          const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
+          const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+          return isBookOnWego || isHotelSite || isTravelAgencySite;
+        });
+      }
+
+      // if provider code exists
+      if (providerCodes.length > 0) {
+        rates = rates.filter(rate => {
+          return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
+        });
+      }
+
+      // if rate amenity id exists
+      if (rateAmenityIds.length > 0) {
+        rates = rates.filter(rate => {
+          return rate.rateAmenityIds.some(amenityId => rateAmenityIds.indexof(parseInt(amenityId)));
+        });
+      }
+
+      return rates;
+    };
+
+    cloneHotels.sort(function (hotel1, hotel2) {
+      // if provider or provider code or rate amenity id exists
+      if (providers.length > 0 || providerCodes.length > 0 || rateAmenityIds.length > 0) {
+        const hotel1Rate = filteredRates(hotel1, providers, providerCodes, rateAmenityIds)[0];
+        const hotel2Rate = filteredRates(hotel2, providers, providerCodes, rateAmenityIds)[0];
+        if (hotel1Rate && hotel2Rate) {
+          if (hotel1Rate.price.amountUsd > hotel2Rate.price.amountUsd) {
+            return sort.order === "ASC" ? 1 : -1;
+          } else if (hotel1Rate.price.amountUsd < hotel2Rate.price.amountUsd) {
+            return sort.order === "ASC" ? -1 : 1;
+          } else {
+            return 0;
+          }
+        }
+        return 0;
+      }
+
       var compareResult = utils.compare(hotel1, hotel2, propertyGetter, sort.order);
       if (compareResult == 0 && sort.by != 'PRICE') {
         return utils.compare(hotel1, hotel2, getPrice, 'ASC');
