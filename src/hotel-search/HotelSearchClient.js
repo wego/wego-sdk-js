@@ -123,7 +123,7 @@ class HotelSearchClient {
     let self = this;
     let hotels = self.merger.getHotels();
     let filteredHotels = filtering.filterHotels(hotels, self.filter);
-    let sortedHotels = sorting.sortHotels(filteredHotels, self.sort);
+    let sortedHotels = sorting.sortHotels(filteredHotels, self.sort, self.filter);
     self.onHotelsChanged(sortedHotels);
     self.onTotalHotelsChanged(hotels);
     self.onDisplayedFilterChanged(self.merger.getFilter());
