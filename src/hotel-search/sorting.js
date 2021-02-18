@@ -4,10 +4,7 @@ module.exports = {
   sortHotels: function (hotels, sort, filter = {}) {
     if (!sort) return hotels;
 
-    console.log("filter: ", filter)
     const { providers = [], providerCodes = [], rateAmenityIds = [] } = filter;
-    console.log("check providers: ", providers);
-    console.log("check provider codes: ", providerCodes);
 
     function getPrice(hotel) {
       if (hotel.rates && hotel.rates.length > 0) {
@@ -110,7 +107,7 @@ module.exports = {
       // if rate amenity id exists
       if (rateAmenityIds.length > 0) {
         rates = rates.filter(rate => {
-          return rate.rateAmenityIds.some(amenityId => rateAmenityIds.indexof(parseInt(amenityId)));
+          return rate.rateAmenityIds.some(amenityId => rateAmenityIds.indexof(parseInt(amenityId)) !== -1);
         });
       }
 
@@ -132,13 +129,13 @@ module.exports = {
           }
         }
         return 0;
-      }
-
-      var compareResult = utils.compare(hotel1, hotel2, propertyGetter, sort.order);
-      if (compareResult == 0 && sort.by != 'PRICE') {
-        return utils.compare(hotel1, hotel2, getPrice, 'ASC');
       } else {
-        return compareResult;
+        var compareResult = utils.compare(hotel1, hotel2, propertyGetter, sort.order);
+        if (compareResult == 0 && sort.by != 'PRICE') {
+          return utils.compare(hotel1, hotel2, getPrice, 'ASC');
+        } else {
+          return compareResult;
+        }
       }
     });
 
