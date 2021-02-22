@@ -107,7 +107,12 @@ module.exports = {
       // if rate amenity id exists
       if (rateAmenityIds.length > 0) {
         rates = rates.filter(rate => {
-          return rate.rateAmenityIds.some(amenityId => rateAmenityIds.indexof(parseInt(amenityId)) !== -1);
+          for (let j = 0; j < rateAmenityIds.length; j++) {
+            if (rate.rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) {
+              return true;
+            }
+          }
+          return false;
         });
       }
 
