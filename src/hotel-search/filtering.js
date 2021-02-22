@@ -73,7 +73,15 @@ function filterByPrice(hotel = {}, filter = {}) {
 
   // if rate amenity id exists
   if (rateAmenityIds.length > 0) {
-    filteredRates = filteredRates.filter(rate => rate.rateAmenityIds.some(amenityId => rateAmenityIds.includes(amenityId)));
+    filteredRates = filteredRates.filter(rate => {
+      for (let j = 0; j < rateAmenityIds.length; j++) {
+        if (rate.rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) {
+          return true;
+        }
+      }
+      return false;
+    });
+
   }
 
   if (filteredRates.length > 0) {
