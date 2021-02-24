@@ -48,7 +48,7 @@ function filterByDeals(hotel, deals) {
 
 function filterByPrice(hotel = {}, filter = {}) {
 
-  const { providers = [], providerCodes = [], rateAmenityIds = [], priceRange } = filter;
+  const { providers = [], providerCodes = [], priceRange } = filter;
 
   if (!priceRange) {
     return true;
@@ -69,19 +69,6 @@ function filterByPrice(hotel = {}, filter = {}) {
   // if provider code exists
   if (providerCodes.length > 0) {
     filteredRates = filteredRates.filter(rate => providerCodes.includes(rate.providerCode));
-  }
-
-  // if rate amenity id exists
-  if (rateAmenityIds.length > 0) {
-    filteredRates = filteredRates.filter(rate => {
-      for (let j = 0; j < rateAmenityIds.length; j++) {
-        if (rate.rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) {
-          return true;
-        }
-      }
-      return false;
-    });
-
   }
 
   if (filteredRates.length > 0) {

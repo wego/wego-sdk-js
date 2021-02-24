@@ -4,7 +4,7 @@ module.exports = {
   sortHotels: function (hotels, sort, filter = {}) {
     if (!sort) return hotels;
 
-    const { providers = [], providerCodes = [], rateAmenityIds = [] } = filter;
+    const { providers = [], providerCodes = [] } = filter;
 
     function getPrice(hotel) {
       if (hotel.rates && hotel.rates.length > 0) {
@@ -84,7 +84,7 @@ module.exports = {
     var propertyGetter = getterMap[sort.by] || function () { };
     var cloneHotels = utils.cloneArray(hotels);
 
-    const filteredRates = (hotel, providers = [], providerCodes = [], rateAmenityIds = []) => {
+    const filteredRates = (hotel, providers = [], providerCodes = [], sortOrder) => {
       let rates = hotel.rates || [];
 
       // if provider exists
@@ -104,26 +104,24 @@ module.exports = {
         });
       }
 
-      // if rate amenity id exists
-      if (rateAmenityIds.length > 0) {
-        rates = rates.filter(rate => {
-          for (let j = 0; j < rateAmenityIds.length; j++) {
-            if (rate.rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) {
-              return true;
-            }
-          }
-          return false;
-        });
-      }
+      rates = rates.sort((rate1, rate2) => {
+        if (rate1.price.amountUsd > rate2.price.amountUsd) {
+          return sortOrder === "ASC" ? 1 : -1;
+        } else if (rate1.price.amountUsd < rate2.price.amountUsd) {
+          return sortOrder === "ASC" ? -1 : 1;
+        } else {
+          return 0;
+        }
+      });
 
       return rates;
     };
 
     cloneHotels.sort(function (hotel1, hotel2) {
-      // if provider or provider code or rate amenity id exists
-      if (providers.length > 0 || providerCodes.length > 0 || rateAmenityIds.length > 0) {
-        const hotel1Rate = filteredRates(hotel1, providers, providerCodes, rateAmenityIds)[0];
-        const hotel2Rate = filteredRates(hotel2, providers, providerCodes, rateAmenityIds)[0];
+      // if provider or provider code exists
+      if (providers.length > 0 || providerCodes.length > 0) {
+        const hotel1Rate = filteredRates(hotel1, providers, providerCodes, sort.order)[0];
+        const hotel2Rate = filteredRates(hotel2, providers, providerCodes, sort.order)[0];
         if (hotel1Rate && hotel2Rate) {
           if (hotel1Rate.price.amountUsd > hotel2Rate.price.amountUsd) {
             return sort.order === "ASC" ? 1 : -1;
