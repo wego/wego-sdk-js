@@ -6,7 +6,7 @@ function filterByPrice(trip, priceRange) {
 }
 
 function filterByFlexibleTickets(trip, flexible = []) {
-  const isRefundableFlag = flexible.map(str => str.toLowerCase()).indexOf("refundable") !== -1;
+  const isRefundableFlag = flexible.map(str => str.toLowerCase()).includes("refundable");
   if (!isRefundableFlag) {
     return true;
   }
