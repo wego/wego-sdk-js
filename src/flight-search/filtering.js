@@ -5,6 +5,23 @@ function filterByPrice(trip, priceRange) {
   return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
+/* e.g. flexible: ["refundable"] */
+function filterByFlexibleTickets(trip, flexible = []) {
+  // check if "refundable" string exists in flexible array
+  const regex = new RegExp("^" + flexible.join("$|") + "$", "i");
+  const isRefundableFlag = regex.test("refundable");
+
+  if (!isRefundableFlag) {
+    return true;
+  }
+  for (let i = 0; i < trip.fares.length; i++) {
+    if (trip.fares[i].refundable) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*
   e.g providerFilter: {
     providerCodeMap: {'citybookers.com': true, 'rehlat.ae': true},
@@ -29,7 +46,7 @@ function filterByProviders(trip, providerFilter) {
   return false;
 }
 
-function isFareMatchProviderType (fare, providerTypes) {
+function isFareMatchProviderType(fare, providerTypes) {
   if (!providerTypes) return true;
   return (
     _isFacilitatedBooking(fare, providerTypes) ||
@@ -51,8 +68,8 @@ function _hasProviderType(fare, providerTypes) {
     !fare.provider.instant;
 }
 
-function isFareMatchProviderCode (fare, providerCodeMap) {
-  if(!providerCodeMap) return true;
+function isFareMatchProviderCode(fare, providerCodeMap) {
+  if (!providerCodeMap) return true;
   return utils.filterByKey(fare.provider.code, providerCodeMap);
 }
 
@@ -110,7 +127,7 @@ function filterByConditions(items, conditions, conditionsObj) {
     return true;
   }
 
-  filteredItems = items.filter(function(item) {
+  filteredItems = items.filter(function (item) {
     conditionIds = item["conditionIds"];
     for (var i = 0; i < conditions.length; i++) {
       conditionMapper = _conditionMap(conditions[i], conditionsObj);
@@ -140,13 +157,13 @@ function _conditionMap(condition, conditionsObj) {
 }
 
 module.exports = {
-  passLegConditions: function(value) {
+  passLegConditions: function (value) {
     this.legConditions = value;
   },
-  passFareConditions: function(value) {
+  passFareConditions: function (value) {
     this.fareConditions = value;
   },
-  filterTrips: function(trips, filter, multiCity) {
+  filterTrips: function (trips, filter, multiCity) {
     if (!filter) return trips;
     var self = this;
     var stopCodes = filter.stopCodes;
@@ -161,49 +178,49 @@ module.exports = {
 
     var providerCodeMap = utils.arrayToMap(filter.providerCodes);
     var providerTypes = filter.providerTypes;
-    var providerFilter = {providerCodeMap, providerTypes};
+    var providerFilter = { providerCodeMap, providerTypes };
 
-    var filteredTrips = trips.filter(function(trip) {
-      if(!filterByPrice(trip, filter.priceRange)) return false;
+    var filteredTrips = trips.filter(function (trip) {
+      if (!filterByPrice(trip, filter.priceRange)) return false;
 
-      if( multiCity ) {
+      if (multiCity) {
         var legs = trip.legs, legsCount = legs.length;
 
-        for(var i=0; i<legsCount; i++) {
+        for (var i = 0; i < legsCount; i++) {
           var leg = legs[i];
 
           // if filter on this leg applied and leg's stopCode not selected
-          if(stopCodeMap && stopCodeMap[i] && !stopCodeMap[i][leg.stopCode]) {
+          if (stopCodeMap && stopCodeMap[i] && !stopCodeMap[i][leg.stopCode]) {
             return false;
           }
 
           let filterByAll = (map, legCodes) => {
             var mapCodes = map && Object.keys(map[i] || {});
             var mapCodesLength = mapCodes && mapCodes.length;
-            if( mapCodesLength ) {
+            if (mapCodesLength) {
               var found = false;
-              for(var j = mapCodesLength; !found && j && j--;) {
+              for (var j = mapCodesLength; !found && j && j--;) {
                 found = legCodes.indexOf(mapCodes[j]) >= 0;
               }
-              if( !found ) return false;
+              if (!found) return false;
             }
             return true;
           }
 
           // filter each leg by airline codes
-          if( !filterByAll(airlineCodeMap, leg.airlineCodes) ) return false;
+          if (!filterByAll(airlineCodeMap, leg.airlineCodes)) return false;
 
           // filter each leg by alliance codes
-          if( !filterByAll(allianceCodeMap, leg.allianceCodes) ) return false;
+          if (!filterByAll(allianceCodeMap, leg.allianceCodes)) return false;
 
           // filter each leg by stopover codes
-          if( !filterByAll(stopoverAirportCodesMap, leg.stopoverAirportCodes) ) return false;
+          if (!filterByAll(stopoverAirportCodesMap, leg.stopoverAirportCodes)) return false;
 
           // itinerary options for each leg (no overnight & short stopovers)
           var itineraryOptions = itineraryOptionsMap && Object.keys(itineraryOptionsMap[i] || {});
-          if( !filterByItineraryOptions(leg, itineraryOptions) ) return false;
+          if (!filterByItineraryOptions(leg, itineraryOptions)) return false;
 
-          if( !filterByRanges(trip, stopoverRanges, 'stopoverDurationMinutes') ) return false;
+          if (!filterByRanges(trip, stopoverRanges, 'stopoverDurationMinutes')) return false;
 
         } // end for
 
@@ -225,7 +242,8 @@ module.exports = {
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
-        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions);
+        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions)
+        && filterByFlexibleTickets(trip, filter.flexible);
     });
 
     return filteredTrips;
