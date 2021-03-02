@@ -22,8 +22,12 @@ function filterByPrice(trip, filter = {}) {
   return false;
 }
 
+/* e.g. flexible: ["refundable"] */
 function filterByFlexibleTickets(trip, flexible = []) {
-  const isRefundableFlag = flexible.map(str => str.toLowerCase()).includes("refundable");
+  // check if "refundable" string exists in flexible array
+  const regex = new RegExp("^" + flexible.join("$|") + "$", "i");
+  const isRefundableFlag = regex.test("refundable");
+
   if (!isRefundableFlag) {
     return true;
   }
