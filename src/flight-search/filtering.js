@@ -8,11 +8,11 @@ function filterByPrice(trip, filter = {}) {
 
   let filteredFares = trip.fares || [];
 
-  if (providerCodes.length > 0) {
+  if (!!providerCodes && providerCodes.length > 0) {
     filteredFares = filteredFares.filter(fare => providerCodes.indexOf(fare.provider.code) !== -1);
   }
 
-  if (providerTypes.length > 0) {
+  if (!!providerTypes && providerTypes.length > 0) {
     filteredFares = filteredFares.filter(fare => isFareMatchProviderType(fare, providerTypes));
   }
 
