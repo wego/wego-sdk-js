@@ -1,8 +1,10 @@
 var utils = require('../utils');
 
 module.exports = {
-  sortHotels: function(hotels, sort) {
+  sortHotels: function (hotels, sort, filter = {}) {
     if (!sort) return hotels;
+
+    const { providers = [], providerCodes = [] } = filter;
 
     function getPrice(hotel) {
       if (hotel.rates && hotel.rates.length > 0) {
@@ -41,7 +43,7 @@ module.exports = {
     }
 
     function getReviewScore(type) {
-      return function(hotel) {
+      return function (hotel) {
         var review = hotel.reviewMap[type];
         if (!review) return null;
         return review.score;
@@ -79,10 +81,41 @@ module.exports = {
       DISTANCE_TO_NEAREST_AIRPORT: getDistanceToNearestAirport,
     };
 
-    var propertyGetter = getterMap[sort.by] || function() {};
+    var propertyGetter = getterMap[sort.by] || function () { };
     var cloneHotels = utils.cloneArray(hotels);
 
-    cloneHotels.sort(function(hotel1, hotel2) {
+    cloneHotels.sort(function (hotel1, hotel2) {
+
+      // if provider exists
+      if (providers.length > 0) {
+        const filterByProviders = hotel => {
+          hotel.rates = hotel.rates.filter(rate => {
+            const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
+            const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
+            const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+            return isBookOnWego || isHotelSite || isTravelAgencySite;
+          });
+          return hotel;
+        }
+
+        hotel1 = filterByProviders(hotel1);
+        hotel2 = filterByProviders(hotel2);
+      }
+
+      // if provider code exists
+      if (providerCodes.length > 0) {
+        const filterByProviderCodes = hotel => {
+          hotel.rates = hotel.rates.filter(rate => {
+            return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
+          });
+          return hotel;
+        }
+
+        hotel1 = filterByProviderCodes(hotel1);
+        hotel2 = filterByProviderCodes(hotel2);
+      }
+
+
       var compareResult = utils.compare(hotel1, hotel2, propertyGetter, sort.order);
       if (compareResult == 0 && sort.by != 'PRICE') {
         return utils.compare(hotel1, hotel2, getPrice, 'ASC');

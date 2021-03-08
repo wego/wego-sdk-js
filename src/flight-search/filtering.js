@@ -1,8 +1,25 @@
 var utils = require('../utils');
 
-function filterByPrice(trip, priceRange) {
-  if (!priceRange) return true;
-  return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
+function filterByPrice(trip, filter = {}) {
+  const { priceRange, providerCodes = [], providerTypes = [] } = filter;
+  if (!priceRange) {
+    return true;
+  }
+
+  let filteredFares = trip.fares || [];
+
+  if (!!providerCodes && providerCodes.length > 0) {
+    filteredFares = filteredFares.filter(fare => providerCodes.indexOf(fare.provider.code) !== -1);
+  }
+
+  if (!!providerTypes && providerTypes.length > 0) {
+    filteredFares = filteredFares.filter(fare => isFareMatchProviderType(fare, providerTypes));
+  }
+
+  if (filteredFares.length > 0) {
+    return utils.filterByRange(filteredFares[0].price.amountUsd, priceRange);
+  }
+  return false;
 }
 
 /* e.g. flexible: ["refundable"] */
@@ -181,7 +198,7 @@ module.exports = {
     var providerFilter = { providerCodeMap, providerTypes };
 
     var filteredTrips = trips.filter(function (trip) {
-      if (!filterByPrice(trip, filter.priceRange)) return false;
+      if (!filterByPrice(trip, filter)) return false;
 
       if (multiCity) {
         var legs = trip.legs, legsCount = legs.length;

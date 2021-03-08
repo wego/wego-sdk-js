@@ -46,9 +46,36 @@ function filterByDeals(hotel, deals) {
   return false;
 }
 
-function filterByPrice(hotel, priceRange) {
-  if (!priceRange) return true;
-  return hotel.rates[0] && utils.filterByRange(hotel.rates[0].price.amountUsd, priceRange);
+function filterByPrice(hotel = {}, filter = {}) {
+
+  const { providers = [], providerCodes = [], priceRange } = filter;
+
+  if (!priceRange) {
+    return true;
+  }
+
+  let filteredRates = hotel.rates || [];
+
+  // if provider exists
+  if (providers.length > 0) {
+    filteredRates = filteredRates.filter(rate => {
+      const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
+      const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
+      const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+      return isBookOnWego || isHotelSite || isTravelAgencySite;
+    });
+  }
+
+  // if provider code exists
+  if (providerCodes.length > 0) {
+    filteredRates = filteredRates.filter(rate => providerCodes.includes(rate.providerCode));
+  }
+
+  if (filteredRates.length > 0) {
+    return utils.filterByRange(filteredRates[0].price.amountUsd, priceRange);
+  }
+
+  return false;
 }
 
 function filterByName(hotel, name) {
@@ -65,59 +92,26 @@ function filterByBedroomCount(hotel, count) {
   return count > 0 ? hotel.bedroomsCount >= count : true;
 }
 
-function filterByProviders(hotel, providerCodes) {
-  if (!providerCodes || providerCodes.length === 0) return true;
-  var rates = hotel.rates;
-
-  if (!rates) return false;
-
-  for (var i = 0; i < rates.length; i++) {
-    if (providerCodes.includes(rates[i].providerCode)) return true;
+function filterByProviders(hotel, providerCodes = []) {
+  if (providerCodes.length === 0) {
+    return true;
   }
 
-  return false;
+  return (hotel.rates || []).some(rate => providerCodes.includes(rate.providerCode));
 }
 
-function filterByProviderTypes(hotel, providers) {
+function filterByProviderTypes(hotel, providers = []) {
   // providers = wego, hotels, ota
-  if (!providers || providers.length === 0) return true;
-  var rates = hotel.rates;
-
-  if (!rates) return false;
-
-  for (var i = 0; i < rates.length; i++) {
-    if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
-      if (rates[i].provider.directBooking || rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA') {
-        return true;
-      }
-    } else if (providers.indexOf('wego') !== -1 && providers.indexOf('hotels') !== -1) {
-      if (rates[i].provider.directBooking || rates[i].provider.isHotelWebsite) {
-        return true;
-      }
-    } else if (providers.indexOf('wego') !== -1 && providers.indexOf('ota') !== -1) {
-      if (rates[i].provider.directBooking || rates[i].provider.type === 'OTA') {
-        return true;
-      }
-    } else if (providers.indexOf('hotels') !== -1 && providers.indexOf('ota') !== -1) {
-      if (rates[i].provider.isHotelWebsite || rates[i].provider.type === 'OTA') {
-        return true;
-      }
-    } else if (providers.indexOf('wego') !== -1) {
-      if (rates[i].provider.directBooking) {
-        return true;
-      }
-    } else if (providers.indexOf('hotels') !== -1) {
-      if (rates[i].provider.isHotelWebsite) {
-        return true;
-      }
-    } else if (providers.indexOf('ota') !== -1) {
-      if (rates[i].provider.type === 'OTA') {
-        return true;
-      }
-    }
+  if (providers.length === 0) {
+    return true;
   }
 
-  return false;
+  return (hotel.rates || []).some(rate => {
+    const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
+    const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
+    const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+    return isBookOnWego || isHotelSite || isTravelAgencySite;
+  });
 }
 
 module.exports = {
@@ -134,7 +128,7 @@ module.exports = {
 
     return hotels.filter(function (hotel) {
       var conditionResult =
-        filterByPrice(hotel, filter.priceRange) &&
+        filterByPrice(hotel, filter) &&
         utils.filterByKey(hotel.star, starMap) &&
         utils.filterByContainAllKeys(hotel.amenityIdMap, filter.amenityIds) &&
         utils.filterByKey(hotel.districtId, districtIdMap) &&
