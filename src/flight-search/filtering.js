@@ -22,6 +22,23 @@ function filterByPrice(trip, filter = {}) {
   return false;
 }
 
+/* e.g. flexible: ["refundable"] */
+function filterByFlexibleTickets(trip, flexible = []) {
+  // check if "refundable" string exists in flexible array
+  const regex = new RegExp("^" + flexible.join("$|") + "$", "i");
+  const isRefundableFlag = regex.test("refundable");
+
+  if (!isRefundableFlag) {
+    return true;
+  }
+  for (let i = 0; i < trip.fares.length; i++) {
+    if (trip.fares[i].refundable) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*
   e.g providerFilter: {
     providerCodeMap: {'citybookers.com': true, 'rehlat.ae': true},
@@ -242,7 +259,8 @@ module.exports = {
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
         && filterByProviders(trip, providerFilter)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
-        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions);
+        && filterByConditions(trip.legs, filter.flightTypes, self.legConditions)
+        && filterByFlexibleTickets(trip, filter.flexible);
     });
 
     return filteredTrips;
