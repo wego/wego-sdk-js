@@ -84,37 +84,31 @@ module.exports = {
     var propertyGetter = getterMap[sort.by] || function () { };
     var cloneHotels = utils.cloneArray(hotels);
 
+    // if provider or providerCode exists, sort in ascending with rates with provider/ providerCode first for all hotels
+    if (providers.length > 0 || providerCodes.length > 0) {
+      for (let cloneHotel of cloneHotels) {
+        const isProviders = rate => {
+          const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
+          const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
+          const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+          return isBookOnWego || isHotelSite || isTravelAgencySite;
+        }
+        const isProviderCodes = rate => {
+          return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
+        }
+        const sortedRates = [];
+        for (let rate of cloneHotel.rates) {
+          if (isProviders(rate) || isProviderCodes(rate)) {
+            sortedRates.unshift(rate);
+          } else {
+            sortedRates.push(rate);
+          }
+        }
+        cloneHotel.rates = sortedRates;
+      }
+    }
+
     cloneHotels.sort(function (hotel1, hotel2) {
-
-      // if provider exists
-      if (providers.length > 0) {
-        const filterByProviders = hotel => {
-          hotel.rates = hotel.rates.filter(rate => {
-            const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
-            const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
-            const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
-            return isBookOnWego || isHotelSite || isTravelAgencySite;
-          });
-          return hotel;
-        }
-
-        hotel1 = filterByProviders(hotel1);
-        hotel2 = filterByProviders(hotel2);
-      }
-
-      // if provider code exists
-      if (providerCodes.length > 0) {
-        const filterByProviderCodes = hotel => {
-          hotel.rates = hotel.rates.filter(rate => {
-            return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
-          });
-          return hotel;
-        }
-
-        hotel1 = filterByProviderCodes(hotel1);
-        hotel2 = filterByProviderCodes(hotel2);
-      }
-
 
       var compareResult = utils.compare(hotel1, hotel2, propertyGetter, sort.order);
       if (compareResult == 0 && sort.by != 'PRICE') {
