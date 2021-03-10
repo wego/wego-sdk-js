@@ -23,6 +23,7 @@ HotelSearchClient.prototype = {
     this._mergeFilter(Object.assign({}, response.rentalFilter, response.filter), response.providers); // Has to be in this sequence because rentalFilter contains airbnb minPrice and maxPrice which is to be overiden by filter.
     this._mergeRates(response.rates, isSearchEnd);
     this._mergeSortedRatesByBasePrice();
+    this._mergeSortedRatesByTotalPrice();
     this._mergeScores(response.scores);
     this._mergeRatesCounts(response.providerRatesCounts);
 
@@ -130,15 +131,15 @@ HotelSearchClient.prototype = {
     }
   },
 
-  _mergeSortedRatesByBasePrice: function() {
-    var self = this,
-      sortedCloneRates;
+  _mergeSortedRatesByBasePrice: function () {
+    var self = this;
+    var sortedCloneBaseRates = [];
 
     for (var hotelId in self.__hotelMap) {
       if (self.__hotelMap[hotelId]) {
-        sortedCloneRates = utils
+        sortedCloneBaseRates = utils
           .cloneArray(self.__hotelMap[hotelId].rates)
-          .sort(function(a, b) {
+          .sort(function (a, b) {
             var totalAmountA = a.price.totalAmount,
               totalAmountB = b.price.totalAmount,
               totalTaxAmountA = a.price.totalTaxAmount,
@@ -151,7 +152,31 @@ HotelSearchClient.prototype = {
             }
           });
 
-        self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneRates;
+        self.__hotelMap[hotelId].sortedRatesByBasePrice = sortedCloneBaseRates;
+      }
+    }
+  },
+
+  _mergeSortedRatesByTotalPrice: function () {
+    var self = this;
+    var sortedCloneTotalRates = [];
+
+    for (var hotelId in self.__hotelMap) {
+      if (self.__hotelMap[hotelId]) {
+        sortedCloneTotalRates = utils
+          .cloneArray(self.__hotelMap[hotelId].rates)
+          .sort(function (a, b) {
+            var totalAmountA = a.price.totalAmount;
+            var totalAmountB = b.price.totalAmount;
+
+            if (totalAmountA === totalAmountB) {
+              return b.price.ecpc - a.price.ecpc;
+            } else {
+              return totalAmountA - totalAmountB;
+            }
+          });
+
+        self.__hotelMap[hotelId].sortedRatesByTotalPrice = sortedCloneTotalRates;
       }
     }
   },
