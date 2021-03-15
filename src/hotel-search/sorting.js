@@ -88,9 +88,9 @@ module.exports = {
     if (providers.length > 0 || providerCodes.length > 0) {
       for (let cloneHotel of cloneHotels) {
         const isProviders = rate => {
-          const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
-          const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
-          const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+          const isBookOnWego = providers.includes('wego') && rate.provider.bookingOptions.includes("BOW");
+          const isHotelSite = providers.includes('hotels') && rate.provider.bookingOptions.includes("HOTEL_WEBSITE");
+          const isTravelAgencySite = providers.includes('ota') && rate.provider.bookingOptions.includes("TRAVEL_AGENCY");
           return isBookOnWego || isHotelSite || isTravelAgencySite;
         }
         const isProviderCodes = rate => {

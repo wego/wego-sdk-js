@@ -1,8 +1,8 @@
 var filtering = require('../../src/hotel-search/filtering');
 
-describe('wego-hotel-filtering-behavior_test', function() {
-  describe('#filterHotels', function() {
-    it('filtering by star', function() {
+describe('wego-hotel-filtering-behavior_test', function () {
+  describe('#filterHotels', function () {
+    it('filtering by star', function () {
       var hotel1 = createHotel({
         star: 1,
       });
@@ -20,7 +20,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filters by deals', function() {
+    it('filters by deals', function () {
       var hotel1 = createHotelWithDeals(100, 0.15);
       var hotel2 = createHotel();
       var hotel3 = createHotelWithDeals(200, 0.20);
@@ -31,7 +31,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by review score', function() {
+    it('filtering by review score', function () {
       var hotel1 = createHotelWithReviewScore(7);
       var hotel2 = createHotelWithReviewScore(5);
       var hotel3 = createHotelWithReviewScore(6);
@@ -45,30 +45,36 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by amenities', function() {
-      var hotel1 = createHotel({ amenityIdMap: {
-        1: true,
-        4: true,
-        2: true,
-      }});
+    it('filtering by amenities', function () {
+      var hotel1 = createHotel({
+        amenityIdMap: {
+          1: true,
+          4: true,
+          2: true,
+        }
+      });
 
-      var hotel2 = createHotel({ amenityIdMap: {
-        1: true,
-        4: true,
-        5: true,
-      }});
+      var hotel2 = createHotel({
+        amenityIdMap: {
+          1: true,
+          4: true,
+          5: true,
+        }
+      });
 
-      var hotel3 = createHotel({ amenityIdMap: {
-        1: true,
-        6: true,
-      }});
+      var hotel3 = createHotel({
+        amenityIdMap: {
+          1: true,
+          6: true,
+        }
+      });
 
       expect(filtering.filterHotels([hotel1, hotel2, hotel3], {
         amenityIds: [1, 4]
       })).to.deep.equal([hotel1, hotel2]);
     });
 
-    it('filtering by districts', function() {
+    it('filtering by districts', function () {
       var hotel1 = createHotel({ districtId: 1 });
       var hotel2 = createHotel({ districtId: 2 });
       var hotel3 = createHotel({ districtId: 3 });
@@ -78,7 +84,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by propertyTypes', function() {
+    it('filtering by propertyTypes', function () {
       var hotel1 = createHotel({ propertyTypeId: 1 });
       var hotel2 = createHotel({ propertyTypeId: 2 });
       var hotel3 = createHotel({ propertyTypeId: 3 });
@@ -88,7 +94,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by brands', function() {
+    it('filtering by brands', function () {
       var hotel1 = createHotel({ brandId: 1 });
       var hotel2 = createHotel({ brandId: 2 });
       var hotel3 = createHotel({ brandId: 3 });
@@ -98,10 +104,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by name', function() {
+    it('filtering by name', function () {
       var hotel1 = createHotel({ name: 'wEgo' });
-      var hotel2 = createHotel({ name: 'weho', nameI18n: { en: "weho", ar: "wehoxx"}});
-      var hotel3 = createHotel({ name: 'legh', nameI18n: { en: "legh", ar: "leghx"} });
+      var hotel2 = createHotel({ name: 'weho', nameI18n: { en: "weho", ar: "wehoxx" } });
+      var hotel3 = createHotel({ name: 'legh', nameI18n: { en: "legh", ar: "leghx" } });
 
       expect(filtering.filterHotels([hotel1, hotel2, hotel3], {
         name: 'eg'
@@ -111,7 +117,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel2]);
     });
 
-    it('filtering by chainIdMap', function() {
+    it('filtering by chainIdMap', function () {
       var hotel1 = createHotel({ chainId: 1 });
       var hotel2 = createHotel({ chainId: 2 });
       var hotel3 = createHotel({ chainId: 3 });
@@ -121,7 +127,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1, hotel3]);
     });
 
-    it('filtering by recommended Reviewer', function() {
+    it('filtering by recommended Reviewer', function () {
       var hotel1 = createHotel({
         reviewMap: {
           FAMILY: {
@@ -156,7 +162,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       })).to.deep.equal([hotel1]);
     });
 
-    it('priceRange', function() {
+    it('priceRange', function () {
       var filter = {
         priceRange: {
           min: 5,
@@ -189,21 +195,21 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel2, hotel3, hotel4]);
     });
 
-    it('filtering by rate amenities', function() {
+    it('filtering by rate amenities', function () {
       var filter = {
         rateAmenityIds: [1, 2]
       };
 
       var hotel1 = {
-        rates: [createRateWithRateAmenities([1,2])]
+        rates: [createRateWithRateAmenities([1, 2])]
       };
 
       var hotel2 = {
-        rates: [createRateWithRateAmenities([3,2])]
+        rates: [createRateWithRateAmenities([3, 2])]
       };
 
       var hotel3 = {
-        rates: [createRateWithRateAmenities([3,4])]
+        rates: [createRateWithRateAmenities([3, 4])]
       };
 
       var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
@@ -211,7 +217,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel1, hotel2]);
     });
 
-    it('filtering by providers', function() {
+    it('filtering by providers', function () {
       var filter = {
         providerCodes: ['a.com', 'b.com']
       };
@@ -233,7 +239,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel1, hotel2]);
     });
 
-    it('filters by "wego" and "hotels" provider types', function() {
+    it('filters by "wego" and "hotels" provider types', function () {
       var filter = {
         providers: ['wego', 'hotels']
       };
@@ -241,10 +247,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel1 = {
         rates: [
           {
-            provider: { directBooking: true, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["BOW", "TRAVEL_AGENCY"] }
           },
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           }
         ]
       };
@@ -252,10 +258,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel2 = {
         rates: [
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           },
           {
-            provider: { directBooking: false, isHotelWebsite: true, type: 'DIRECT' }
+            provider: { bookingOptions: ["HOTEL_WEBSITE"] }
           }
         ]
       };
@@ -263,10 +269,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel3 = {
         rates: [
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           },
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           }
         ]
       };
@@ -276,7 +282,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       expect(hotels).to.deep.equal([hotel1, hotel2]);
     });
 
-    it('filters by "ota" provider types', function() {
+    it('filters by "ota" provider types', function () {
       var filter = {
         providers: ['ota']
       };
@@ -284,10 +290,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel1 = {
         rates: [
           {
-            provider: { directBooking: true, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["BOW", "TRAVEL_AGENCY"] }
           },
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           }
         ]
       };
@@ -295,7 +301,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel2 = {
         rates: [
           {
-            provider: { directBooking: false, isHotelWebsite: true, type: 'DIRECT' }
+            provider: { bookingOptions: ["HOTEL_WEBSITE"] }
           }
         ]
       };
@@ -303,10 +309,10 @@ describe('wego-hotel-filtering-behavior_test', function() {
       var hotel3 = {
         rates: [
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           },
           {
-            provider: { directBooking: false, isHotelWebsite: false, type: 'OTA' }
+            provider: { bookingOptions: ["TRAVEL_AGENCY"] }
           }
         ]
       };
@@ -333,7 +339,7 @@ describe('wego-hotel-filtering-behavior_test', function() {
   function createRatesWithProviderCodes(providerCodes) {
     var rates = [];
 
-    providerCodes.forEach(function(providerCode) {
+    providerCodes.forEach(function (providerCode) {
       rates.push(createRateWithProviderCode(providerCode));
     })
 
