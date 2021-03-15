@@ -36,6 +36,20 @@ class HotelDetailsClient {
           }
         }
 
+        if ((self.providerTypes || []).length > 0) {
+          params.bookingOptions = [];
+
+          if (self.providerTypes.includes('wego')) {
+            params.bookingOptions.push("BOW");
+          }
+          if (self.providerTypes.includes('hotels')) {
+            params.bookingOptions.push("HOTEL_WEBSITE");
+          }
+          if (self.providerTypes.includes('ota')) {
+            params.bookingOptions.push("TRAVEL_AGENCY");
+          }
+        }
+
         if (self.similarHotels) {
           params.similarHotelLimit = self.similarHotels.limit;
         }
@@ -100,6 +114,10 @@ class HotelDetailsClient {
 
   updateCurrency(currency) {
     this.currency = currency;
+  }
+
+  updateProviderTypes(providerTypes) {
+    this.providerTypes = providerTypes;
   }
 
   getSearchRequestBody() {
