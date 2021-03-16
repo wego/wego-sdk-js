@@ -96,15 +96,16 @@ module.exports = {
         const isProviderCodes = rate => {
           return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
         }
-        const sortedRates = [];
+        const sortedProviderRates = [];
+        const sortedNonProviderRates = [];
         for (let rate of cloneHotel.rates) {
           if (isProviders(rate) || isProviderCodes(rate)) {
-            sortedRates.unshift(rate);
+            sortedProviderRates.push(rate);
           } else {
-            sortedRates.push(rate);
+            sortedNonProviderRates.push(rate);
           }
         }
-        cloneHotel.rates = sortedRates;
+        cloneHotel.rates = sortedProviderRates.concat(sortedNonProviderRates);
       }
     }
 
