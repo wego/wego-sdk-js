@@ -146,7 +146,7 @@ class FlightSearchClient {
     }
 
     let filteredTrips = filtering.filterTrips(trips, self.filter, self.multiCity);
-    let sortedTrips = sorting.sortTrips(filteredTrips, self.sort);
+    let sortedTrips = sorting.sortTrips(filteredTrips, self.sort, self.filter);
 
     self.onTripsChanged(sortedTrips);
     self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
