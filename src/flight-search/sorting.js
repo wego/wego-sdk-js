@@ -5,7 +5,7 @@ module.exports = {
     if (!sort) return trips;
     console.log("filter: ", filter);
 
-    const { providerTypes = [], providerCodes = [] } = filter;
+    const { providerTypes, providerCodes } = filter;
 
     function getBestFare(trip) {
       if (!trip.fares[0]) return null;
@@ -52,7 +52,9 @@ module.exports = {
     var clonedTrips = utils.cloneArray(trips);
 
     // if provider or providerCode exists, sort in ascending with fares with provider/ providerCode first for all flights
-    if (providerTypes.length > 0 || providerCodes.length > 0) {
+    if (!!providerTypes && providerTypes.length > 0 || !!providerCodes && providerCodes.length > 0) {
+      console.log("provider types: ", providerTypes)
+      console.log("provider codes: ", providerCodes)
       for (let clonedTrip of clonedTrips) {
         const isProviderTypes = fare => {
           if (!!fare && !!fare.provider) {
@@ -73,7 +75,9 @@ module.exports = {
         const sortedNonProviderFares = [];
 
         for (let fare of clonedTrip.fares) {
-          if (isProviderTypes(fare) || isProviderCodes(fare)) {
+          if (
+            !!providerTypes && providerTypes.length > 0 && isProviderTypes(fare) ||
+            !!providerCodes && providerCodes.length > 0 && isProviderCodes(fare)) {
             sortedProviderFares.push(fare);
           } else {
             sortedNonProviderFares.push(fare);
