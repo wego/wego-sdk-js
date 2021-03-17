@@ -50,9 +50,6 @@ module.exports = {
 
     var propertyGetter = getterMap[sort.by] || function () { };
     var clonedTrips = utils.cloneArray(trips);
-    console.log("trips: ", clonedTrips);
-    console.log("providers: ", providerTypes);
-    console.log("provider codes: ", providerCodes);
 
     // if provider or providerCode exists, sort in ascending with fares with provider/ providerCode first for all flights
     if (providerTypes.length > 0 || providerCodes.length > 0) {
