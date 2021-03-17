@@ -3,7 +3,6 @@ var utils = require('../utils');
 module.exports = {
   sortTrips: function (trips, sort, filter = {}) {
     if (!sort) return trips;
-    console.log("filter: ", filter);
 
     const { providerTypes, providerCodes } = filter;
 
@@ -53,8 +52,6 @@ module.exports = {
 
     // if provider or providerCode exists, sort in ascending with fares with provider/ providerCode first for all flights
     if (!!providerTypes && providerTypes.length > 0 || !!providerCodes && providerCodes.length > 0) {
-      console.log("provider types: ", providerTypes)
-      console.log("provider codes: ", providerCodes)
       for (let clonedTrip of clonedTrips) {
         const isProviderTypes = fare => {
           if (!!fare && !!fare.provider) {
