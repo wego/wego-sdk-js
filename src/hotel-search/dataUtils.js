@@ -109,8 +109,8 @@ module.exports = {
   },
 
   isBetterRate: function (firstRate, secondRate) {
-    function processRateAmount(rate) {
-      var amount = Math.round(rate.price.amount);
+    function processRateAmount(rateAmount) {
+      var amount = Math.round(rateAmount);
       if (amount > 99999) {
         amount = (amount / 100) * 100;
       }
@@ -126,8 +126,10 @@ module.exports = {
 
     if (firstTax != secondTax) return firstTax > secondTax;
 
-    var firstRateAmount = processRateAmount(firstRate);
-    var secondRateAmount = processRateAmount(secondRate);
+    var isSameHotelAndProvider = firstRate.hotelId == secondRate.hotelId && 
+        firstRate.provider && secondRate.provider && firstRate.provider.code == secondRate.provider.code;
+    var firstRateAmount = processRateAmount(isSameHotelAndProvider ? firstRate.price.totalAmountUsd : firstRate.price.totalAmount);
+    var secondRateAmount = processRateAmount(isSameHotelAndProvider ? secondRate.price.totalAmountUsd : secondRate.price.totalAmount);
     if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
 
     if (firstRate.provider.directBooking && !secondRate.provider.directBooking) {

@@ -270,8 +270,8 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'x',
         price: {
-          amount: 100,
-        }
+          totalAmount: 100,
+        },
       };
 
       var rate2 = {
@@ -279,8 +279,8 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'y',
         price: {
-          amount: 70,
-        }
+          totalAmount: 70,
+        },
       };
 
       var rate3 = {
@@ -288,13 +288,17 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'z',
         price: {
-          amount: 80,
-        }
+          totalAmount: 80,
+        },
       };
 
       var hotel = {
         id: 1,
       };
+
+      merger.mergeResponse({
+        providers: [{ id: 1, code: 'x'}, {id: 2, code: 'y'}, {id: 3, code: 'z'}],
+      });
 
       merger.mergeResponse({
         rates: [rate1, rate2],
@@ -322,8 +326,8 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'x',
         price: {
-          amount: 100,
-        }
+          totalAmount: 100,
+        },
       };
 
       var rate2 = {
@@ -331,8 +335,9 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'y',
         price: {
-          amount: 70,
-        }
+          totalAmount: 70,
+          totalAmountUsd: 70,
+        },
       };
 
       var rate3 = {
@@ -340,13 +345,18 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'y',
         price: {
-          amount: 60,
-        }
+          totalAmount: 60,
+          totalAmountUsd: 60,
+        },
       };
 
       var hotel = {
         id: 1,
       };
+
+      merger.mergeResponse({
+        providers: [{ id: 1, code: 'x'}, {id: 2, code: 'y'}],
+      });
 
       merger.mergeResponse({
         rates: [rate1, rate2],
@@ -360,14 +370,101 @@ describe('Merger', function() {
       expect(getRateIds(merger.__hotelMap[1].rates)).to.deep.equal([3, 1]);
     });
 
-    it('not update with worse rate', function() {
+    it('update with better rate with equal amount but different amountUsd', function () {
+      var rate1 = {
+        id: '6d6c67c5780bdcbe:booking.com:1331161:17',
+        hotelId: 1331161,
+        providerHotelId: '1630603',
+        providerCode: 'booking.com',
+        description: 'King Guest Room',
+        price: {
+          amount: 169,
+          currencyCode: 'SGD',
+          amountUsd: 127.868324,
+          taxAmount: 31,
+          taxAmountUsd: 23.487078,
+          taxInclusive: true,
+          ecpc: 0.21,
+          localTaxAmount: 7,
+          localTaxAmountUsd: 5.457461,
+          totalLocalTaxAmount: 56,
+          totalLocalTaxAmountUsd: 43.659687,
+          totalAmount: 1352,
+          totalAmountUsd: 1022.9466,
+          totalTaxAmount: 248,
+          totalTaxAmountUsd: 187.89662,
+        },
+        rateAmenityIds: [2, 3, 4, 5, 13],
+      };
+
+      var rate2 = {
+        id: '6d6c67c5780bdcbe:booking.com:1331161:13',
+        hotelId: 1331161,
+        providerHotelId: '1630603',
+        providerCode: 'booking.com',
+        description: 'Twin Guest Room',
+        price: {
+          amount: 169,
+          currencyCode: 'SGD',
+          amountUsd: 127.570114,
+          taxAmount: 31,
+          taxAmountUsd: 23.431246,
+          taxInclusive: true,
+          ecpc: 0.21,
+          localTaxAmount: 7,
+          localTaxAmountUsd: 5.44517,
+          totalLocalTaxAmount: 56,
+          totalLocalTaxAmountUsd: 43.56136,
+          totalAmount: 1352,
+          totalAmountUsd: 1020.5609,
+          totalTaxAmount: 248,
+          totalTaxAmountUsd: 187.44997,
+        },
+        rateAmenityIds: [5, 2],
+      };
+
+      var hotel = {
+        id: 1331161,
+      };
+
+      var currency = {
+        code: 'SGD',
+        rate: 1,
+      };
+
+      merger.updateCurrency(currency);
+
+      var provider = {
+        id: 1,
+        code: 'booking.com',
+      };
+
+      merger.mergeResponse({
+        providers: [provider],
+      });
+
+      merger.mergeResponse({
+        rates: [rate1],
+        hotels: [hotel],
+      });
+
+      merger.mergeResponse({
+        rates: [rate2],
+      });
+
+      expect(getRateIds(merger.__hotelMap[1331161].rates)).to.deep.equal([
+        '6d6c67c5780bdcbe:booking.com:1331161:13',
+      ]);
+    });
+
+    it('not update with worse rate', function () {
       var rate1 = {
         id: 1,
         hotelId: 1,
         providerCode: 'x',
         price: {
-          amount: 100,
-        }
+          totalAmount: 100,
+        },
       };
 
       var rate2 = {
@@ -375,8 +472,9 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'y',
         price: {
-          amount: 70,
-        }
+          totalAmount: 70,
+          totalAmountUsd: 70,
+        },
       };
 
       var rate3 = {
@@ -384,13 +482,18 @@ describe('Merger', function() {
         hotelId: 1,
         providerCode: 'y',
         price: {
-          amount: 120,
-        }
+          totalAmount: 120,
+          totalAmountUsd: 120,
+        },
       };
 
       var hotel = {
         id: 1,
       };
+
+      merger.mergeResponse({
+        providers: [{ id: 1, code: 'x'}, {id: 2, code: 'y'}],
+      });
 
       merger.mergeResponse({
         rates: [rate1, rate2],
@@ -408,13 +511,18 @@ describe('Merger', function() {
       var response = {
         hotels: [{ id: 1},{ id: 2}],
         rates: [
-          { id: 1, hotelId: 1, providerCode: "a.com", price: {amount: 100, taxAmountUsd: 1}},
-          { id: 2, hotelId: 1, providerCode: "a.com", price: {amount: 110, taxAmountUsd: 1}},
-          { id: 3, hotelId: 2, providerCode: "a.com", price: {amount: 120, taxAmountUsd: 1}},
-          { id: 4, hotelId: 2, providerCode: "b.com", price: {amount: 130, taxAmountUsd: 1}},
-          { id: 5, hotelId: 1, providerCode: "a.com", price: {amount: 140, taxAmountUsd: 1}}
+          { id: 1, hotelId: 1, providerCode: "x", price: {amount: 100, taxAmountUsd: 1}},
+          { id: 2, hotelId: 1, providerCode: "x", price: {amount: 110, taxAmountUsd: 1}},
+          { id: 3, hotelId: 2, providerCode: "x", price: {amount: 120, taxAmountUsd: 1}},
+          { id: 4, hotelId: 2, providerCode: "y", price: {amount: 130, taxAmountUsd: 1}},
+          { id: 5, hotelId: 1, providerCode: "x", price: {amount: 140, taxAmountUsd: 1}}
         ]
       }
+
+      merger.mergeResponse({
+        providers: [{ id: 1, code: 'x'}, {id: 2, code: 'y'}],
+      });
+
       merger.updateCurrency(null);
       merger.mergeResponse(response, true);
       expect(merger.__hotelMap[1].rates.length).to.equal(3);
@@ -451,7 +559,7 @@ describe('Merger', function() {
       var rate1 = {
         id: 1,
         hotelId: 1,
-        providerCode: "a",
+        providerCode: "x",
         price: {
           totalAmount: 20,
           totalTaxAmount: 10,
@@ -462,7 +570,7 @@ describe('Merger', function() {
       var rate2 = {
         id: 2,
         hotelId: 1,
-        providerCode: "b",
+        providerCode: "y",
         price: {
           totalAmount: 15,
           totalTaxAmount: 5,
@@ -473,13 +581,17 @@ describe('Merger', function() {
       var rate3 = {
         id: 3,
         hotelId: 1,
-        providerCode: "c",
+        providerCode: "z",
         price: {
           totalAmount: 25,
           totalTaxAmount: 10,
           ecpc: 0.20
         }
       };
+
+      merger.mergeResponse({
+        providers: [{ id: 1, code: 'x'}, {id: 2, code: 'y'}, {id: 3, code: 'z'}],
+      });
 
       merger.mergeResponse({
         hotels: [{ id: 1 }],
