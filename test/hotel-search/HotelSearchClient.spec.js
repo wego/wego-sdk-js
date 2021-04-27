@@ -394,11 +394,12 @@ describe("HotelSearchClient", function () {
           { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
           { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
           { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
-        ]
+        ],
+        providers: [{ id: 1, code: 'a.com'}, {id: 2, code: 'b.com'}],
       }
       client.poller.pollCount = 1;
       client.poller.pollLimit = 3;
-      client.handleSearchResponse(response);
+      client.handleSearchResponse(response)
       expect(client.merger.__hotelMap[1].rates.length).to.equal(1);
       expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
       expect(client.merger.__hotelMap[2].rates[0].providerCode).to.not.equal(
@@ -414,7 +415,8 @@ describe("HotelSearchClient", function () {
           { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
           { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
           { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
-        ]
+        ],
+        providers: [{ id: 1, code: 'a.com'}, {id: 2, code: 'b.com'}],
       }
       client.poller.pollCount = 2;
       client.poller.pollLimit = 1;
@@ -432,7 +434,8 @@ describe("HotelSearchClient", function () {
           { id: 3, hotelId: 2, providerCode: "a.com", price: { amount: 120, taxAmountUsd: 1 } },
           { id: 4, hotelId: 2, providerCode: "b.com", price: { amount: 130, taxAmountUsd: 1 } },
           { id: 5, hotelId: 1, providerCode: "a.com", price: { amount: 140, taxAmountUsd: 1 } },
-        ]
+        ],
+        providers: [{ id: 1, code: 'a.com'}, {id: 2, code: 'b.com'}],
       }
       client.handleSearchResponse(response);
       expect(client.merger.__hotelMap[1].rates.length).to.equal(3);
