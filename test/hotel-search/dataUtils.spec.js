@@ -243,13 +243,13 @@ describe('dataUtils', function() {
     it('resolve by tax amount usd', function() {
       var r1 = {
         price: {
-          taxAmountUsd: 0,
+          taxAmount: 0,
         }
       };
 
       var r2 = {
         price: {
-          taxAmountUsd: -2,
+          taxAmount: -2,
         }
       };
 
@@ -259,13 +259,13 @@ describe('dataUtils', function() {
     it('resolve by price', function() {
       var r1 = {
         price: {
-          amount: 11.1
+          totalAmount: 11.1
         }
       };
 
       var r2 = {
         price: {
-          amount: 12.1
+          totalAmount: 12.1
         }
       };
 
@@ -275,15 +275,119 @@ describe('dataUtils', function() {
     it('resolve by ecpc', function() {
       var r1 = {
         price: {
-          amount: 100000.3,
+          totalAmount: 100000.3,
           ecpc: 1,
         }
       };
 
       var r2 = {
         price: {
-          amount: 100099.2,
+          totalAmount: 100099.2,
           ecpc: 2,
+        }
+      };
+
+      expect(bestRateOf([r1, r2])).to.equal(r1);
+    });
+
+    it('compare totalAmount when different providers with different amount', function() {
+      var r1 = {
+        price: {
+          totalAmount: 100000.3,
+          ecpc: 1,
+        },
+        provider: {
+          code: 'x'
+        }
+      };
+
+      var r2 = {
+        price: {
+          totalAmount: 100099.2,
+          ecpc: 2,
+        },
+        provider: {
+          code: 'y'
+        }
+      };
+
+      expect(bestRateOf([r1, r2])).to.equal(r1);
+    });
+
+    it('compare ecpc when different providers with same amount', function() {
+      var r1 = {
+        price: {
+          totalAmount: 10000,
+          ecpc: 1,
+        },
+        provider: {
+          code: 'x'
+        }
+      };
+
+      var r2 = {
+        price: {
+          totalAmount: 10000,
+          ecpc: 2,
+        },
+        provider: {
+          code: 'y'
+        }
+      };
+
+      expect(bestRateOf([r1, r2])).to.equal(r2);
+    });
+
+    it('compare totalAmountUsd when the same providers and hotel', function() {
+      var r1 = {
+        price: {
+          totalAmount: 10000,
+          totalAmountUsd: 10005,
+          ecpc: 1,
+        },
+        hotelId: 10,
+        provider: {
+          code: 'x'
+        }
+      };
+
+      var r2 = {
+        price: {
+          totalAmount: 10000,
+          totalAmountUsd: 10007,
+          ecpc: 2,
+        },
+        hotelId: 10,
+        provider: {
+          code: 'x'
+        }
+      };
+
+      expect(bestRateOf([r1, r2])).to.equal(r1);
+    });
+
+    it('compare totalAmount when the same providers but different hotel', function() {
+      var r1 = {
+        price: {
+          totalAmount: 10000,
+          totalAmountUsd: 10005,
+          ecpc: 1,
+        },
+        hotelId: 10,
+        provider: {
+          code: 'x'
+        }
+      };
+
+      var r2 = {
+        price: {
+          totalAmount: 10001,
+          totalAmountUsd: 10005,
+          ecpc: 2,
+        },
+        hotelId: 10,
+        provider: {
+          code: 'y'
         }
       };
 
@@ -293,21 +397,21 @@ describe('dataUtils', function() {
     it('compare three prices', function() {
       var r1 = {
         price: {
-          amount: 100000,
+          totalAmount: 100000,
           ecpc: 1,
         }
       };
 
       var r2 = {
         price: {
-          amount: 100099,
+          totalAmount: 100099,
           ecpc: 2,
         }
       };
 
       var r3 = {
         price: {
-          amount: 1000,
+          totalAmount: 1000,
           ecpc: 1000,
         }
       };
@@ -318,7 +422,7 @@ describe('dataUtils', function() {
     it('prioritizes directBooking when prices are the same but one is directBooking', function() {
       var r1 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 1
         },
         provider: {
@@ -329,7 +433,7 @@ describe('dataUtils', function() {
 
       var r2 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 2
         },
         provider: {
@@ -344,7 +448,7 @@ describe('dataUtils', function() {
     it('compare two rates when price and provider type same', function() {
       var r1 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 1
         },
         provider: {
@@ -355,7 +459,7 @@ describe('dataUtils', function() {
 
       var r2 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 2
         },
         provider: {
@@ -370,7 +474,7 @@ describe('dataUtils', function() {
     it('compare two rates when price is same but first with direct_priority provider', function() {
       var r1 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 1
         },
         provider: {
@@ -381,7 +485,7 @@ describe('dataUtils', function() {
 
       var r2 = {
         price: {
-          amount: 10000,
+          totalAmount: 10000,
           ecpc: 2
         },
         provider: {
