@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/wego/wego-sdk-js",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "babel-loader": "^8.0.6",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "babel-loader": "^8.2.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-spies": "^0.7.1",
@@ -29,9 +29,9 @@
     "mocha": "^5.2.0",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10",
-    "webpack-merge": "^4.2.2"
+    "webpack": "^5.36.1",
+    "webpack-cli": "^4.6.0",
+    "webpack-merge": "^5.7.3"
   },
   "publishConfig": {
     "access": "public"
