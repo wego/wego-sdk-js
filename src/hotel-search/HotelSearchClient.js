@@ -30,6 +30,7 @@ class HotelSearchClient {
     self.requestHeaders = options.requestHeaders;
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
     self.onGroupSearchChanged = options.onGroupSearchChanged || function () { };
+    self.extraSearchRequestBody = options.extraSearchRequestBody;
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -133,31 +134,32 @@ class HotelSearchClient {
   }
 
   getSearchRequestBody() {
-    let self = this;
-    let search = self.search || {};
-    let currency = self.currency || {};
-    let currencyCode = currency.code;
-    let locale = self.locale;
-    let searchParams;
-    let selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
-    let shortlistedHotelIds = self.shortlistedHotelIds;
+    const self = this;
+    const search = self.search || {};
+    const currency = self.currency || {};
+    const currencyCode = currency.code;
+    const locale = self.locale;
+    const extraSearchRequestBody = self.extraSearchRequestBody || {};
+    const selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
+    const shortlistedHotelIds = self.shortlistedHotelIds;
 
-    searchParams = {
+    const searchParams = {
       search: {
-        id: self.responseSearch.id,
-        siteCode: self.siteCode,
-        locale: locale,
-        currencyCode: currencyCode,
-        cityCode: search.cityCode,
-        hotelId: search.hotelId,
-        districtId: search.districtId,
-        regionId: search.regionId,
-        countryCode: search.countryCode,
-        rooms: search.rooms,
+        ...extraSearchRequestBody,
+        appType: self.appType,
         checkIn: search.checkIn,
         checkOut: search.checkOut,
+        cityCode: search.cityCode,
+        countryCode: search.countryCode,
+        currencyCode: currencyCode,
         deviceType: self.deviceType,
-        appType: self.appType,
+        districtId: search.districtId,
+        hotelId: search.hotelId,
+        id: self.responseSearch.id,
+        locale: locale,
+        regionId: search.regionId,
+        rooms: search.rooms,
+        siteCode: self.siteCode,
         userLoggedIn: self.userLoggedIn,
       },
       includeDirect: true, // to show Book on Wego rates
