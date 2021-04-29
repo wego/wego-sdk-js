@@ -22,6 +22,7 @@ class HotelDetailsClient {
     self.similarHotels = options.similarHotels || {};
     self.nearbyHotels = options.nearbyHotels || {};
     self.hotelDetailsEndpointUrl = hotelDetailsEndpointUrl;
+    self.extraSearchRequestBody = options.extraSearchRequestBody;
 
     self.poller = new Poller({
       delays: DELAYS,
@@ -121,25 +122,26 @@ class HotelDetailsClient {
   }
 
   getSearchRequestBody() {
-    let self = this
-    let hotelSearch = self.search || {};
-    let currency = self.currency || {};
-    let currencyCode = currency.code;
-    let locale = self.locale;
-    let searchRequestBody = {};
+    const self = this
+    const hotelSearch = self.search || {};
+    const currency = self.currency || {};
+    const currencyCode = currency.code;
+    const locale = self.locale;
+    const extraSearchRequestBody = self.extraSearchRequestBody || {};
 
-    searchRequestBody = {
+    const searchRequestBody = {
       search: {
-        cityCode: hotelSearch.cityCode,
-        rooms: hotelSearch.rooms,
-        hotelId: hotelSearch.hotelId,
+        ...extraSearchRequestBody,
+        appType: self.appType,
         checkIn: hotelSearch.checkIn,
         checkOut: hotelSearch.checkOut,
-        locale: locale,
-        siteCode: self.siteCode,
+        cityCode: hotelSearch.cityCode,
         currencyCode: currencyCode,
         deviceType: self.deviceType,
-        appType: self.appType,
+        hotelId: hotelSearch.hotelId,
+        locale: locale,
+        rooms: hotelSearch.rooms,
+        siteCode: self.siteCode,
         userLoggedIn: self.userLoggedIn
       },
       includeDirect: true
