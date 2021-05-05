@@ -5,21 +5,16 @@ function filterByPrice(trip, priceRange) {
   return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
-/* e.g. flexible: ["refundable"] */
-function filterByFlexibleTickets(trip, flexible = []) {
-  // check if "refundable" string exists in flexible array
-  const regex = new RegExp("^" + flexible.join("$|") + "$", "i");
-  const isRefundableFlag = regex.test("refundable");
-
-  if (!isRefundableFlag) {
+/* e.g. flexibilities: ["refundable", "non_refundable"] */
+function filterByFlexibleTickets(fares, flexibilities) {
+  if (!flexibilities || flexibilities.length === 0) {
     return true;
-  }
-  for (let i = 0; i < trip.fares.length; i++) {
-    if (trip.fares[i].refundable) {
-      return true;
+  } else {
+    if (flexibilities.some(flexibility => flexibility === 'refundable')) {
+      return fares.some(fare => fare.refundable);
     }
+    return false;
   }
-  return false;
 }
 
 /*
@@ -243,7 +238,7 @@ module.exports = {
         && filterByProviders(trip, providerFilter)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
         && filterByConditions(trip.legs, filter.flightTypes, self.legConditions)
-        && filterByFlexibleTickets(trip, filter.flexible);
+        && filterByFlexibleTickets(trip.fares, filter.flexibilities);
     });
 
     return filteredTrips;
