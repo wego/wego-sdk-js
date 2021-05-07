@@ -23,9 +23,8 @@ function filterByFlexibleTickets(fares, flexibilities) {
     providerTypes: ['instant', 'airline'],
   }
 */
-function filterByProviders(trip, providerFilter) {
+function filterByProviders(trip, providerFilter, flexibilities) {
   if (!providerFilter) return true;
-
   var providerCodeMap = providerFilter.providerCodeMap;
   var providerTypes = providerFilter.providerTypes;
 
@@ -34,8 +33,19 @@ function filterByProviders(trip, providerFilter) {
   var fares = trip.fares;
   if (!fares) return false;
   for (var i = 0; i < fares.length; i++) {
-    var isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
-    var isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+    var isMatchCode, isMatchType;
+    var hasFlexibilities = flexibilities && flexibilities.length > 0;
+    // if the flexible fare is applied check the fare with refundable
+    if(hasFlexibilities) {
+      var isRefundableFare = flexibilities.includes('refundable') && fares[i].refundable;
+      if(isRefundableFare) {
+        isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
+        isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+      }
+    } else {
+      isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
+      isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+    }
     if (isMatchCode && isMatchType) return true;
   }
   return false;
@@ -235,7 +245,7 @@ module.exports = {
         && (multiCity || utils.filterByRange(trip.stopoverDurationMinutes, stopoverRanges && stopoverRanges[0]))
         && (multiCity || filterByItineraryOptions(trip, filter.itineraryOptions))
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
-        && filterByProviders(trip, providerFilter)
+        && filterByProviders(trip, providerFilter, filter.flexibilities)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
         && filterByConditions(trip.legs, filter.flightTypes, self.legConditions)
         && filterByFlexibleTickets(trip.fares, filter.flexibilities);
