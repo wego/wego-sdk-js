@@ -28,7 +28,7 @@ function filterByProviders(trip, providerFilter, flexibilities) {
     return true;
   }
 
-  const hasFlexibilitiesFilter = flexibilities && flexibilities.length > 0;
+  const hasFlexibilitiesFilter = !!flexibilities && flexibilities.length > 0;
   const providerCodeMap = providerFilter.providerCodeMap;
   const providerTypes = providerFilter.providerTypes;
 

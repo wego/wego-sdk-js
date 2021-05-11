@@ -149,7 +149,7 @@ class FlightSearchClient {
     let sortedTrips = sorting.sortTrips(filteredTrips, self.sort, self.filter);
 
     self.onTripsChanged(sortedTrips);
-    self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips));
+    self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips, self.filter));
     self.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
     self.onBestExperienceTripChanged(
       sorting.getBestExperienceTrip(filteredTrips)

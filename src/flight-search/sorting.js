@@ -58,7 +58,7 @@ module.exports = {
             const isFacilitatedBooking = providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
             const isWegoFares = providerTypes.indexOf("instant") !== -1 && fare.provider.wegoFare;
             const hasProviderType = providerTypes.indexOf(fare.provider.type) !== -1 && !fare.provider.instant;
-            return isFacilitatedBooking || isWegoFares || hasProviderType;  
+            return isFacilitatedBooking || isWegoFares || hasProviderType;
           }
           return false;
         };
@@ -97,9 +97,26 @@ module.exports = {
     return clonedTrips;
   },
 
-  getCheapestTrip: function (trips) {
+  getCheapestTrip: function (trips, filter) {
+    const hasFlexibilitiesFilter = !!filter && !!filter.flexibilities && filter.flexibilities.length > 0;
+
     return this._getBestTripBy(trips, function (betterTrip, trip) {
-      return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      if (hasFlexibilitiesFilter) {
+        if (filter.flexibilities.includes('refundable')) {
+          const betterTripRefundableFare = betterTrip.fares.find(fare => fare.refundable);
+          const tripRefundableFare = trip.fares.find(fare => fare.refundable);
+
+          if ((!betterTripRefundableFare && !tripRefundableFare) || (!betterTripRefundableFare && !!tripRefundableFare)) {
+            return false;
+          } else if (!!betterTripRefundableFare && !tripRefundableFare) {
+            return true;
+          } else {
+            return betterTripRefundableFare.price.amountUsd < tripRefundableFare.price.amountUsd;
+          }
+        }
+      } else {
+        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      }
     });
   },
 
