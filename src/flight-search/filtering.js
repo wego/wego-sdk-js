@@ -5,21 +5,16 @@ function filterByPrice(trip, priceRange) {
   return trip.fares[0] && utils.filterByRange(trip.fares[0].price.amountUsd, priceRange);
 }
 
-/* e.g. flexible: ["refundable"] */
-function filterByFlexibleTickets(trip, flexible = []) {
-  // check if "refundable" string exists in flexible array
-  const regex = new RegExp("^" + flexible.join("$|") + "$", "i");
-  const isRefundableFlag = regex.test("refundable");
-
-  if (!isRefundableFlag) {
+/* e.g. flexibilities: ["refundable", "non_refundable"] */
+function filterByFlexibleTickets(fares, flexibilities) {
+  if (!flexibilities || flexibilities.length === 0) {
     return true;
-  }
-  for (let i = 0; i < trip.fares.length; i++) {
-    if (trip.fares[i].refundable) {
-      return true;
+  } else {
+    if (flexibilities.includes('refundable')) {
+      return fares.some(fare => fare.refundable);
     }
+    return false;
   }
-  return false;
 }
 
 /*
@@ -28,20 +23,31 @@ function filterByFlexibleTickets(trip, flexible = []) {
     providerTypes: ['instant', 'airline'],
   }
 */
-function filterByProviders(trip, providerFilter) {
-  if (!providerFilter) return true;
+function filterByProviders(trip, providerFilter, flexibilities) {
+  if (!providerFilter) {
+    return true;
+  }
 
-  var providerCodeMap = providerFilter.providerCodeMap;
-  var providerTypes = providerFilter.providerTypes;
+  const hasFlexibilitiesFilter = !!flexibilities && flexibilities.length > 0;
+  const providerCodeMap = providerFilter.providerCodeMap;
+  const providerTypes = providerFilter.providerTypes;
 
-  if (!providerCodeMap && !providerTypes) return true;
+  if (!providerCodeMap && !providerTypes) {
+    return true;
+  }
 
-  var fares = trip.fares;
-  if (!fares) return false;
-  for (var i = 0; i < fares.length; i++) {
-    var isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
-    var isMatchType = isFareMatchProviderType(fares[i], providerTypes);
-    if (isMatchCode && isMatchType) return true;
+  const fares = trip.fares;
+
+  if (!!fares && fares.length > 0) {
+    for (let i = 0; i < fares.length; i++) {
+      const isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
+      const isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+      const isMatchFlexibilitiesFilter = hasFlexibilitiesFilter ? flexibilities.includes('refundable') && fares[i].refundable : true;
+
+      if (isMatchCode && isMatchType && isMatchFlexibilitiesFilter) {
+        return true;
+      }
+    }
   }
   return false;
 }
@@ -240,10 +246,10 @@ module.exports = {
         && (multiCity || utils.filterByRange(trip.stopoverDurationMinutes, stopoverRanges && stopoverRanges[0]))
         && (multiCity || filterByItineraryOptions(trip, filter.itineraryOptions))
         && utils.filterByContainAllKeys(trip.legIdMap, filter.legIds)
-        && filterByProviders(trip, providerFilter)
+        && filterByProviders(trip, providerFilter, filter.flexibilities)
         && filterByConditions(trip.fares, filter.fareTypes, self.fareConditions)
         && filterByConditions(trip.legs, filter.flightTypes, self.legConditions)
-        && filterByFlexibleTickets(trip, filter.flexible);
+        && filterByFlexibleTickets(trip.fares, filter.flexibilities);
     });
 
     return filteredTrips;

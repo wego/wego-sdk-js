@@ -4,7 +4,7 @@ module.exports = {
   sortTrips: function (trips, sort, filter = {}) {
     if (!sort) return trips;
 
-    const { providerTypes, providerCodes } = filter;
+    const { providerTypes, providerCodes, flexibilities } = filter;
 
     function getBestFare(trip) {
       if (!trip.fares[0]) return null;
@@ -50,39 +50,53 @@ module.exports = {
     var propertyGetter = getterMap[sort.by] || function () { };
     var clonedTrips = utils.cloneArray(trips);
 
-    // if provider or providerCode exists, sort in ascending with fares with provider/ providerCode first for all flights
-    if (!!providerTypes && providerTypes.length > 0 || !!providerCodes && providerCodes.length > 0) {
-      for (let clonedTrip of clonedTrips) {
-        const isProviderTypes = fare => {
-          if (!!fare && !!fare.provider) {
-            const isFacilitatedBooking = providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
-            const isWegoFares = providerTypes.indexOf("instant") !== -1 && fare.provider.wegoFare;
-            const hasProviderType = providerTypes.indexOf(fare.provider.type) !== -1 && !fare.provider.instant;
-            return isFacilitatedBooking || isWegoFares || hasProviderType;  
+    const hasProviderTypesFilter = !!providerTypes && providerTypes.length > 0;
+    const hasProviderCodesFilter = !!providerCodes && providerCodes.length > 0;
+    const hasFlexibilitiesFilter = !!flexibilities && flexibilities.length > 0;
+
+    if (hasProviderTypesFilter || hasProviderCodesFilter || hasFlexibilitiesFilter) {
+      clonedTrips.forEach(clonedTrip => {
+        const sortedFaresByFilter = [];
+        const sortedFaresByDefault = [];
+
+        for (const fare of clonedTrip.fares) {
+          let matchesProviderTypesFilter = true;
+          let matchesProviderCodesFilter = true;
+          let matchesFlexibilitiesFilter = true;
+
+          if (hasProviderTypesFilter) {
+            const isWegoFare = providerTypes.includes('instant');
+            const isAirlineFare = providerTypes.includes('airline');
+
+            if (isWegoFare && isAirlineFare) {
+              matchesProviderTypesFilter = fare.provider.wegoFare || fare.provider.instant || fare.provider.type === 'airline';
+            } else if (isWegoFare) {
+              matchesProviderTypesFilter = fare.provider.wegoFare || fare.provider.instant;
+            } else if (isAirlineFare) {
+              matchesProviderTypesFilter = fare.provider.type === 'airline';
+            }
           }
-          return false;
-        };
 
-        const isProviderCodes = fare => {
-          const providerCode = fare.providerCode || fare.provider.code;
-          return !!providerCode ? providerCodes.indexOf(providerCode) !== -1 : false;
-        }
+          if (hasProviderCodesFilter) {
+            const providerCode = fare.providerCode || fare.provider.code;
+            matchesProviderCodesFilter = providerCodes.includes(providerCode);
+          }
 
-        const sortedProviderFares = [];
-        const sortedNonProviderFares = [];
+          if (hasFlexibilitiesFilter) {
+            if (flexibilities.includes('refundable')) {
+              matchesFlexibilitiesFilter = fare.refundable;
+            }
+          }
 
-        for (let fare of clonedTrip.fares) {
-          if (
-            !!providerTypes && providerTypes.length > 0 && isProviderTypes(fare) ||
-            !!providerCodes && providerCodes.length > 0 && isProviderCodes(fare)) {
-            sortedProviderFares.push(fare);
+          if (matchesProviderTypesFilter && matchesProviderCodesFilter && matchesFlexibilitiesFilter) {
+            sortedFaresByFilter.push(fare);
           } else {
-            sortedNonProviderFares.push(fare);
+            sortedFaresByDefault.push(fare);
           }
         }
 
-        clonedTrip.fares = sortedProviderFares.concat(sortedNonProviderFares);
-      }
+        clonedTrip.fares = sortedFaresByFilter.concat(sortedFaresByDefault);
+      })
     }
 
     clonedTrips.sort(function (trip1, trip2) {
@@ -97,9 +111,29 @@ module.exports = {
     return clonedTrips;
   },
 
-  getCheapestTrip: function (trips) {
+  getCheapestTrip: function (trips, filter) {
+    const hasFlexibilitiesFilter = !!filter && !!filter.flexibilities && filter.flexibilities.length > 0;
+
     return this._getBestTripBy(trips, function (betterTrip, trip) {
-      return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      if (hasFlexibilitiesFilter) {
+        if (filter.flexibilities.includes('refundable')) {
+          const betterTripRefundableFare = betterTrip.fares.find(fare => fare.refundable);
+          const tripRefundableFare = trip.fares.find(fare => fare.refundable);
+
+          // Assuming that getCheapestTrip() is called with all trips that have refundable fare in it.
+          return betterTripRefundableFare.price.amountUsd < tripRefundableFare.price.amountUsd;
+
+          // if ((!betterTripRefundableFare && !tripRefundableFare) || (!betterTripRefundableFare && !!tripRefundableFare)) {
+          //   return false;
+          // } else if (!!betterTripRefundableFare && !tripRefundableFare) {
+          //   return true;
+          // } else {
+          //   return betterTripRefundableFare.price.amountUsd < tripRefundableFare.price.amountUsd;
+          // }
+        }
+      } else {
+        return betterTrip.fares[0].price.amountUsd < trip.fares[0].price.amountUsd;
+      }
     });
   },
 
