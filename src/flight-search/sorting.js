@@ -120,6 +120,7 @@ module.exports = {
           const betterTripRefundableFare = betterTrip.fares.find(fare => fare.refundable);
           const tripRefundableFare = trip.fares.find(fare => fare.refundable);
 
+          // Assuming that getCheapestTrip() is called with all trips that have refundable fare in it.
           return betterTripRefundableFare.price.amountUsd < tripRefundableFare.price.amountUsd;
 
           // if ((!betterTripRefundableFare && !tripRefundableFare) || (!betterTripRefundableFare && !!tripRefundableFare)) {
