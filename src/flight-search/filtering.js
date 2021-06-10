@@ -24,29 +24,30 @@ function filterByFlexibleTickets(fares, flexibilities) {
   }
 */
 function filterByProviders(trip, providerFilter, flexibilities) {
-  if (!providerFilter) return true;
-  var providerCodeMap = providerFilter.providerCodeMap;
-  var providerTypes = providerFilter.providerTypes;
+  if (!providerFilter) {
+    return true;
+  }
 
-  if (!providerCodeMap && !providerTypes) return true;
+  const hasFlexibilitiesFilter = !!flexibilities && flexibilities.length > 0;
+  const providerCodeMap = providerFilter.providerCodeMap;
+  const providerTypes = providerFilter.providerTypes;
 
-  var fares = trip.fares;
-  if (!fares) return false;
-  for (var i = 0; i < fares.length; i++) {
-    var isMatchCode, isMatchType;
-    var hasFlexibilities = flexibilities && flexibilities.length > 0;
-    // if the flexible fare is applied check the fare with refundable
-    if(hasFlexibilities) {
-      var isRefundableFare = flexibilities.includes('refundable') && fares[i].refundable;
-      if(isRefundableFare) {
-        isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
-        isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+  if (!providerCodeMap && !providerTypes) {
+    return true;
+  }
+
+  const fares = trip.fares;
+
+  if (!!fares && fares.length > 0) {
+    for (let i = 0; i < fares.length; i++) {
+      const isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
+      const isMatchType = isFareMatchProviderType(fares[i], providerTypes);
+      const isMatchFlexibilitiesFilter = hasFlexibilitiesFilter ? flexibilities.includes('refundable') && fares[i].refundable : true;
+
+      if (isMatchCode && isMatchType && isMatchFlexibilitiesFilter) {
+        return true;
       }
-    } else {
-      isMatchCode = isFareMatchProviderCode(fares[i], providerCodeMap);
-      isMatchType = isFareMatchProviderType(fares[i], providerTypes);
     }
-    if (isMatchCode && isMatchType) return true;
   }
   return false;
 }

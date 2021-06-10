@@ -40,7 +40,7 @@ Poller.prototype = {
   },
 
   getProgress: function() {
-    if (this.pollCount >= this.pollLimit || this.resultCount >= 1000) {
+    if (this.pollCount >= this.pollLimit) {
       return 100;
     }
 
