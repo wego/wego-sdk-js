@@ -325,7 +325,7 @@ describe("HotelSearchClient", function () {
     });
 
     it("return isLastPolling flag at the last polling request", function () {
-      client.poller.pollCount = 2;
+      client.poller.pollCount = 1;
       client.poller.pollLimit = 1;
       var params = client.fetchHotelsParams();
       expect(params.isLastPolling).to.equal(true);

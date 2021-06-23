@@ -10,7 +10,7 @@ describe("Poller", () => {
     clock = sinon.useFakeTimers();
     poller = new Poller({
       callApi: callApiCallbackFn,
-      onSuccessResponse: function() {},
+      onSuccessResponse: function () { },
       delays: []
     });
   });
@@ -28,19 +28,19 @@ describe("Poller", () => {
       expect(poller.timer).not.equal(null);
       expect(poller.pollCount).not.equal(2);
     });
-    it("calls callApi when initCallApi not provided", function() {
+    it("calls callApi when initCallApi not provided", function () {
       poller.start();
       clock.tick(510);
       expect(callApiCallbackFn).to.have.been.called();
     });
 
-    it("calls initCallApi when provided", function() {
+    it("calls initCallApi when provided", function () {
       var fn = sinon.spy(() => {
         return Promise.resolve();
       });
       anotherPoller = new Poller({
         initCallApi: fn,
-        onSuccessResponse: function() {},
+        onSuccessResponse: function () { },
         delays: []
       });
       anotherPoller.start();
@@ -61,30 +61,12 @@ describe("Poller", () => {
       poller.reset();
       expect(poller.abortLastFetch).to.have.been.calledOnce();
     });
-
-    it("sets count to 0", function() {
-      poller.resultCount = 10;
-      poller.reset();
-      expect(poller.resultCount).to.equal(0);
-    });
   });
 
-  describe("#getProgress", function() {
-    it("is computed by both fetch count and count", function() {
-      poller.pollLimit = 10;
-      poller.pollCount = 4;
-      poller.resultCount = 200;
-      expect(poller.getProgress()).to.equal(30);
-    });
-
-    it("returns 100 when pollCount >= pollLimit", () => {
+  describe("#getProgress", function () {
+    it("returns 100 when pollCount === pollLimit", () => {
       poller.pollLimit = 3;
       poller.pollCount = 3;
-      expect(poller.getProgress()).to.equal(100);
-    });
-
-    it("returns 100 when count >= 1000", function() {
-      poller.resultCount = 1000;
       expect(poller.getProgress()).to.equal(100);
     });
   });
@@ -132,7 +114,7 @@ describe("Poller", () => {
 
   describe("#isLastPolling", () => {
     it("return true at the last polling", () => {
-      poller.pollCount = 1;
+      poller.pollCount = 0;
       poller.pollLimit = 1;
       poller.poll();
       expect(poller.isLastPolling()).to.equal(true);
@@ -163,14 +145,6 @@ describe("Poller", () => {
       poller.timer = null;
       poller.handleSuccessResponse({});
       expect(poller.timer).not.equal(null);
-    });
-
-    it("sets count", () => {
-      var count = 100;
-      poller.handleSuccessResponse({
-        count: count
-      });
-      expect(poller.resultCount).to.equal(count);
     });
 
     it("calls onSuccessResponse", () => {
