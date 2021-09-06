@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 var FlightSearchMerger = require('../../src/flight-search/Merger');
 
 describe('FlightSearchMerger', function () {
@@ -375,6 +376,57 @@ describe('FlightSearchMerger', function () {
     expect(merger.__tripMap[tripId].score).to.equal(score);
     expect(merger.__tripMap[tripId]).to.not.equal(oldTrip);
   });
+
+  it('merge inline ad trips', function() {
+
+    var sponsors = [
+      {
+        "partnerLogoUrl": "url",
+        "brandingHeader": "text",
+        "brandingDescription": "text",
+        "brandingColor": "hex string",
+        "handoffUrl": "url",
+        "fare": {
+          "id": "fareId",
+          "providerCode": "ota.com",
+          "refundable": false,
+          "exchangeable": false,
+          "tags": [],
+          "tripId": "tripId",
+          "price": {
+            "totalAmount": 3361,
+            "totalAmountUsd": 46.012104,
+            "amount": 3361,
+            "amountUsd": 46.012104,
+            "originalAmount": 3361,
+            "originalAmountUsd": 46.012104,
+            "amountPerAdult": 3171,
+            "amountPerChild": 0,
+            "amountPerInfant": 0,
+            "taxAmount": 0,
+            "taxAmountUsd": 0,
+            "totalTaxAmount": 0,
+            "totalTaxAmountUsd": 0,
+            "currencyCode": "INR",
+            "paymentFeeAmountUsd": 0,
+            "bookingFee": 0,
+            "bookingFeeUsd": 0,
+            "totalBookingFee": 0,
+            "totalBookingFeeUsd": 0
+          }
+        }
+      }
+    ];
+
+    merger.mergeResponse({
+      sponsor: sponsors
+    });
+
+    const inlineAdTripKeys = Object.keys(merger.__inlineAdTrips);
+
+    expect(inlineAdTripKeys.length).to.equal(sponsors.length);
+    expect(merger.__inlineAdTrips[inlineAdTripKeys[0]].fare.tripId).to.equal(sponsors[0].fare.tripId);
+  })
 
   it('merge fares', function () {
     var tripId = 4;

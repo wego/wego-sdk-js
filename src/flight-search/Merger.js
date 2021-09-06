@@ -19,6 +19,7 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
+    self._mergeInlineAdTrips(response.sponsor);
 
     self._cloneTrips(updatedTripIds);
   },
@@ -30,6 +31,7 @@ FlightSearchMerger.prototype = {
     this.__trips = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
+    this.__inlineAdTrips = {};
   },
 
   getTrips: function () {
@@ -51,6 +53,10 @@ FlightSearchMerger.prototype = {
 
   getFilter: function () {
     return this.__filter;
+  },
+
+  getInlineAdTrips: function () {
+    return Object.keys(this.__inlineAdTrips).map(key => this.__inlineAdTrips[key]);
   },
 
   updateCurrency: function (currency) {
@@ -175,6 +181,16 @@ FlightSearchMerger.prototype = {
       if (trip) {
         trip.score = scores[tripId];
       }
+    }
+  },
+
+  _mergeInlineAdTrips: function (sponsors) {
+    if (!sponsors || sponsors.length === 0) return;
+    for (var sponsor of sponsors) {
+      var key = `${sponsor.fare.providerCode}-${sponsor.fare.price.amount}`;
+      var trip = this.__tripMap[sponsor.fare.tripId];
+      sponsor.fare.trip = trip;
+      this.__inlineAdTrips[key] = sponsor;
     }
   },
 

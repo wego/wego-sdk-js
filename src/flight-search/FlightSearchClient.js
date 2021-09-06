@@ -18,6 +18,7 @@ class FlightSearchClient {
     self.paymentMethodIds = options.paymentMethodIds || [];
     self.providerTypes = options.providerTypes || [];
     self.onProgressChanged = options.onProgressChanged || function () { };
+    self.onInlineAdTripsChanged = options.onInlineAdTripsChanged || function () { };
     self.onTripsChanged = options.onTripsChanged || function () { };
     self.onTotalTripsChanged = options.onTotalTripsChanged || function () { };
     self.onCheapestTripChanged = options.onCheapestTripChanged || function () { };
@@ -148,6 +149,7 @@ class FlightSearchClient {
     let filteredTrips = filtering.filterTrips(trips, self.filter, self.multiCity);
     let sortedTrips = sorting.sortTrips(filteredTrips, self.sort, self.filter);
 
+    self.onInlineAdTripsChanged(self.merger.getInlineAdTrips());
     self.onTripsChanged(sortedTrips);
     self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips, self.filter));
     self.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
@@ -158,7 +160,6 @@ class FlightSearchClient {
     self.onDisplayedFilterChanged(self.merger.getFilter());
     self.onProgressChanged(self.poller.getProgress());
 
-    // changes in providers
     self.onProvidersChanged(self.merger.getProviders());
   }
 
