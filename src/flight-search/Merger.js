@@ -190,6 +190,9 @@ FlightSearchMerger.prototype = {
       var key = `${sponsor.fare.providerCode}-${sponsor.fare.price.amount}`;
       var trip = this.__tripMap[sponsor.fare.tripId];
       sponsor.fare.trip = trip;
+      sponsor.fare.legs = trip.legIds.map(legId => this.__legMap[legId]);
+      sponsor.fare.provider = this.__staticData.providers[sponsor.fare.providerCode];
+
       this.__inlineAdTrips[key] = sponsor;
     }
   },
