@@ -19,7 +19,7 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
-    self._mergeInlineAdTrips(response.sponsor);
+    self._mergeSponsors(response.sponsor);
 
     self._cloneTrips(updatedTripIds);
   },
@@ -31,7 +31,7 @@ FlightSearchMerger.prototype = {
     this.__trips = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
-    this.__inlineAdTrips = {};
+    this.__sponsors = {};
   },
 
   getTrips: function () {
@@ -55,8 +55,8 @@ FlightSearchMerger.prototype = {
     return this.__filter;
   },
 
-  getInlineAdTrips: function () {
-    return Object.keys(this.__inlineAdTrips).map(key => this.__inlineAdTrips[key]);
+  getSponsors: function () {
+    return Object.keys(this.__sponsors).map(key => this.__sponsors[key]);
   },
 
   updateCurrency: function (currency) {
@@ -184,16 +184,18 @@ FlightSearchMerger.prototype = {
     }
   },
 
-  _mergeInlineAdTrips: function (sponsors) {
+  _mergeSponsors: function (sponsors) {
     if (!sponsors || sponsors.length === 0) return;
     for (var sponsor of sponsors) {
       var key = `${sponsor.fare.providerCode}-${sponsor.fare.price.amount}`;
       var trip = this.__tripMap[sponsor.fare.tripId];
       sponsor.fare.trip = trip;
-      sponsor.fare.legs = trip.legIds.map(legId => this.__legMap[legId]);
+      if (!!trip && !!trip.legIds) {
+        sponsor.fare.legs = trip.legIds.map(legId => this.__legMap[legId]);
+      }
       sponsor.fare.provider = this.__staticData.providers[sponsor.fare.providerCode];
 
-      this.__inlineAdTrips[key] = sponsor;
+      this.__sponsors[key] = sponsor;
     }
   },
 

@@ -377,7 +377,7 @@ describe('FlightSearchMerger', function () {
     expect(merger.__tripMap[tripId]).to.not.equal(oldTrip);
   });
 
-  it('merge inline ad trips', function() {
+  it('merge sponsors', function() {
 
     var sponsors = [
       {
@@ -422,10 +422,9 @@ describe('FlightSearchMerger', function () {
       sponsor: sponsors
     });
 
-    const inlineAdTripKeys = Object.keys(merger.__inlineAdTrips);
-
-    expect(inlineAdTripKeys.length).to.equal(sponsors.length);
-    expect(merger.__inlineAdTrips[inlineAdTripKeys[0]].fare.tripId).to.equal(sponsors[0].fare.tripId);
+    const sponsorKeys = Object.keys(merger.__sponsors);
+    expect(sponsorKeys.length).to.equal(sponsors.length);
+    expect(merger.__sponsors[sponsorKeys[0]].fare.tripId).to.equal(sponsors[0].fare.tripId);
   })
 
   it('merge fares', function () {
