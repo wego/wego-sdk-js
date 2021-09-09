@@ -149,7 +149,6 @@ class FlightSearchClient {
     let filteredTrips = filtering.filterTrips(trips, self.filter, self.multiCity);
     let sortedTrips = sorting.sortTrips(filteredTrips, self.sort, self.filter);
 
-    self.onSponsorsChanged(self.merger.getSponsors());
     self.onTripsChanged(sortedTrips);
     self.onCheapestTripChanged(sorting.getCheapestTrip(filteredTrips, self.filter));
     self.onFastestTripChanged(sorting.getFastestTrip(filteredTrips));
@@ -161,6 +160,10 @@ class FlightSearchClient {
     self.onProgressChanged(self.poller.getProgress());
 
     self.onProvidersChanged(self.merger.getProviders());
+
+    let sponsors = self.merger.getSponsors();
+    let filteredSponsors = filtering.filterSponsors(sponsors, trips, self.filter, self.multiCity);
+    self.onSponsorsChanged(filteredSponsors);
   }
 
   getSearchRequestBody() {

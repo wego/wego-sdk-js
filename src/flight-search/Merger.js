@@ -19,7 +19,7 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
-    self._mergeSponsors(response.sponsor);
+    self._mergeSponsors(response.routeSponsors);
 
     self._cloneTrips(updatedTripIds);
   },
