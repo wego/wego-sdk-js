@@ -31,6 +31,7 @@ class HotelSearchClient {
     self.shortlistedHotelIds = options.shortlistedHotelIds || [];
     self.onGroupSearchChanged = options.onGroupSearchChanged || function () { };
     self.extraSearchRequestBody = options.extraSearchRequestBody;
+    self.bowOnly = options.bowOnly;
 
     self.merger = new HotelSearchMerger();
     self.poller = new Poller({
@@ -142,6 +143,7 @@ class HotelSearchClient {
     const extraSearchRequestBody = self.extraSearchRequestBody || {};
     const selectedHotelIds = dataUtils.trimArray(self.selectedHotelIds);
     const shortlistedHotelIds = self.shortlistedHotelIds;
+    const bowOnly = self.bowOnly;
 
     const searchParams = {
       search: {
@@ -163,6 +165,7 @@ class HotelSearchClient {
         userLoggedIn: self.userLoggedIn,
       },
       includeDirect: true, // to show Book on Wego rates
+      ...(!!bowOnly && { bowOnly }),
       rateAmenityIds: self.rateAmenityIds,
       offset: self.lastRatesCount
     };
