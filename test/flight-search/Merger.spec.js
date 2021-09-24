@@ -383,10 +383,9 @@ describe('FlightSearchMerger', function () {
       {
         "partnerLogoUrl": "url",
         "brandingHeader": "text",
-        "brandingDescription": "text",
         "brandingColor": "hex string",
         "handoffUrl": "url",
-        "fare": {
+        "fareView": {
           "id": "fareId",
           "providerCode": "ota.com",
           "refundable": false,
@@ -419,12 +418,12 @@ describe('FlightSearchMerger', function () {
     ];
 
     merger.mergeResponse({
-      sponsor: sponsors
+      sponsors: sponsors
     });
 
     const sponsorKeys = Object.keys(merger.__sponsors);
     expect(sponsorKeys.length).to.equal(sponsors.length);
-    expect(merger.__sponsors[sponsorKeys[0]].fare.tripId).to.equal(sponsors[0].fare.tripId);
+    expect(merger.__sponsors[sponsorKeys[0]].fareView.tripId).to.equal(sponsors[0].fareView.tripId);
   })
 
   it('merge fares', function () {

@@ -19,7 +19,7 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
-    self._mergeSponsors(response.routeSponsors);
+    self._mergeSponsors(response.sponsors);
 
     self._cloneTrips(updatedTripIds);
   },
@@ -187,13 +187,16 @@ FlightSearchMerger.prototype = {
   _mergeSponsors: function (sponsors) {
     if (!sponsors || sponsors.length === 0) return;
     for (var sponsor of sponsors) {
-      var key = `${sponsor.fare.providerCode}-${sponsor.fare.price.amount}`;
-      var trip = this.__tripMap[sponsor.fare.tripId];
-      sponsor.fare.trip = trip;
-      if (!!trip && !!trip.legIds) {
-        sponsor.fare.legs = trip.legIds.map(legId => this.__legMap[legId]);
+      var key = `${sponsor.fareView.providerCode}-${sponsor.fareView.price.amount}`;
+      var trip = this.__tripMap[sponsor.fareView.tripId];
+      if (!!trip) {
+        trip.fares = [sponsor.fareView];
       }
-      sponsor.fare.provider = this.__staticData.providers[sponsor.fare.providerCode];
+      sponsor.fareView.trip = trip;
+      if (!!trip && !!trip.legIds) {
+        sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
+      }
+      sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
 
       this.__sponsors[key] = sponsor;
     }
