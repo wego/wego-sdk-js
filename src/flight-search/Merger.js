@@ -188,13 +188,14 @@ FlightSearchMerger.prototype = {
     if (!sponsors || sponsors.length === 0) return;
     for (var sponsor of sponsors) {
       var key = `${sponsor.fareView.providerCode}-${sponsor.fareView.price.amount}`;
-      var trip = this.__tripMap[sponsor.fareView.tripId];
+      var trip = utils.cloneObject(this.__tripMap[sponsor.fareView.tripId]);
       if (!!trip) {
         trip.fares = [sponsor.fareView];
-      }
-      sponsor.fareView.trip = trip;
-      if (!!trip && !!trip.legIds) {
-        sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
+        sponsor.fareView.trip = trip;
+
+        if (!!trip.legIds) {
+          sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
+        }  
       }
       sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
 
