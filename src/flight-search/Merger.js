@@ -72,6 +72,13 @@ FlightSearchMerger.prototype = {
     }
     self._cloneTrips(Object.keys(tripMap));
 
+    var sponsorMap = self.__sponsors;
+    for (var sponsorKey in sponsorMap) {
+      var sponsor = sponsorMap[sponsorKey];
+      sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, currency);
+      sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, currency);
+    }
+
     var filter = self.__filter;
     self.__filterOptionTypes.forEach(function (type) {
       var optionMap = self.__filterOptionsMap[type];
@@ -190,12 +197,15 @@ FlightSearchMerger.prototype = {
       var key = `${sponsor.fareView.providerCode}-${sponsor.fareView.price.amount}`;
       var trip = utils.cloneObject(this.__tripMap[sponsor.fareView.tripId]);
       if (!!trip) {
+        sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, this.currency);
+        sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, this.currency);
+
         trip.fares = [sponsor.fareView];
         sponsor.fareView.trip = trip;
 
         if (!!trip.legIds) {
           sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
-        }  
+        }
       }
       sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
 
