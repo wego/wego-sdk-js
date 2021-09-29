@@ -77,6 +77,7 @@ FlightSearchMerger.prototype = {
       var sponsor = sponsorMap[sponsorKey];
       sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, currency);
       sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, currency);
+      sponsorMap[sponsorKey] = utils.cloneObject(sponsor);
     }
 
     var filter = self.__filter;
