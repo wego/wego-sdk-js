@@ -31,7 +31,7 @@ FlightSearchMerger.prototype = {
     this.__trips = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
-    this.__sponsors = {};
+    this.__sponsors = [];
   },
 
   getTrips: function () {
@@ -56,7 +56,7 @@ FlightSearchMerger.prototype = {
   },
 
   getSponsors: function () {
-    return Object.keys(this.__sponsors).map(key => this.__sponsors[key]);
+    return this.__sponsors;
   },
 
   updateCurrency: function (currency) {
@@ -72,13 +72,11 @@ FlightSearchMerger.prototype = {
     }
     self._cloneTrips(Object.keys(tripMap));
 
-    var sponsorMap = self.__sponsors;
-    for (var sponsorKey in sponsorMap) {
-      var sponsor = sponsorMap[sponsorKey];
+    self.__sponsors = self.__sponsors.map(function(sponsor){
       sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, currency);
       sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, currency);
-      sponsorMap[sponsorKey] = utils.cloneObject(sponsor);
-    }
+      return utils.cloneObject(sponsor);
+    });
 
     var filter = self.__filter;
     self.__filterOptionTypes.forEach(function (type) {
@@ -194,8 +192,7 @@ FlightSearchMerger.prototype = {
 
   _mergeSponsors: function (sponsors) {
     if (!sponsors || sponsors.length === 0) return;
-    for (var sponsor of sponsors) {
-      var key = `${sponsor.fareView.providerCode}-${sponsor.fareView.price.amount}`;
+    this.__sponsors = sponsors.reduce((acc, sponsor) => {
       var trip = utils.cloneObject(this.__tripMap[sponsor.fareView.tripId]);
       if (!!trip) {
         sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, this.currency);
@@ -207,11 +204,14 @@ FlightSearchMerger.prototype = {
         if (!!trip.legIds) {
           sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
         }
-      }
-      sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
 
-      this.__sponsors[key] = sponsor;
-    }
+        sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
+      }
+
+      acc = [...acc, sponsor];
+
+      return acc;
+    }, []);
   },
 
   _mergeFilter: function (newFilter) {

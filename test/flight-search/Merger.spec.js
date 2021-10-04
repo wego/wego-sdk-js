@@ -421,9 +421,8 @@ describe('FlightSearchMerger', function () {
       sponsors: sponsors
     });
 
-    const sponsorKeys = Object.keys(merger.__sponsors);
-    expect(sponsorKeys.length).to.equal(sponsors.length);
-    expect(merger.__sponsors[sponsorKeys[0]].fareView.tripId).to.equal(sponsors[0].fareView.tripId);
+    expect(merger.__sponsors.length).to.equal(sponsors.length);
+    expect(merger.__sponsors[0].fareView.tripId).to.equal(sponsors[0].fareView.tripId);
   })
 
   it('merge fares', function () {
