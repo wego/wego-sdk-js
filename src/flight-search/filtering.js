@@ -1,3 +1,4 @@
+const { cloneObject } = require('../utils');
 var utils = require('../utils');
 
 function filterByPrice(trip, priceRange) {
@@ -306,9 +307,13 @@ module.exports = {
     var providerFilter = { providerCodeMap, providerTypes };
 
     return sponsors.filter(function (sponsor) {
-      const trip = trips.find(trip => {
+      let trip = trips.find(trip => {
         return trip.id === sponsor.fareView.tripId;
       });
+      if (!!trip) {
+        trip = cloneObject(trip);
+        trip.fares = trip.fares.filter(fare => fare.id === sponsor.fareView.id);
+      }
 
       return filterTripCriteria(
         trip,
