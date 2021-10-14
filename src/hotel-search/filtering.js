@@ -23,13 +23,16 @@ function filterByRateAmenities(hotel, rateAmenityIds) {
 
   if (!rates) return false;
 
-  for (var i = 0; i < rates.length; i++) {
-    for (var j = 0; j < rateAmenityIds.length; j++) {
-      if (rates[i].rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) return true;
-    }
-  }
+  // for (var i = 0; i < rates.length; i++) {
+  //   for (var j = 0; j < rateAmenityIds.length; j++) {
+  //     // if (rates[i].rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) return true;
+  //     if (rateAmenityIds[j].includes())
+  //   }
+  // }
 
-  return false;
+  return (rates || []).some(rate => rateAmenityIds.includes(rate.rateAmenityIds.toString()));
+
+  // return false;
 }
 
 function filterByDeals(hotel, deals) {
