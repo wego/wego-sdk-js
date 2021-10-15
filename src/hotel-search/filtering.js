@@ -23,16 +23,7 @@ function filterByRateAmenities(hotel, rateAmenityIds) {
 
   if (!rates) return false;
 
-  // for (var i = 0; i < rates.length; i++) {
-  //   for (var j = 0; j < rateAmenityIds.length; j++) {
-  //     // if (rates[i].rateAmenityIds.includes(parseInt(rateAmenityIds[j]))) return true;
-  //     if (rateAmenityIds[j].includes())
-  //   }
-  // }
-
-  return (rates || []).some(rate => rateAmenityIds.includes(rate.rateAmenityIds.toString()));
-
-  // return false;
+  return rates.some((rate) => rate.rateAmenityIds.length > 0 && rate.rateAmenityIds.some((rateAmenityId) => rateAmenityIds.includes(rateAmenityId.toString())));
 }
 
 function filterByDeals(hotel, deals) {
@@ -120,6 +111,8 @@ function filterByProviderTypes(hotel, providers = []) {
 module.exports = {
   filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
+
+    console.log('hotels', hotels, 'filter', filter);
 
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
