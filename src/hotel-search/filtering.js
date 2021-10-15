@@ -112,8 +112,6 @@ module.exports = {
   filterHotels: function (hotels, filter) {
     if (!filter) return hotels;
 
-    console.log('hotels', hotels, 'filter', filter);
-
     var starMap = utils.arrayToMap(filter.stars);
     var districtIdMap = utils.arrayToMap(filter.districtIds);
     var cityCodeMap = utils.arrayToMap(filter.cityCodes);
