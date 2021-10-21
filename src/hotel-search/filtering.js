@@ -23,7 +23,7 @@ function filterByRateAmenities(hotel, rateAmenityIds) {
 
   if (!rates) return false;
 
-  return rates.some((rate) => rate.rateAmenityIds.length > 0 && rate.rateAmenityIds.some((rateAmenityId) => rateAmenityIds.includes(rateAmenityId.toString())));
+  return rates.length > 0 && rates.every((rate) => rateAmenityIds.every((rateAmenityId) => rate.rateAmenityIds.length > 0 && rate.rateAmenityIds.includes(parseInt(rateAmenityId))));
 }
 
 function filterByDeals(hotel, deals) {
