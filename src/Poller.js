@@ -53,7 +53,8 @@ Poller.prototype = {
 
   preparePoll: function () {
     var self = this;
-    if (this.pollCount < this.delays.length && !this.forceStop) {
+
+    if (this.pollCount < this.delays.length && !this.forceStop && !self.isLastPolling()) {
       this.timer = setTimeout(function () {
         self.poll();
       }, this.delays[this.pollCount]);

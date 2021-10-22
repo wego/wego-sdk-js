@@ -78,7 +78,7 @@ class HotelSearchClient {
 
   mergeResponse(response) {
     let self = this;
-    let isSearchEnd = response.done || self.poller.isLastPolling()
+    let isSearchEnd = response.done || self.poller.isLastPolling();
     self.merger.mergeResponse(response, isSearchEnd);
     self.lastRatesCount = response.count;
     self.responseSearch = response.search;

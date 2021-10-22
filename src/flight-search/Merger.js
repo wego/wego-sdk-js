@@ -19,7 +19,6 @@ FlightSearchMerger.prototype = {
     self._mergeFilter(response.filters);
     self._mergeScores(response.scores);
     self._mergeFares(response.fares);
-    self._mergeSponsors(response.sponsors);
 
     self._cloneTrips(updatedTripIds);
   },
@@ -31,7 +30,6 @@ FlightSearchMerger.prototype = {
     this.__trips = [];
     this.__filter = this._getEmptyFilter();
     this.__filterOptionsMap = this._getEmptyFilterOptionsMap();
-    this.__sponsors = [];
   },
 
   getTrips: function () {
@@ -55,10 +53,6 @@ FlightSearchMerger.prototype = {
     return this.__filter;
   },
 
-  getSponsors: function () {
-    return this.__sponsors;
-  },
-
   updateCurrency: function (currency) {
     var self = this;
     self.currency = currency;
@@ -71,12 +65,6 @@ FlightSearchMerger.prototype = {
       });
     }
     self._cloneTrips(Object.keys(tripMap));
-
-    self.__sponsors = self.__sponsors.map(function(sponsor){
-      sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, currency);
-      sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, currency);
-      return utils.cloneObject(sponsor);
-    });
 
     var filter = self.__filter;
     self.__filterOptionTypes.forEach(function (type) {
@@ -188,30 +176,6 @@ FlightSearchMerger.prototype = {
         trip.score = scores[tripId];
       }
     }
-  },
-
-  _mergeSponsors: function (sponsors) {
-    if (!sponsors || sponsors.length === 0) return;
-    this.__sponsors = sponsors.reduce((acc, sponsor) => {
-      var trip = utils.cloneObject(this.__tripMap[sponsor.fareView.tripId]);
-      if (!!trip) {
-        sponsor.fareView.price = dataUtils.convertPrice(sponsor.fareView.price, this.currency);
-        sponsor.fareView.paymentFees = dataUtils.convertPaymentFees(sponsor.fareView.paymentFees, this.currency);
-
-        trip.fares = [sponsor.fareView];
-        sponsor.fareView.trip = trip;
-
-        if (!!trip.legIds) {
-          sponsor.fareView.legs = trip.legIds.map(legId => this.__legMap[legId]);
-        }
-
-        sponsor.fareView.provider = this.__staticData.providers[sponsor.fareView.providerCode];
-      }
-
-      acc = [...acc, sponsor];
-
-      return acc;
-    }, []);
   },
 
   _mergeFilter: function (newFilter) {
