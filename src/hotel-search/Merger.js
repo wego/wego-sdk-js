@@ -110,31 +110,27 @@ HotelSearchClient.prototype = {
       var hotel = self.__hotelMap[hotelId];
 
       if (!hotel) return;
-      // var rates = hotel.rates;
+      var rates = hotel.rates;
 
-      hotel.rates = [...hotel.rates, newRate];
+      var i;
+      for (i = 0; i < rates.length; i++) {
+        if (dataUtils.isBetterRate(newRate, rates[i])) break;
+        if (newRate.providerCode === rates[i].providerCode) return;
+      }
+      rates.splice(i, 0, newRate);
 
-      console.log('Hotel Id: %s - Rate count: %d', hotelId, hotel.rates.length);
-
-      // var i;
-      // for (i = 0; i < rates.length; i++) {
-      //   if (dataUtils.isBetterRate(newRate, rates[i])) break;
-      //   if (newRate.providerCode === rates[i].providerCode) return;
-      // }
-      // rates.splice(i, 0, newRate);
-
-      // i++;
-      // for (; i < rates.length; i++) {
-      //   if (newRate.providerCode === rates[i].providerCode) {
-      //     rates.splice(i, 1);
-      //     break;
-      //   }
-      // }
+      i++;
+      for (; i < rates.length; i++) {
+        if (newRate.providerCode === rates[i].providerCode) {
+          rates.splice(i, 1);
+          break;
+        }
+      }
     });
 
-    // if (isSearchEnd) {
-    //   this._lastMergeRates(newRates);
-    // }
+    if (isSearchEnd) {
+      this._lastMergeRates(newRates);
+    }
   },
 
   _mergeSortedRatesByBasePrice: function () {
