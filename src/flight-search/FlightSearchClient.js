@@ -18,7 +18,6 @@ class FlightSearchClient {
     self.paymentMethodIds = options.paymentMethodIds || [];
     self.providerTypes = options.providerTypes || [];
     self.onProgressChanged = options.onProgressChanged || function () { };
-    self.onSponsorsChanged = options.onSponsorsChanged || function () { };
     self.onTripsChanged = options.onTripsChanged || function () { };
     self.onTotalTripsChanged = options.onTotalTripsChanged || function () { };
     self.onCheapestTripChanged = options.onCheapestTripChanged || function () { };
@@ -159,11 +158,8 @@ class FlightSearchClient {
     self.onDisplayedFilterChanged(self.merger.getFilter());
     self.onProgressChanged(self.poller.getProgress());
 
+    // changes in providers
     self.onProvidersChanged(self.merger.getProviders());
-
-    let sponsors = self.merger.getSponsors();
-    let filteredSponsors = filtering.filterSponsors(sponsors, trips, self.filter, self.multiCity);
-    self.onSponsorsChanged(filteredSponsors);
   }
 
   getSearchRequestBody() {
