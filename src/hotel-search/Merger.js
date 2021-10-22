@@ -105,7 +105,7 @@ HotelSearchClient.prototype = {
 
     newRates.forEach(function (newRate) {
       dataUtils.prepareRate(newRate, self.currency, self.__staticData);
-      
+
       var hotelId = newRate.hotelId;
       var hotel = self.__hotelMap[hotelId];
 
@@ -113,6 +113,8 @@ HotelSearchClient.prototype = {
       // var rates = hotel.rates;
 
       hotel.rates = [...hotel.rates, newRate];
+
+      console.log('Hotel Id: %s - Rate count: %d', hotelId, hotel.rates.length);
 
       // var i;
       // for (i = 0; i < rates.length; i++) {
