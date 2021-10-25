@@ -232,167 +232,167 @@ describe('dataUtils', function() {
     });
   });
 
-  describe('#isBetterRate', function() {
-    function bestRateOf(rates) {
-      rates.sort(function(rate1, rate2) {
-        return dataUtils.isBetterRate(rate1, rate2) ? -1 : 1;
-      });
-      return rates[0];
-    }
+  // describe('#isBetterRate', function() {
+  //   function bestRateOf(rates) {
+  //     rates.sort(function(rate1, rate2) {
+  //       return dataUtils.isBetterRate(rate1, rate2) ? -1 : 1;
+  //     });
+  //     return rates[0];
+  //   }
 
-    it('resolve by tax amount usd', function() {
-      var r1 = {
-        price: {
-          taxAmountUsd: 0,
-        }
-      };
+  //   it('resolve by tax amount usd', function() {
+  //     var r1 = {
+  //       price: {
+  //         taxAmountUsd: 0,
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          taxAmountUsd: -2,
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         taxAmountUsd: -2,
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equal(r1);
-    });
+  //     expect(bestRateOf([r1, r2])).to.equal(r1);
+  //   });
 
-    it('resolve by price', function() {
-      var r1 = {
-        price: {
-          amount: 11.1
-        }
-      };
+  //   it('resolve by price', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 11.1
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 12.1
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 12.1
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equal(r1);
-    });
+  //     expect(bestRateOf([r1, r2])).to.equal(r1);
+  //   });
 
-    it('resolve by ecpc', function() {
-      var r1 = {
-        price: {
-          amount: 100000.3,
-          ecpc: 1,
-        }
-      };
+  //   it('resolve by ecpc', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 100000.3,
+  //         ecpc: 1,
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 100099.2,
-          ecpc: 2,
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 100099.2,
+  //         ecpc: 2,
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equal(r1);
-    });
+  //     expect(bestRateOf([r1, r2])).to.equal(r1);
+  //   });
 
-    it('compare three prices', function() {
-      var r1 = {
-        price: {
-          amount: 100000,
-          ecpc: 1,
-        }
-      };
+  //   it('compare three prices', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 100000,
+  //         ecpc: 1,
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 100099,
-          ecpc: 2,
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 100099,
+  //         ecpc: 2,
+  //       }
+  //     };
 
-      var r3 = {
-        price: {
-          amount: 1000,
-          ecpc: 1000,
-        }
-      };
+  //     var r3 = {
+  //       price: {
+  //         amount: 1000,
+  //         ecpc: 1000,
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2, r3])).to.equal(r3);
-    });
+  //     expect(bestRateOf([r1, r2, r3])).to.equal(r3);
+  //   });
 
-    it('prioritizes directBooking when prices are the same but one is directBooking', function() {
-      var r1 = {
-        price: {
-          amount: 10000,
-          ecpc: 1
-        },
-        provider: {
-          code: 'provider1',
-          directBooking: false
-        }
-      };
+  //   it('prioritizes directBooking when prices are the same but one is directBooking', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 1
+  //       },
+  //       provider: {
+  //         code: 'provider1',
+  //         directBooking: false
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 10000,
-          ecpc: 2
-        },
-        provider: {
-          code: 'provider2',
-          directBooking: true
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 2
+  //       },
+  //       provider: {
+  //         code: 'provider2',
+  //         directBooking: true
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equals(r2);
-    });
+  //     expect(bestRateOf([r1, r2])).to.equals(r2);
+  //   });
 
-    it('compare two rates when price and provider type same', function() {
-      var r1 = {
-        price: {
-          amount: 10000,
-          ecpc: 1
-        },
-        provider: {
-          code: 'provider1',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
+  //   it('compare two rates when price and provider type same', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 1
+  //       },
+  //       provider: {
+  //         code: 'provider1',
+  //         type: 'DIRECT_PRIORITY'
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 10000,
-          ecpc: 2
-        },
-        provider: {
-          code: 'provider2',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 2
+  //       },
+  //       provider: {
+  //         code: 'provider2',
+  //         type: 'DIRECT_PRIORITY'
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equals(r2);
-    });
+  //     expect(bestRateOf([r1, r2])).to.equals(r2);
+  //   });
 
-    it('compare two rates when price is same but first with direct_priority provider', function() {
-      var r1 = {
-        price: {
-          amount: 10000,
-          ecpc: 1
-        },
-        provider: {
-          code: 'provider1',
-          type: 'DIRECT_PRIORITY'
-        }
-      };
+  //   it('compare two rates when price is same but first with direct_priority provider', function() {
+  //     var r1 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 1
+  //       },
+  //       provider: {
+  //         code: 'provider1',
+  //         type: 'DIRECT_PRIORITY'
+  //       }
+  //     };
 
-      var r2 = {
-        price: {
-          amount: 10000,
-          ecpc: 2
-        },
-        provider: {
-          code: 'provider2',
-          type: 'OTA'
-        }
-      };
+  //     var r2 = {
+  //       price: {
+  //         amount: 10000,
+  //         ecpc: 2
+  //       },
+  //       provider: {
+  //         code: 'provider2',
+  //         type: 'OTA'
+  //       }
+  //     };
 
-      expect(bestRateOf([r1, r2])).to.equals(r1)
-    });
-  });
+  //     expect(bestRateOf([r1, r2])).to.equals(r1)
+  //   });
+  // });
 
   function createStaticData(data) {
     return Object.assign({

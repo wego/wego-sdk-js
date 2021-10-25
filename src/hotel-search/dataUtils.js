@@ -108,42 +108,42 @@ module.exports = {
     return value;
   },
 
-  isBetterRate: function (firstRate, secondRate) {
-    function processRateAmount(rate) {
-      var amount = Math.round(rate.price.amount);
-      if (amount > 99999) {
-        amount = (amount / 100) * 100;
-      }
-      return amount;
-    }
+  // isBetterRate: function (firstRate, secondRate) {
+  //   function processRateAmount(rate) {
+  //     var amount = Math.round(rate.price.amount);
+  //     if (amount > 99999) {
+  //       amount = (amount / 100) * 100;
+  //     }
+  //     return amount;
+  //   }
 
-    function getPriceTaxAmountInclusive(rate) {
-      return rate.price.taxAmountUsd < 0 ? -1 : 1;
-    }
+  //   function getPriceTaxAmountInclusive(rate) {
+  //     return rate.price.taxAmountUsd < 0 ? -1 : 1;
+  //   }
 
-    var firstTax = getPriceTaxAmountInclusive(firstRate);
-    var secondTax = getPriceTaxAmountInclusive(secondRate);
+  //   var firstTax = getPriceTaxAmountInclusive(firstRate);
+  //   var secondTax = getPriceTaxAmountInclusive(secondRate);
 
-    if (firstTax != secondTax) return firstTax > secondTax;
+  //   if (firstTax != secondTax) return firstTax > secondTax;
 
-    var firstRateAmount = processRateAmount(firstRate);
-    var secondRateAmount = processRateAmount(secondRate);
-    if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
+  //   var firstRateAmount = processRateAmount(firstRate);
+  //   var secondRateAmount = processRateAmount(secondRate);
+  //   if (firstRateAmount != secondRateAmount) return firstRateAmount < secondRateAmount;
 
-    if (firstRate.provider.directBooking && !secondRate.provider.directBooking) {
-      return true;
-    } else if (secondRate.provider.directBooking && !firstRate.provider.directBooking) {
-      return false;
-    }
+  //   if (firstRate.provider.directBooking && !secondRate.provider.directBooking) {
+  //     return true;
+  //   } else if (secondRate.provider.directBooking && !firstRate.provider.directBooking) {
+  //     return false;
+  //   }
 
-    if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
-      return true;
-    } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
-      return false;
-    }
+  //   if (firstRate.provider.type == 'DIRECT_PRIORITY' && secondRate.provider.type != 'DIRECT_PRIORITY') {
+  //     return true;
+  //   } else if (secondRate.provider.type == 'DIRECT_PRIORITY' && firstRate.provider.type != 'DIRECT_PRIORITY') {
+  //     return false;
+  //   }
 
-    return firstRate.price.ecpc > secondRate.price.ecpc;
-  },
+  //   return firstRate.price.ecpc > secondRate.price.ecpc;
+  // },
 
   __filterOptionTypeToStaticDataType: {
     stars: 'stars',

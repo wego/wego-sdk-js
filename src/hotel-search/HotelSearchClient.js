@@ -77,9 +77,9 @@ class HotelSearchClient {
   }
 
   mergeResponse(response) {
-    let self = this;
-    let isSearchEnd = response.done || self.poller.isLastPolling()
-    self.merger.mergeResponse(response, isSearchEnd);
+    const self = this;
+    
+    self.merger.mergeResponse(response);
     self.lastRatesCount = response.count;
     self.responseSearch = response.search;
     dataUtils.prepareResponseSearch(self.responseSearch, self.merger.getStaticData());

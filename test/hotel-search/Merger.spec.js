@@ -301,9 +301,6 @@ describe('Merger', function() {
         hotels: [hotel],
       });
 
-      var oldHotels = merger.getHotels();
-      var oldHotel = oldHotels[0];
-
       merger.mergeResponse({
         rates: [rate3]
       });
@@ -311,97 +308,7 @@ describe('Merger', function() {
       var newHotels = merger.getHotels();
       var newHotel = newHotels[0];
 
-      expect(getRateIds(newHotel.rates)).to.deep.equal([2, 3, 1]);
-      expect(newHotel).to.not.equal(oldHotel);
-      expect(newHotels).to.not.equal(oldHotels);
-    });
-
-    it('update with better rate', function() {
-      var rate1 = {
-        id: 1,
-        hotelId: 1,
-        providerCode: 'x',
-        price: {
-          amount: 100,
-        }
-      };
-
-      var rate2 = {
-        id: 2,
-        hotelId: 1,
-        providerCode: 'y',
-        price: {
-          amount: 70,
-        }
-      };
-
-      var rate3 = {
-        id: 3,
-        hotelId: 1,
-        providerCode: 'y',
-        price: {
-          amount: 60,
-        }
-      };
-
-      var hotel = {
-        id: 1,
-      };
-
-      merger.mergeResponse({
-        rates: [rate1, rate2],
-        hotels: [hotel],
-      });
-
-      merger.mergeResponse({
-        rates: [rate3]
-      });
-
-      expect(getRateIds(merger.__hotelMap[1].rates)).to.deep.equal([3, 1]);
-    });
-
-    it('not update with worse rate', function() {
-      var rate1 = {
-        id: 1,
-        hotelId: 1,
-        providerCode: 'x',
-        price: {
-          amount: 100,
-        }
-      };
-
-      var rate2 = {
-        id: 2,
-        hotelId: 1,
-        providerCode: 'y',
-        price: {
-          amount: 70,
-        }
-      };
-
-      var rate3 = {
-        id: 3,
-        hotelId: 1,
-        providerCode: 'y',
-        price: {
-          amount: 120,
-        }
-      };
-
-      var hotel = {
-        id: 1,
-      };
-
-      merger.mergeResponse({
-        rates: [rate1, rate2],
-        hotels: [hotel],
-      });
-
-      merger.mergeResponse({
-        rates: [rate3]
-      });
-
-      expect(getRateIds(merger.__hotelMap[1].rates)).to.deep.equal([2, 1]);
+      expect(getRateIds(newHotel.rates)).to.deep.equal([1, 2, 3]);
     });
 
     it("some hotel may have more than 1 from a provider rate when search's is end", () => {
