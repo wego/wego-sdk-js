@@ -112,26 +112,7 @@ HotelSearchClient.prototype = {
       if (!!hotel) {
         hotel.rates = [...hotel.rates, newRate];
       };
-
-      // var i;
-      // for (i = 0; i < rates.length; i++) {
-      //   if (dataUtils.isBetterRate(newRate, rates[i])) break;
-      //   if (newRate.providerCode === rates[i].providerCode) return;
-      // }
-      // rates.splice(i, 0, newRate);
-
-      // i++;
-      // for (; i < rates.length; i++) {
-      //   if (newRate.providerCode === rates[i].providerCode) {
-      //     rates.splice(i, 1);
-      //     break;
-      //   }
-      // }
     });
-
-    // if (isSearchEnd) {
-    //   this._lastMergeRates(newRates);
-    // }
   },
 
   _mergeSortedRatesByBasePrice: function () {
