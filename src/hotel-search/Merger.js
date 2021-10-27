@@ -165,48 +165,6 @@ HotelSearchClient.prototype = {
     }
   },
 
-  // _lastMergeRates: function (newRates) {
-  //   if (!newRates) return;
-  //   var self = this;
-
-  //   var singlePartnerHotels = {};
-  //   for (var hotelId in self.__hotelMap) {
-  //     if (self.__hotelMap[hotelId].rates && self.__hotelMap[hotelId].rates.length === 1) {
-  //       singlePartnerHotels[hotelId] = true;
-  //     }
-  //   }
-
-  //   var hotelIdToNewRatesMap = {};
-  //   for (var i in newRates) {
-  //     var rate = newRates[i];
-  //     if (singlePartnerHotels[rate.hotelId]) {
-  //       if (!hotelIdToNewRatesMap[rate.hotelId]) {
-  //         hotelIdToNewRatesMap[rate.hotelId] = [];
-  //       }
-  //       var hotelOrderedRates = hotelIdToNewRatesMap[rate.hotelId];
-  //       var index;
-  //       for (index = 0; index < hotelOrderedRates.length; index++) {
-  //         if (dataUtils.isBetterRate(rate, hotelOrderedRates[index])) {
-  //           break;
-  //         }
-  //       }
-  //       hotelOrderedRates.splice(index, 0, rate);
-  //     }
-  //   }
-
-  //   for (var hotelId in singlePartnerHotels) {
-  //     var currentBestRate = self.__hotelMap[hotelId].rates[0];
-  //     var hotelOrderedRates = hotelIdToNewRatesMap[hotelId];
-  //     if (!hotelOrderedRates) {
-  //       continue;
-  //     }
-  //     if (hotelOrderedRates[0].id !== currentBestRate.id) {
-  //       hotelOrderedRates.splice(0, 0, currentBestRate);
-  //     }
-  //     self.__hotelMap[hotelId].rates = hotelOrderedRates;
-  //   }
-  // },
-
   _mergeScores: function (scores) {
     if (!scores) return;
     var hotelMap = this.__hotelMap;
