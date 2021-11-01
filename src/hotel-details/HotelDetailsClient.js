@@ -23,6 +23,7 @@ class HotelDetailsClient {
     self.nearbyHotels = options.nearbyHotels || {};
     self.hotelDetailsEndpointUrl = hotelDetailsEndpointUrl;
     self.extraSearchRequestBody = options.extraSearchRequestBody;
+    self.bowOnly = options.bowOnly;
 
     self.poller = new Poller({
       delays: DELAYS,
@@ -128,6 +129,7 @@ class HotelDetailsClient {
     const currencyCode = currency.code;
     const locale = self.locale;
     const extraSearchRequestBody = self.extraSearchRequestBody || {};
+    const bowOnly = self.bowOnly;
 
     const searchRequestBody = {
       search: {
@@ -144,7 +146,8 @@ class HotelDetailsClient {
         siteCode: self.siteCode,
         userLoggedIn: self.userLoggedIn
       },
-      includeDirect: true
+      includeDirect: true,
+      ...(!!bowOnly && { bowOnly })
     };
 
     if (self.searchId !== undefined) {
