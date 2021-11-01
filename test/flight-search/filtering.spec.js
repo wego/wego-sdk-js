@@ -268,7 +268,7 @@ describe('filtering', function() {
         providerCodes: ['wego.com-kiwi', 'vietjetair.com'],
         providerTypes: ['instant', 'airline']
       };
-      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
+      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip3]);
     });
 
     it('filtering by allianceCodes', function() {
@@ -598,7 +598,7 @@ describe('filtering', function() {
         fares: [fare2, fare3]
       }
 
-      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([trip1]);
+      expect(filtering.filterTrips([trip1, trip2], filter)).to.deep.equal([]);
     });
 
     it('filter for airline', function() {
@@ -641,7 +641,7 @@ describe('filtering', function() {
         fares: [fare3]
       }
 
-      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip1, trip3]);
+      expect(filtering.filterTrips([trip1, trip2, trip3], filter)).to.deep.equal([trip3]);
     });
   });
 
