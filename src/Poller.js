@@ -52,11 +52,12 @@ Poller.prototype = {
   },
 
   preparePoll: function () {
-    var self = this;
-    if (this.pollCount < this.delays.length && !this.forceStop) {
-      this.timer = setTimeout(function () {
+    const self = this;
+
+    if (self.pollCount < self.delays.length && !self.forceStop && !self.isLastPolling()) {
+      self.timer = setTimeout(function () {
         self.poll();
-      }, this.delays[this.pollCount]);
+      }, self.delays[self.pollCount]);
     }
   },
 

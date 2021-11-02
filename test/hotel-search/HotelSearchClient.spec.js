@@ -384,7 +384,7 @@ describe("HotelSearchClient", function () {
       expect(client.merger.__staticData.brands[1]).to.equal(brand);
     });
 
-    it("no hotel can have more than 1 rate from a provider when search's status is not'done'", () => {
+    it("rates should be assigned to respective hotel based on hotelId", () => {
       var response = {
         done: false,
         hotels: [{ id: 1 }, { id: 2 }],
@@ -399,11 +399,10 @@ describe("HotelSearchClient", function () {
       client.poller.pollCount = 1;
       client.poller.pollLimit = 3;
       client.handleSearchResponse(response);
-      expect(client.merger.__hotelMap[1].rates.length).to.equal(1);
+      expect(client.merger.__hotelMap[1].rates.length).to.equal(3);
       expect(client.merger.__hotelMap[2].rates.length).to.equal(2);
-      expect(client.merger.__hotelMap[2].rates[0].providerCode).to.not.equal(
-        client.merger.__hotelMap[2].rates[1].providerCode);
     });
+
     it("some hotels may have more than 1 from a provider rate when search's status is not 'done' but reaching limit polling time", () => {
       var response = {
         done: true,
@@ -577,7 +576,7 @@ describe("HotelSearchClient", function () {
       var params = client.fetchHotelsParams();
       expect(params.currencyCode).to.equal(currencyCode);
     });
-    it("returns moreRates", function() {
+    it("returns moreRates", function () {
       var params = client.fetchHotelsParams();
       expect(params.moreRates).to.equal(true);
     });
