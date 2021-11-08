@@ -11,6 +11,7 @@ class FlightSearchClient {
     self.currency = options.currency || {};
     self.locale = options.locale;
     self.showWegoFares = options.showWegoFares || false;
+    self.shopcashClickId = options.shopcashClickId || '';
     self.siteCode = options.siteCode;
     self.deviceType = options.deviceType || "DESKTOP";
     self.appType = options.appType || "WEB_APP";
@@ -184,6 +185,7 @@ class FlightSearchClient {
         currencyCode: self.currency.code,
         locale: self.locale,
         showWegoFares: self.showWegoFares,
+        shopcashClickId: self.shopcashClickId,
         legs: legs.map(leg => {
           return {
             departureCityCode: leg.departureCityCode,
