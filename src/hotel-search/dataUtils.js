@@ -119,6 +119,7 @@ module.exports = {
     chains: 'chains',
     providers: 'providers',
     reviewerGroups: 'reviewerGroups',
-    roomTypeCategories: 'roomTypeCategories'
+    roomTypeCategories: 'roomTypeCategories',
+    bookingOptions: 'bookingOptions'
   }
 };
