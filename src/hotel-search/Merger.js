@@ -318,7 +318,8 @@ HotelSearchClient.prototype = {
     'chains',
     'providers',
     'roomTypeCategories',
-    'destinationInfo'
+    'destinationInfo',
+    'bookingOptions'
   ],
 
   __filterOptionTypes: [
