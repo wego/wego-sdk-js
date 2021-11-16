@@ -319,8 +319,6 @@ describe('wego-hotel-filtering-behavior_test', function () {
 
       var hotels = filtering.filterHotels([hotel1, hotel2, hotel3], filter);
 
-      console.log(hotels)
-
       expect(hotels).to.deep.equal([hotel1, hotel3]);
     });
 
