@@ -32,6 +32,8 @@ function filterByProviders(trip, providerFilter, flexibilities) {
   const hasFlexibilitiesFilter = !!flexibilities && flexibilities.length > 0;
   const providerCodeMap = providerFilter.providerCodeMap;
   const providerTypes = providerFilter.providerTypes;
+  console.log('providerCodeMap: ', providerCodeMap);
+  console.log('providerTypes: ', providerTypes)
 
   if (!providerCodeMap && !providerTypes) {
     return true;
