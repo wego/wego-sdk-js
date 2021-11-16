@@ -4,7 +4,7 @@ module.exports = {
   sortHotels: function (hotels, sort, filter = {}) {
     if (!sort) return hotels;
 
-    const { providers = [], providerCodes = [] } = filter;
+    const { bookingOptions = [], providerCodes = [] } = filter;
 
     function getPrice(hotel) {
       if (hotel.rates && hotel.rates.length > 0) {
@@ -85,21 +85,21 @@ module.exports = {
     var cloneHotels = utils.cloneArray(hotels);
 
     // if provider or providerCode exists, sort in ascending with rates with provider/ providerCode first for all hotels
-    if (providers.length > 0 || providerCodes.length > 0) {
+    if (bookingOptions.length > 0 || providerCodes.length > 0) {
       for (let cloneHotel of cloneHotels) {
-        const isProviders = rate => {
-          const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
-          const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
-          const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+        const isSelectedBookingOptions = rate => {
+          const isBookOnWego = bookingOptions.indexOf('BOW') !== -1 && rate.provider.directBooking;
+          const isHotelSite = bookingOptions.indexOf('HOTEL_WEBSITE') !== -1 && rate.provider.isHotelWebsite;
+          const isTravelAgencySite = bookingOptions.indexOf('TRAVEL_AGENCY') !== -1 && rate.provider.type === 'OTA';
           return isBookOnWego || isHotelSite || isTravelAgencySite;
         }
-        const isProviderCodes = rate => {
+        const isSelectedProviderCodes = rate => {
           return !!rate.providerCode ? providerCodes.indexOf(rate.providerCode) !== -1 : false;
         }
         const sortedProviderRates = [];
         const sortedNonProviderRates = [];
         for (let rate of cloneHotel.rates) {
-          if (isProviders(rate) || isProviderCodes(rate)) {
+          if (isSelectedBookingOptions(rate) || isSelectedProviderCodes(rate)) {
             sortedProviderRates.push(rate);
           } else {
             sortedNonProviderRates.push(rate);

@@ -332,7 +332,8 @@ HotelSearchClient.prototype = {
     'chains',
     'providers',
     'reviewerGroups',
-    'roomTypeCategories'
+    'roomTypeCategories',
+    'bookingOptions'
   ],
 };
 
