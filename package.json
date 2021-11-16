@@ -1,6 +1,6 @@
 {
   "name": "wego-sdk",
-  "version": "1.4.6",
+  "version": "1.4.8",
   "description": "Wego SDK",
   "main": "dist/WegoSdk.js",
   "files": [
