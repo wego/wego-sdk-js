@@ -48,7 +48,7 @@ function filterByDeals(hotel, deals) {
 
 function filterByPrice(hotel = {}, filter = {}) {
 
-  const { providers: bookingOptions = [], providerCodes = [], priceRange } = filter;
+  const { bookingOptions = [], providerCodes = [], priceRange } = filter;
 
   if (!priceRange) {
     return true;
