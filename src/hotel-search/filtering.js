@@ -48,7 +48,7 @@ function filterByDeals(hotel, deals) {
 
 function filterByPrice(hotel = {}, filter = {}) {
 
-  const { providers = [], providerCodes = [], priceRange } = filter;
+  const { providers: bookingOptions = [], providerCodes = [], priceRange } = filter;
 
   if (!priceRange) {
     return true;
@@ -57,11 +57,11 @@ function filterByPrice(hotel = {}, filter = {}) {
   let filteredRates = hotel.rates || [];
 
   // if provider exists
-  if (providers.length > 0) {
+  if (bookingOptions.length > 0) {
     filteredRates = filteredRates.filter(rate => {
-      const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
-      const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
-      const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+      const isBookOnWego = bookingOptions.indexOf('BOW') !== -1 && rate.provider.directBooking;
+      const isHotelSite = bookingOptions.indexOf('HOTEL_WEBSITE') !== -1 && rate.provider.isHotelWebsite;
+      const isTravelAgencySite = bookingOptions.indexOf('TRAVEL_AGENCY') !== -1 && rate.provider.type === 'OTA';
       return isBookOnWego || isHotelSite || isTravelAgencySite;
     });
   }
@@ -100,16 +100,16 @@ function filterByProviders(hotel, providerCodes = []) {
   return (hotel.rates || []).some(rate => providerCodes.includes(rate.providerCode));
 }
 
-function filterByProviderTypes(hotel, providers = []) {
+function filterByBookingOptions(hotel, bookingOptions = []) {
   // providers = wego, hotels, ota
-  if (providers.length === 0) {
+  if (bookingOptions.length === 0) {
     return true;
   }
 
   return (hotel.rates || []).some(rate => {
-    const isBookOnWego = providers.indexOf('wego') !== -1 && rate.provider.directBooking;
-    const isHotelSite = providers.indexOf('hotels') !== -1 && rate.provider.isHotelWebsite;
-    const isTravelAgencySite = providers.indexOf('ota') !== -1 && rate.provider.type === 'OTA';
+    const isBookOnWego = bookingOptions.indexOf('BOW') !== -1 && rate.provider.directBooking;
+    const isHotelSite = bookingOptions.indexOf('HOTEL_WEBSITE') !== -1 && rate.provider.isHotelWebsite;
+    const isTravelAgencySite = bookingOptions.indexOf('TRAVEL_AGENCY') !== -1 && rate.provider.type === 'OTA';
     return isBookOnWego || isHotelSite || isTravelAgencySite;
   });
 }
@@ -140,7 +140,7 @@ module.exports = {
         filterByReviewerGroups(hotel, filter.reviewerGroups) &&
         filterByRateAmenities(hotel, filter.rateAmenityIds) &&
         filterByProviders(hotel, filter.providerCodes) &&
-        filterByProviderTypes(hotel, filter.providers) &&
+        filterByBookingOptions(hotel, filter.bookingOptions) &&
         filterByDeals(hotel, filter.deals) &&
         filterByReviewScore(hotel, filter.reviewScoreRange);
 
