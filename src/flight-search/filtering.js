@@ -56,14 +56,9 @@ function filterByProviders(trip, providerFilter, flexibilities) {
 function isFareMatchProviderType(fare, providerTypes) {
   if (!providerTypes) return true;
   return (
-    _isFacilitatedBooking(fare, providerTypes) ||
     _isWegoFares(fare, providerTypes) ||
     _hasProviderType(fare, providerTypes)
   );
-}
-
-function _isFacilitatedBooking(fare, providerTypes) {
-  return providerTypes.indexOf("instant") !== -1 && fare.provider.instant;
 }
 
 function _isWegoFares(fare, providerTypes) {
