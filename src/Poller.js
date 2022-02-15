@@ -48,7 +48,7 @@ Poller.prototype = {
 
   getPollCount: function () {
     const initialCallToInitiateTimer = 1;
-    return this.pollCount - initialCallToInitiateTimer || 0;
+    return (this.pollCount - initialCallToInitiateTimer) || 0;
   },
 
   handleSuccessResponse: function (response) {
