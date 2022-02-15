@@ -46,6 +46,10 @@ Poller.prototype = {
     return (this.pollCount / this.pollLimit) * 100;
   },
 
+  getPollCount: function () {
+    return this.pollCount || 0;
+  },
+
   handleSuccessResponse: function (response) {
     this.onSuccessResponse(response);
     this.preparePoll();

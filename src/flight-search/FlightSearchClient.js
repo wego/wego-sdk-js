@@ -208,7 +208,8 @@ class FlightSearchClient {
       currencyCode: self.currency.code,
       locale: self.locale,
       paymentMethodIds: self.paymentMethodIds || [],
-      offset: self.processedFaresCount
+      offset: self.processedFaresCount,
+      pollCount: self.poller.getPollCount()
     };
   }
 }
