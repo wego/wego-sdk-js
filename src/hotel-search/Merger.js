@@ -104,7 +104,7 @@ HotelSearchClient.prototype = {
     var self = this;
 
     newRates.forEach(function (newRate) {
-      dataUtils.prepareRate(newRate, self.currency, self.__staticData);
+      dataUtils.prepareRateProvider(newRate, self.__staticData);
 
       var hotelId = newRate.hotelId;
       var hotel = self.__hotelMap[hotelId];
