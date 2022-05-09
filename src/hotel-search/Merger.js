@@ -50,14 +50,6 @@ HotelSearchClient.prototype = {
   updateCurrency: function (currency) {
     this.currency = currency;
 
-    var hotelMap = this.__hotelMap;
-    for (var hotelId in hotelMap) {
-      hotelMap[hotelId].rates.forEach(function (rate) {
-        rate.price = dataUtils.convertPrice(rate.price, currency);
-      });
-    }
-    this._cloneHotels(Object.keys(hotelMap));
-
     var filter = this.__filter;
     filter.minPrice = dataUtils.convertPrice(filter.minPrice, currency);
     filter.maxPrice = dataUtils.convertPrice(filter.maxPrice, currency);

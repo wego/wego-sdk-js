@@ -116,45 +116,6 @@ describe("HotelSearchClient", function () {
     expect(hotelIds).to.deep.equal([2]);
   });
 
-  it("#updateCurrency", function () {
-    var hotels, filter;
-    var client = new HotelSearchClient(hotelSearchEndpointUrl, {
-      onHotelsChanged: function (_hotels) {
-        hotels = _hotels;
-      },
-      onDisplayedFilterChanged: function (_filter) {
-        filter = _filter;
-      }
-    });
-
-    mockAjaxCall(client);
-
-    var hotel = {
-      id: 1
-    };
-
-    client.handleSearchResponse({
-      hotels: [hotel],
-      rates: [
-        {
-          hotelId: 1,
-          price: {
-            currencyCode: "SGD",
-            amount: 1000,
-            amountUsd: 100
-          }
-        }
-      ]
-    });
-
-    client.updateCurrency({
-      code: "VND",
-      rate: 2
-    });
-
-    expect(hotels[0].rates[0].price.amount).to.equal(200);
-  });
-
   describe("#searchHotels", function () {
     it("start poller", function () {
       client.poller.timer = null;
