@@ -85,7 +85,7 @@ describe('dataUtils', function() {
     })
   });
 
-  describe('#prepareRate', function() {
+  describe('#prepareRateProvider', function() {
     it('provider', function() {
       var providerCode = 1;
       var provider = {
@@ -96,7 +96,7 @@ describe('dataUtils', function() {
         providerCode: providerCode,
       };
 
-      dataUtils.prepareRate(rate, {}, createStaticData({
+      dataUtils.prepareRateProvider(rate, createStaticData({
         providers: {
           1: provider
         }
@@ -104,24 +104,6 @@ describe('dataUtils', function() {
 
       expect(rate.provider).to.equal(provider);
     });
-
-    it('price', function() {
-      var rate = {
-        price: {
-          currencyCode: 'VND',
-          amountUsd: 10,
-        }
-      };
-
-      var currency = {
-        code: 'SGD',
-        rate: 2
-      };
-
-      dataUtils.prepareRate(rate, currency, createStaticData());
-
-      expect(rate.price.amount).to.equal(20);
-    })
   });
 
   describe('#convertPrice', function() {

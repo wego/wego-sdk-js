@@ -17,49 +17,6 @@ describe('Merger', function() {
   });
 
   describe('#updateCurrency', function() {
-    it('update hotel rate', function() {
-      var hotel = {
-        id: 1,
-      };
-
-      var roomsCount = 1;
-      var nightsCount = 2;
-      var amountUsd = 10.15;
-      var totalAmountUsd = amountUsd * roomsCount * nightsCount;
-
-      var rate = {
-        hotelId: 1,
-        price: {
-          currencyCode: 'vnd',
-          amountUsd: 10.15,
-          totalAmountUsd: totalAmountUsd
-        }
-      };
-
-      var currency = {
-        code: 'sgd',
-        rate: 2,
-      };
-
-      merger.mergeResponse({
-        hotels: [hotel],
-        rates: [rate]
-      });
-
-      var oldHotels = merger.getHotels();
-      var oldHotel = oldHotels[0];
-
-      merger.updateCurrency(currency);
-
-      var newHotels = merger.getHotels();
-      var newHotel = newHotels[0];
-
-      expect(newHotel.rates[0].price.amount).to.equal(20);
-      expect(newHotel.rates[0].price.totalAmount).to.equal(40);
-      expect(newHotels).to.not.equal(oldHotels);
-      expect(newHotel).to.not.equal(oldHotel);
-    });
-
     it('update minPrice', function() {
       merger.mergeResponse({
         filter: {

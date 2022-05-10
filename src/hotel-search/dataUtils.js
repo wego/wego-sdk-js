@@ -55,9 +55,8 @@ module.exports = {
     }
   },
 
-  prepareRate: function (rate, currency, staticData) {
+  prepareRateProvider: function (rate, staticData) {
     rate.provider = staticData.providers[rate.providerCode];
-    rate.price = this.convertPrice(rate.price, currency);
   },
 
   convertPrice: function (price, currency) {
