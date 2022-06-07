@@ -17,7 +17,6 @@ class FlightSearchClient {
     self.appType = options.appType || "WEB_APP";
     self.userLoggedIn = options.userLoggedIn;
     self.paymentMethodIds = options.paymentMethodIds || [];
-    self.liveProviderCodes = options.liveProviderCodes;
     self.providerTypes = options.providerTypes || [];
     self.onProgressChanged = options.onProgressChanged || function () { };
     self.onSponsorsChanged = options.onSponsorsChanged || function () { };
@@ -31,6 +30,7 @@ class FlightSearchClient {
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.requestHeaders = options.requestHeaders;
     self.merger = new FlightSearchMerger();
+    self.extraBodyParams = options.extraBodyParams;
 
     self.poller = new Poller({
       initCallApi: () => {
@@ -171,7 +171,7 @@ class FlightSearchClient {
     let self = this;
     let search = self.search || {};
     let legs = search.legs || [];
-    const liveProviderCodes = self.liveProviderCodes;
+    const extraBodyParams = self.extraBodyParams;
 
     return {
       search: {
@@ -201,7 +201,7 @@ class FlightSearchClient {
       offset: self.processedFaresCount,
       paymentMethodIds: self.paymentMethodIds,
       providerTypes: self.providerTypes,
-      liveProviderCodes,
+      ...(!!extraBodyParams && { liveTestProviderCodes: extraBodyParams })
     };
   }
 
