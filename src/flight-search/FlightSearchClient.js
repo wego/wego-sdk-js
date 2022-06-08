@@ -201,7 +201,7 @@ class FlightSearchClient {
       offset: self.processedFaresCount,
       paymentMethodIds: self.paymentMethodIds,
       providerTypes: self.providerTypes,
-      ...(!!extraBodyParams && { liveTestProviderCodes: extraBodyParams })
+      ...(!!extraBodyParams && extraBodyParams)
     };
   }
 
