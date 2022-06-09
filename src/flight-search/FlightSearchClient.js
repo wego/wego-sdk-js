@@ -29,8 +29,8 @@ class FlightSearchClient {
     self.onProvidersChanged = options.onProvidersChanged || function () { };
     self.onSearchCreated = options.onSearchCreated || function () { };
     self.requestHeaders = options.requestHeaders;
-
     self.merger = new FlightSearchMerger();
+    self.extraBodyParams = options.extraBodyParams;
 
     self.poller = new Poller({
       initCallApi: () => {
@@ -171,6 +171,8 @@ class FlightSearchClient {
     let self = this;
     let search = self.search || {};
     let legs = search.legs || [];
+    const extraBodyParams = self.extraBodyParams;
+
     return {
       search: {
         id: self.responseSearch.id,
@@ -198,7 +200,8 @@ class FlightSearchClient {
       },
       offset: self.processedFaresCount,
       paymentMethodIds: self.paymentMethodIds,
-      providerTypes: self.providerTypes
+      providerTypes: self.providerTypes,
+      ...(!!extraBodyParams && extraBodyParams)
     };
   }
 
@@ -208,7 +211,7 @@ class FlightSearchClient {
       currencyCode: self.currency.code,
       locale: self.locale,
       paymentMethodIds: self.paymentMethodIds || [],
-      offset: self.processedFaresCount
+      offset: self.processedFaresCount,
     };
   }
 }
