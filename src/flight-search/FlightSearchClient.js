@@ -31,6 +31,7 @@ class FlightSearchClient {
     self.requestHeaders = options.requestHeaders;
     self.merger = new FlightSearchMerger();
     self.extraBodyParams = options.extraBodyParams;
+    self.campaignParams = options.campaignParams;
 
     self.poller = new Poller({
       initCallApi: () => {
@@ -207,11 +208,14 @@ class FlightSearchClient {
 
   fetchTripsParams() {
     let self = this;
+    const campaignParams = self.campaignParams;
+  
     return {
       currencyCode: self.currency.code,
       locale: self.locale,
       paymentMethodIds: self.paymentMethodIds || [],
       offset: self.processedFaresCount,
+      ...(!!campaignParams && campaignParams)
     };
   }
 }
