@@ -31,10 +31,11 @@ class FlightSearchClient {
     self.requestHeaders = options.requestHeaders;
     self.merger = new FlightSearchMerger();
     self.extraBodyParams = options.extraBodyParams;
+    self.campaignParams = options.campaignParams;
 
     self.poller = new Poller({
       initCallApi: () => {
-        return Api.searchTrips(flightSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale }, self.requestHeaders);
+        return Api.searchTrips(flightSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale, ...options.campaignParams }, self.requestHeaders);
       },
       callApi: () => {
         return Api.fetchTrips(flightSearchEndpointUrl, self.responseSearch.id, self.fetchTripsParams(), self.requestHeaders);
@@ -207,6 +208,7 @@ class FlightSearchClient {
 
   fetchTripsParams() {
     let self = this;
+    
     return {
       currencyCode: self.currency.code,
       locale: self.locale,
