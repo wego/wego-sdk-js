@@ -35,7 +35,7 @@ class FlightSearchClient {
 
     self.poller = new Poller({
       initCallApi: () => {
-        return Api.searchTrips(flightSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale }, self.requestHeaders);
+        return Api.searchTrips(flightSearchEndpointUrl, self.getSearchRequestBody(), { currencyCode: self.currency.code, locale: self.locale, ...options.campaignParams }, self.requestHeaders);
       },
       callApi: () => {
         return Api.fetchTrips(flightSearchEndpointUrl, self.responseSearch.id, self.fetchTripsParams(), self.requestHeaders);
@@ -208,14 +208,12 @@ class FlightSearchClient {
 
   fetchTripsParams() {
     let self = this;
-    const campaignParams = self.campaignParams;
-  
+    
     return {
       currencyCode: self.currency.code,
       locale: self.locale,
       paymentMethodIds: self.paymentMethodIds || [],
       offset: self.processedFaresCount,
-      ...(!!campaignParams && campaignParams)
     };
   }
 }
